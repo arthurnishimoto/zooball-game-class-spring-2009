@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/processing/core.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/tacTile/TouchAPI.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/processing/net.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/opengl.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/jogl-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/gluegen-rt-natives-linux-amd64.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/gluegen-rt-natives-linux-i586.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/gluegen-rt-natives-macosx-ppc.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/gluegen-rt-natives-macosx-universal.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/gluegen-rt-natives-windows-amd64.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/gluegen-rt-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/jogl.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/jogl-natives-linux-amd64.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/jogl-natives-linux-i586.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/jogl-natives-macosx-ppc.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/jogl-natives-macosx-universal.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Arthur Nishimoto/My Documents/workspace/Zooball/lib/opengl/jogl-natives-windows-amd64.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
