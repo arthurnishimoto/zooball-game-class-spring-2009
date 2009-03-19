@@ -1,0 +1,15 @@
+#summary Prototype Revision Goals.
+
+= Timeline =
+
+|| Version || Notes ||
+|| 0.1     || Initial version ||
+|| 0.2     || Controls and touch sensitivity ||
+|| 0.21    || Ball/bar collision detection added ||
+|| 0.22    || Gameplay borders, foosman collision box fixes ||
+|| 0.3     || Goal zone, scoring ||
+|| 0.3a    || Goal zone, scoring - Java/Eclipse port ||
+|| 0.4     || Mid-Semester Demo  ||
+|| 0.7     || Artwork/sound integration  ||
+|| 0.8     || Menus          ||
+|| 1.0     || Final Project  ||
