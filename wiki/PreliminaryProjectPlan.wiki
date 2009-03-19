@@ -1,0 +1,24 @@
+#summary Preliminary Project Plan.
+
+= Project Plan Projection =
+Updated 3/19/09
+
+||   || *Date*|| *Event*            || *Overall Goals*      ||
+||W  || 3/18 || Meeting             || 
+||F  || 3/19 || Class               || 
+||W  || 3/25 || UIC Spring Break    || 
+||F  || 3/27 || UIC Spring Break    || 
+||M  || 3/30 ||                     || Prepare demo elements - Adding artwork, sound to demo ||
+||W  || 4/1  || Meeting             || Finalize Demo        ||
+||Th || 4/2  ||                     || Test demo on TacTile ||
+||F  || 4/3  || Mid-Semester Review || 
+||W  || 4/8  || LSU Spring Break    || Planning advanced game elements ||
+||F  || 4/10 || LSU Spring Break    || 
+||W  || 4/15 || Meeting             || Finalize advanced game elements ||
+||F  || 4/17 || Class               || 
+||W  || 4/22 || Meeting             || Coding/Testing advanced game elements ||
+||F  || 4/24 || Class               || Integrating final sounds, artwork, code ||
+||W  || 4/8  || Meeting             || Finalize Project ||
+||F  || 4/10 || Class               || 
+||W  || 4/29 || Meeting             || Testing, bug checking ||
+||F  || 5/1  || Final Presentation  || 
