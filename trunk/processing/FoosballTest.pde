@@ -6,7 +6,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto (anishimo) - Infinite State Entertainment
- * Version: 0.225
+ * Version: 0.3
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -35,8 +35,11 @@
                 - [ADDED] Turret ball launcher
    3/19/09      - [ADDED] Pause button/menu - States for overall program
                 - [MODIFIED] Foosplayer::collide(ball[]) now tracks all recently hits balls and ignores them - fixes collision problems except for rare "corner" cases
+   3/20/09      - Version 0.3
+                - [ADDED] Goals and scoring
+                - [FIXED] Minor bugs with collision for ball, foosmen, and goal zone.
+                - [ADDED] After scoring, ball is given to other team. Launcher activated - Only tested with one ball
  * Notes:
- 	- [TODO] Fix collision for slower moving balls
  	- [TODO] Physics engine?
         - [TODO] 1-to-1 control over goalie zone?
         - [TODO] Full bar rotation?
@@ -52,12 +55,13 @@ import tacTile.net.*;
  
 // Overall Program Flags
 String programName = "Zooball";
-float versionNo = 0.225;
+float versionNo = 0.3;
 
 boolean connectToTacTile = false;
 boolean usingMouse = true;
 boolean applet = true;
-boolean debugText = true;
+boolean debugText = false;
+boolean debug2Text = false;
 
 color debugColor = color( 255, 255, 255 );
 
@@ -88,13 +92,15 @@ final static int MAIN_MENU = 0;
 final static int PAUSE = 1;
 final static int GAMEPLAY = 2;
 
-int borderWidth = 75;
+int lastScored = -1;
+
+int borderWidth = 0;
 int borderHeight = 100;
 
 float coinToss;
 int sliderMultiplier = 2;
 float tableFriction = 0.00; // Default = 0.01
-int fieldLines = 5; // Divisions, not actual lines. 1 line appears on screen edge - should be odd #
+int fieldLines = 9; // Divisions, not actual lines. 1 line appears on screen edge - should be odd #. Default = 9
 int nBars = fieldLines - 1;
 FoosBarManager barManager;
 ParticleManager particleManager;
@@ -102,18 +108,22 @@ ParticleManager particleManager;
 int nBalls = 1;
 int ballsInPlay = 0;
 int ballQueue = 0;
-Ball[] balls = new Ball[nBalls];
+Ball[] balls;
 
-Button resumeButton, resetButton;
+Button resumeButton, resetButton, quitButton;
 
 // Bottom player
+int bottomScore = 0;
 Turret ballLauncher_bottom;
 Button pauseButton_bottom;
+Button debugTextButton, debug2TextButton;
 
 // Top Player
+int topScore = 0;
 Turret ballLauncher_top;
 Button pauseButton_top;
 
+Goal leftGoal, rightGoal;
 
 /*
  * Setup Method
@@ -144,8 +154,12 @@ void setup() {
         screenWidth = 1280;
         screenHeight = 1024;
         size( 1280, 1024 ); // applet
-      }else
+      }else{
+        // TacTile Resolution
+        //screenWidth = 1920;
+        //screenHeight = 1080;
         size( screenWidth, screenHeight, OPENGL);
+      }
   }
 
   //color of the background
@@ -160,8 +174,11 @@ void setup() {
   font = loadFont("CourierNew36.vlw"); 
   
   // Program specific setup:
+  balls = new Ball[nBalls];
   timer_g = 0;
   ballsInPlay = 0;
+  bottomScore = 0;
+  topScore = 0;
   barManager = new FoosBarManager( fieldLines, 200 );
   particleManager = new ParticleManager( 2000, 5 );
   
@@ -172,8 +189,8 @@ void setup() {
   
   coinToss();
     
-  pauseButton_bottom = new Button( 50, borderWidth/2, 0 + borderHeight/2);
-  pauseButton_top = new Button( 50, screenWidth - borderWidth/2, screenHeight - borderHeight/2);
+  pauseButton_bottom = new Button( 50, 50 , 0 + borderHeight/2);
+  pauseButton_top = new Button( 50, screenWidth - 50, screenHeight - borderHeight/2);
   
   resumeButton = new Button( 100, screenWidth/4, screenHeight/2);
   resumeButton.setIdleColor(color(0,255,0));
@@ -182,6 +199,19 @@ void setup() {
   resetButton = new Button( 100, 3*screenWidth/4, screenHeight/2);
   resetButton.setIdleColor(color(0,255,100));
   resetButton.setButtonText("RESET");
+  
+  quitButton = new Button( 100, screenWidth/2, screenHeight/2);
+  quitButton.setIdleColor(color(0,100,100));
+  quitButton.setButtonText("QUIT");
+
+  leftGoal = new Goal( borderWidth, height/2, 100, 300 , 0);
+  rightGoal = new Goal( screenWidth-borderWidth-100, height/2, 100, 300 , 1);
+  
+  debugTextButton = new Button( 50, screenWidth - 50, screenHeight - borderHeight/2 - 75*1 );
+  debugTextButton.setIdleColor(color(0,50,50));
+  
+  debug2TextButton = new Button( 50, screenWidth - 50, screenHeight - borderHeight/2 - 75*2 );
+  debug2TextButton.setIdleColor(color(0,50,50));
   
   for( int i = 0; i < nBalls; i++ ){
     // Syntax: Ball(float newX, float newY, float newDiameter, int ID, Ball[] otr)
@@ -210,10 +240,11 @@ void draw() {
   rect( borderWidth, screenHeight-borderHeight, screenWidth-borderWidth*2, borderHeight ); // Bottom border
   rect( 0, borderHeight, borderWidth, screenHeight-borderHeight*2 ); // Left border
   rect( screenWidth-borderWidth, borderHeight, borderWidth, screenHeight-borderHeight*2 ); // Right border
-    
+
   if( ballsInPlay != 0 && ballsInPlay <= nBalls )
     coinToss();
-    
+  if( ballsInPlay == 0)
+    reloadBall();
   ballLauncher_bottom.display();
   ballLauncher_top.display();
   ballLauncher_bottom.displayTurret();
@@ -238,10 +269,23 @@ void draw() {
     }
   }// for all balls
   
+  leftGoal.collide(balls);
+  rightGoal.collide(balls);
+  
   barManager.display();
 
+  leftGoal.display();
+  if( leftGoal.scored() )
+    bottomScore ++;
+    
+  rightGoal.display();
+  if( rightGoal.scored() )
+    topScore ++;
+  
   pauseButton_top.display();
   pauseButton_bottom.display();
+  debugTextButton.display();
+  debug2TextButton.display();
   
   //Pause
   if( state == PAUSE ){
@@ -250,6 +294,7 @@ void draw() {
     rect( 0, 0, screenWidth, screenHeight );
     resumeButton.display();
     resetButton.display();
+    quitButton.display();
   }
   
   // Generic debug info
@@ -262,15 +307,22 @@ void draw() {
     text("Timer: "+timer_g, 16, 16*3);
     text("FPS: "+frameRate, 16, 16*4);
     text("Table Friction: "+tableFriction, 16, 16*5);
+    text("Top (Blue) Score: "+topScore, 16, 16*9);
+    text("Bottom (Red) Score: "+bottomScore, 16, 16*10);
+    text("Last Scored (Top = 0, Bottom = 1): "+lastScored, 16, 16*11);
     if(  nBalls > 0 ){
       text("Ball 0 Speed: "+balls[0].getSpeed(), 16, 16*6);
       text("Ball 0 xVel: "+balls[0].xVel, 16, 16*7);
       text("Ball 0 yVel: "+balls[0].yVel, 16, 16*8);
     }
     // Program specific debug info
-    if( state == GAMEPLAY ){
-      //barManager.displayDebug();
-      //particleManager.displayDebug();
+    if( state == GAMEPLAY && debug2Text){
+      barManager.displayDebug();
+      particleManager.displayDebug();
+      leftGoal.displayDebug();
+      rightGoal.displayDebug();
+      for( int i = 0; i < nBalls; i++ )
+        balls[i].displayDebug();
     }
   }// if debugtext
   
@@ -293,9 +345,6 @@ void checkInput(){
         fill( #FF0000 );
 	stroke( #FF0000 );
 	ellipse( xCoord, yCoord, 20, 20 );
-        //MTFinger fingerTest = new MTFinger(xCoord, yCoord, 20, null);
-        //fingerTest.display();
-        //fingerTest.displayDebug();
 
         // ANY CHANGES HERE MUST BE COPIED TO TOUCH ELSE-IF BELOW
         checkButtonHit(xCoord,yCoord, 1);
@@ -343,12 +392,38 @@ void checkButtonHit(float x, float y, int finger){
       state = GAMEPLAY;
     if(resetButton.isHit(x,y))
       setup();
+    if(quitButton.isHit(x,y))
+      exit();
   }else if( state == GAMEPLAY ){
+    
+    // Ball
     for( int i = 0; i < nBalls; i++ ){
       balls[i].isHit(x,y);
     }// for nBalls
+    
+    // Buttons
     if( pauseButton_top.isHit(x,y) || pauseButton_bottom.isHit(x,y))
       state = PAUSE;
+    
+    if( debugTextButton.isHit(x,y) ){
+      if(debugText){
+        debugText = false;
+        debugTextButton.setIdleColor(color(0,50,50));
+      }else{
+        debugText = true;
+        debugTextButton.setIdleColor(color(0,250,250));
+      }
+    }
+    if( debug2TextButton.isHit(x,y) ){
+      if(debug2Text){
+        debug2Text = false;
+        debug2TextButton.setIdleColor(color(0,50,50));
+      }else{
+        debug2Text = true;
+        debug2TextButton.setIdleColor(color(0,250,250));
+      }
+    }
+    
     barManager.barsPressed(x,y);
     ballLauncher_top.isHit(x,y);
     ballLauncher_top.rotateIsHit(x,y);
@@ -356,6 +431,14 @@ void checkButtonHit(float x, float y, int finger){
     ballLauncher_bottom.rotateIsHit(x,y);
   }
 }// checkButtonHit
+
+void reloadBall(){
+  if( lastScored == 0 ){
+    ballLauncher_bottom.enable();
+  }else if( lastScored == 1 ){
+    ballLauncher_top.enable();
+  }
+}// reloadBall
 
 void coinToss(){
   coinToss = random(2);
