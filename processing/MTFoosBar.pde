@@ -27,11 +27,11 @@ class MTFoosBar{
     teamColor = tColor;
     
     if(zoneFlag == 0){
-      yMinTouchArea = 0;
+      yMinTouchArea = borderHeight;
       yMaxTouchArea = height/2;
     }else if(zoneFlag == 1){
       yMinTouchArea = height/2;
-      yMaxTouchArea = height;
+      yMaxTouchArea = height/2 - borderHeight;
     }
     
     foosPlayers = new FoosPlayer[nPlayers];
@@ -315,7 +315,7 @@ class FoosPlayer{
         if( balls[i].xPos+balls[i].diameter/2 > xPos + playerWidth/2 + hitBuffer && balls[i].xPos+balls[i].diameter/2 < xPos + playerWidth + orig_Width/2 + hitBuffer)
           if( balls[i].yPos+balls[i].diameter/2 > yPos - hitBuffer && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight + hitBuffer )
             if(ballsRecentlyHit[i] == 1)
-              return false;
+              continue;
      
         if( balls[i].xPos+balls[i].diameter/2 > xPos + playerWidth/2 && balls[i].xPos+balls[i].diameter/2 < xPos + playerWidth + orig_Width/2)
           if( balls[i].yPos+balls[i].diameter/2 > yPos && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight ){
@@ -323,16 +323,16 @@ class FoosPlayer{
             balls[i].setColor(color(#FF0000));
             if( balls[i].xVel < 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight ){ // Ball is coming from the right && ball is hitting the right side
               balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }else if( balls[i].xVel > 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight){ // Ball is coming from the left && hitting left side
               balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }else if( balls[i].yVel > 0 && balls[i].xPos < xPos+playerWidth && balls[i].xPos > xPos+playerWidth/2){ // Ball is coming from the top && hitting top side
               balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }else if( balls[i].yVel < 0 && balls[i].xPos < xPos+playerWidth && balls[i].xPos > xPos+playerWidth/2){ // Ball is coming from the bottom && hitting bottom side
               balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }
             
         }// if has been hit 
@@ -344,7 +344,7 @@ class FoosPlayer{
         if( balls[i].xPos+balls[i].diameter/2 > xPos + playerWidth - hitBuffer && balls[i].xPos+balls[i].diameter/2 < xPos + abs(playerWidth)/2 + hitBuffer)
           if( balls[i].yPos+balls[i].diameter/2 > yPos - hitBuffer && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight + hitBuffer)
             if(ballsRecentlyHit[i] == 1)
-              return false;
+              continue;
         
         if( balls[i].xPos+balls[i].diameter/2 > xPos + playerWidth && balls[i].xPos+balls[i].diameter/2 < xPos + abs(playerWidth)/2 )
           if( balls[i].yPos+balls[i].diameter/2 > yPos && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight ){
@@ -352,16 +352,16 @@ class FoosPlayer{
             balls[i].setColor(color(#FF0000));
             if( balls[i].xVel < 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight ){ // Ball is coming from the right && ball is hitting the right side
               balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }else if( balls[i].xVel > 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight){ // Ball is coming from the left && hitting left side
               balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }else if( balls[i].yVel > 0 && balls[i].xPos > xPos+playerWidth && balls[i].xPos < xPos+playerWidth/2){ // Ball is coming from the top && hitting top side
               balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }else if( balls[i].yVel < 0 && balls[i].xPos > xPos+playerWidth && balls[i].xPos < xPos+playerWidth/2){ // Ball is coming from the bottom && hitting bottom side
               balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }
             
         }// if has been hit 
@@ -371,7 +371,7 @@ class FoosPlayer{
         if( balls[i].xPos+balls[i].diameter/2 > xPos - orig_Width  + hitBuffer && balls[i].xPos+balls[i].diameter/2 < xPos + orig_Width + hitBuffer)
           if( balls[i].yPos+balls[i].diameter/2 > yPos - hitBuffer && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight + hitBuffer)
             if(ballsRecentlyHit[i] == 1)
-              return false;
+              continue;
 
         if( balls[i].xPos+balls[i].diameter/2 > xPos - orig_Width/2 && balls[i].xPos+balls[i].diameter/2 < xPos + orig_Width )
           if( balls[i].yPos+balls[i].diameter/2 > yPos && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight ){
@@ -379,16 +379,16 @@ class FoosPlayer{
             balls[i].setColor(color(#FF0000));
             if( balls[i].xVel < 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight ){ // Ball is coming from the right && ball is hitting the right side
               balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }else if( balls[i].xVel > 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight){ // Ball is coming from the left && hitting left side
               balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }else if( balls[i].yVel > 0 && balls[i].xPos > xPos-orig_Width/2 && balls[i].xPos < xPos+orig_Width/2){ // Ball is coming from the top && hitting top side
               balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }else if( balls[i].yVel < 0 && balls[i].xPos > xPos-orig_Width/2 && balls[i].xPos < xPos+orig_Width/2){ // Ball is coming from the bottom && hitting bottom side
               balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              return true;
+              continue;
             }
             
           }// if has been hit   

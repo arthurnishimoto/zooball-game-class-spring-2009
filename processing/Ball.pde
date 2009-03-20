@@ -13,10 +13,10 @@ class Ball{
  
   Ball(float newX, float newY, float newDiameter, int ID, Ball[] otr){
     state = INACTIVE; // Initial state
-    xPos = newX;
-    yPos = newY;
+    xPos = screenWidth - 200; //newX;
+    yPos = random(screenHeight); //newY;
     xVel = 10;
-    yVel = 10;//random(5) + -1*random(5);
+    yVel = 0;//random(5) + -1*random(5);
     diameter = newDiameter;
     ID_no = ID;
     others = otr;
@@ -25,7 +25,7 @@ class Ball{
   void process(){
     if(state == ACTIVE){
       display();
-      //displayDebug();
+      displayDebug();
       move();
     }else if(state == INACTIVE){
       // inactive state
@@ -44,6 +44,10 @@ class Ball{
     state = ACTIVE;
   }// setActive
   
+  void setInactive(){
+    state = INACTIVE;
+  }// setActive
+  
   void setColor(color newColor){
     ballColor = newColor;
   }// setColor
@@ -53,9 +57,9 @@ class Ball{
       return;
       
     // Basic implementation
-    if( hitDirection == 1 || hitDirection == 3)
+    if( hitDirection == 1 || hitDirection == 3) // Reverse x
       xVel *= -1;
-    if( hitDirection == 2 || hitDirection == 3)
+    if( hitDirection == 2 || hitDirection == 3) // Reverse y
       yVel *= -1;
     xVel += xVeloc;
     yVel += yVeloc;
@@ -132,7 +136,6 @@ class Ball{
      fill(debugColor);
      textFont(font,16);
      text("ID: " + ID_no, xPos+diameter, yPos-diameter/2 );
-     //text("Speed: " + getSpeed(), xPos+diameter, yPos-diameter/2 + 16);
   }// displayDebug
   
   float getSpeed(){
