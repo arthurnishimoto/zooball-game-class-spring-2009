@@ -2,7 +2,7 @@
  * Represents a Two-Dimensional Vector
  *
  * @author Andy Bursavich
- * @version 0.5
+ * @version 0.1
  */
 public class Vector2D implements Cloneable {
   public float x;

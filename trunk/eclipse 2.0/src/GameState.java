@@ -6,8 +6,8 @@ import tacTile.net.*;
 /**
  * DOCUMENT ME!
  *
- * @author $author$
- * @version $Revision$
+ * @author Andy Bursavich
+ * @version 0.1
   */
 public interface GameState {
   /**

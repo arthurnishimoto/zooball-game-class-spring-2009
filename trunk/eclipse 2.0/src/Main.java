@@ -11,8 +11,8 @@ import javax.swing.JOptionPane;
 /**
  * Sets up Processing and the TacTile then calls game loop
  *
- * @author $author$
- * @version $Revision$
+ * @author Andy Bursavich
+ * @version 0.1
  */
 public class Main extends PApplet {
   private static final long serialVersionUID = 7150518280552892074L;
@@ -59,7 +59,7 @@ public class Main extends PApplet {
       if ( e.getKeyChar(  ) == 'd' ) {
         game.toggleDebugMode(  );
       } // end if
-      else if ( e.getKeyChar(  ) == 's' ) {
+      else if ( game.isDebugMode(  ) && ( e.getKeyChar(  ) == 's' ) ) {
         GameState state = game.getGameState(  );
 
         if ( state == game.getMenuState(  ) ) {
@@ -75,9 +75,10 @@ public class Main extends PApplet {
           game.setState( game.getMenuState(  ) );
         } // end else if
       } // end else if
+      else if ( e.getKeyCode(  ) == KeyEvent.VK_ESCAPE ) {
+        game.setState( game.getLeavingState(  ) );
+      } // end else if
     } // end if
-
-    super.keyPressed( e );
   } // end keyPressed()
 
   /**

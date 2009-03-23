@@ -2,7 +2,7 @@
  * Clock intended to track time elapsed
  *
  * @author Andy Bursavich
- * @version 1.0
+ * @version 0.1
  */
 public class Timer {
   private boolean active;

@@ -8,7 +8,7 @@ import tacTile.net.TouchAPI;
  * DOCUMENT ME!
  *
  * @author Andy Bursavich
- * @version 0.5
+ * @version 0.1
  */
 public class GameLoadingState implements GameState {
   private static int BARS = 12;
@@ -50,29 +50,30 @@ public class GameLoadingState implements GameState {
     p.pushMatrix(  );
     // move to center of screen
     p.translate( p.width / 2, p.height / 2 );
+
     // Rotate clockwise by pi/3 radians (60 degrees) per second
-    p.rotateZ( PConstants.PI / 3.0f * timer.getSecondsActive(  ) );
+    float rotation = PConstants.PI / 3.0f * timer.getSecondsActive(  );
+
+    // Spin text clockwise
+    p.pushMatrix(  );
+    p.rotateZ( rotation );
     p.fill( 255 );
     p.textAlign( PConstants.CENTER );
+    // TODO: don't use debug font
     p.textFont( game.getDebugFont(  ), 32 );
     p.text( "ZOOBALL", 0, -2 );
     p.text( "LOADING", 0, p.textAscent(  ) + 2.0f );
+    p.popMatrix(  );
+
+    // Spin circle counter-clockwise
+    p.rotateZ( -rotation );
 
     for ( int b = 0; b < BARS; b++ ) {
       float percent = ( (float) b ) / BARS;
       p.pushMatrix(  );
       p.rotateZ( PConstants.TWO_PI * percent );
-      /*
-       * Alternate gradation of peices
-      if(b < 4) {
-        p.fill( 191 + (128 * (4 - b) / 6.0f) );
-      }
-      else p.fill(64);
-      */
-      p.fill( 255 * ( 1.0f - percent ) );
-      p.rect( -17.5f, 75.0f, 35.0f, 70.0f ); // down
-                                             //p.rect( 75.0f, -17.5f, 70.0f, 35.0f ); // right
-                                             //p.ellipse( 0, 110.0f, 35.0f, 70.0f );  
+      p.fill( 0, 0x66, 0xFF, 0xFF * ( 1.0f - percent ) );
+      p.rect( -17.5f, 75.0f, 35.0f, 70.0f );
 
       p.popMatrix(  );
     } // end for
