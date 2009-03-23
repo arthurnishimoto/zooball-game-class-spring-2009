@@ -6,8 +6,8 @@ import tacTile.net.TouchAPI;
 /**
  * DOCUMENT ME!
  *
- * @author $author$
- * @version $Revision$
+ * @author Andy Bursavich
+ * @version 0.1
  */
 public class GameOverState implements GameState {
   Game game;

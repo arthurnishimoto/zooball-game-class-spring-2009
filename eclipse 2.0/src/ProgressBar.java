@@ -4,8 +4,8 @@ import processing.core.PApplet;
 /**
  * DOCUMENT ME!
  *
- * @author $author$
- * @version $Revision$
+ * @author Andy Bursavich
+ * @version 0.1
  */
 public class ProgressBar {
   public static final int LEFT_TO_RIGHT = 0;

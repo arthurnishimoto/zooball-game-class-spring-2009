@@ -6,14 +6,13 @@ import tacTile.net.TouchAPI;
 /**
  * DOCUMENT ME!
  *
- * @author $author$
- * @version $Revision$
+ * @author Andy Bursavich
+ * @version 0.1
  */
 public class GameLeavingState implements GameState {
   private static int WAIT = 2000;
   private Game game;
-  private int begin;
-  private int elapsed;
+  private Timer timer;
 
 /**
    * Creates a new GameLeavingState object.
@@ -22,7 +21,7 @@ public class GameLeavingState implements GameState {
    */
   public GameLeavingState( Game game ) {
     this.game = game;
-    elapsed = 0;
+    timer = new Timer(  );
   } // end GameLeavingState()
 
   /**
@@ -34,9 +33,11 @@ public class GameLeavingState implements GameState {
   public void draw( PApplet p ) {
     p.background( 0 );
 
+    // TODO: thanks for playing, blah, blah, blah...
     if ( game.isDebugMode(  ) ) {
       game.printDebugLine( "Game State: Leaving" );
-      game.printDebugLine( String.format( "Framerate: %2d", (int) ( p.frameRate + 0.5f ) ) );
+      game.printDebugLine( "Frame Rate: " + (int) ( p.frameRate + 0.5f ) + " f/s" );
+      game.printDebugLine( "Timer: " + timer.getTimeActive(  ) );
     } // end if
   } // end draw()
 
@@ -47,7 +48,7 @@ public class GameLeavingState implements GameState {
    */
   @Override
   public void enter( PApplet p ) {
-    // TODO Auto-generated method stub
+    timer.setActive( true );
   } // end enter()
 
   /**
@@ -57,7 +58,7 @@ public class GameLeavingState implements GameState {
    */
   @Override
   public void exit( PApplet p ) {
-    // TODO Auto-generated method stub
+    timer.setActive( false );
   } // end exit()
 
   /**
@@ -67,9 +68,7 @@ public class GameLeavingState implements GameState {
    * @param tacTile DOCUMENT ME!
    */
   @Override
-  public void input( PApplet p, TouchAPI tacTile ) {
-    // TODO Auto-generated method stub
-  } // end input()
+  public void input( PApplet p, TouchAPI tacTile ) {} // end input()
 
   /**
    * DOCUMENT ME!
@@ -78,18 +77,10 @@ public class GameLeavingState implements GameState {
    */
   @Override
   public void update( PApplet p ) {
-    int time = p.millis(  );
+    timer.update(  );
 
-    if ( begin == -1 ) {
-      begin = time;
-      elapsed = 0;
+    if ( timer.getMillisecondsActive(  ) >= WAIT ) {
+      p.exit(  );
     } // end if
-    else {
-      elapsed = time - begin;
-
-      if ( elapsed >= WAIT ) {
-        p.exit(  );
-      } // end if
-    } // end else
   } // end update()
 } // end GameLeavingState

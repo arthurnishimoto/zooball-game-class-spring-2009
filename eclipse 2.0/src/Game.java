@@ -11,11 +11,12 @@ import java.util.Random;
 /**
  * DOCUMENT ME!
  *
- * @author $author$
- * @version $Revision$
+ * @author Andy Bursavich
+ * @version 0.1
  */
 public class Game {
   PApplet p;
+  private GameLeavingState leavingState;
   private GameMenuState menuState;
   private GameOverState overState;
   private GamePausedState pausedState;
@@ -49,6 +50,7 @@ public class Game {
     overState = new GameOverState( this );
     pausedState = new GamePausedState( this );
     playState = new GamePlayState( this );
+    leavingState = new GameLeavingState( this );
     setState( new GameLoadingState( this ) );
   } // end Game()
 
@@ -87,6 +89,15 @@ public class Game {
   public GameState getGameState(  ) {
     return state;
   } // end getGameState()
+
+  /**
+   * DOCUMENT ME!
+   *
+   * @return DOCUMENT ME!
+   */
+  public GameLeavingState getLeavingState(  ) {
+    return leavingState;
+  } // end getLeavingState()
 
   /**
    * DOCUMENT ME!
