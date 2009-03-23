@@ -1,4 +1,5 @@
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 import tacTile.net.TouchAPI;
 
@@ -47,6 +48,15 @@ public class GamePausedState implements GameState {
     // draw black translucent overlay
     p.fill( 0, 0, 0, 128 );
     p.rect( 0, 0, p.width, p.height );
+
+    // TODO: don't use debug font, make this pretty and mirror to both directions
+    p.pushMatrix(  );
+    p.fill( 255 );
+    p.translate( p.width / 2, p.height / 2 );
+    p.textAlign( PConstants.CENTER );
+    p.textFont( game.getDebugFont(  ), 32 );
+    p.text( "Paused", 0, p.textAscent(  ) / 2 );
+    p.popMatrix(  );
 
     // TODO: draw PAUSED/RESUME button (?)
 

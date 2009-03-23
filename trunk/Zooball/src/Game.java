@@ -52,6 +52,8 @@ public class Game {
     playState = new GamePlayState( this );
     leavingState = new GameLeavingState( this );
     setState( new GameLoadingState( this ) );
+
+    //setState(menuState);
   } // end Game()
 
   /**
@@ -186,7 +188,7 @@ public class Game {
     woodTexture = p.loadImage( "wood.tga" );
 
     // spin a while to test the loading screen
-    int max = Integer.MAX_VALUE >> 5;
+    int max = Integer.MAX_VALUE >> 6;
     Random r = new Random(  );
 
     for ( int i = 0; i < max; i++ ) {
