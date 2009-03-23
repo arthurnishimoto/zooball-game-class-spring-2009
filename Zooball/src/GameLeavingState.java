@@ -1,4 +1,5 @@
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 import tacTile.net.TouchAPI;
 
@@ -32,6 +33,17 @@ public class GameLeavingState implements GameState {
   @Override
   public void draw( PApplet p ) {
     p.background( 0 );
+
+    // TODO: don't use debug font, make this pretty and mirror to both directions
+    p.pushMatrix(  );
+    p.fill( 255 );
+    p.translate( p.width / 2, p.height / 2 );
+    p.textAlign( PConstants.CENTER );
+    p.textFont( game.getDebugFont(  ), 32 );
+    p.text( "Thanks for playing ZOOBALL!", 0, -6 );
+    p.textFont( game.getDebugFont(  ), 24 );
+    p.text( "Infinite State Entertainment", 0, p.textAscent(  ) + 6 );
+    p.popMatrix(  );
 
     // TODO: thanks for playing, blah, blah, blah...
     if ( game.isDebugMode(  ) ) {

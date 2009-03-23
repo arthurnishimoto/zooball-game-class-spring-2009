@@ -1,4 +1,5 @@
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 import tacTile.net.TouchAPI;
 
@@ -29,6 +30,23 @@ public class GameMenuState implements GameState {
   @Override
   public void draw( PApplet p ) {
     p.background( 0, 0, 0 );
+
+    // TODO: don't use debug font, make this pretty and mirror to both directions
+    p.pushMatrix(  );
+    p.fill( 255 );
+    p.translate( p.width / 2, p.height / 2 );
+    p.textAlign( PConstants.CENTER );
+    p.textFont( game.getDebugFont(  ), 32 );
+    p.text( "Menu", 0, p.textAscent(  ) / 2 );
+    /*
+    p.stroke(255, 0, 0);
+    p.strokeWeight(1.0f);
+    p.line(-100, 0, 100, 0);
+    p.line(0, -100, 0, 100);
+    p.line(-100, -100, 100, 100);
+    p.line(-100, 100, 100, -100);
+    */
+    p.popMatrix(  );
 
     if ( game.isDebugMode(  ) ) {
       game.printDebugLine( "Game State: Menu" );

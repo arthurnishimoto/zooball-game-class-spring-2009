@@ -1,4 +1,5 @@
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 import tacTile.net.TouchAPI;
 
@@ -28,8 +29,20 @@ public class GameOverState implements GameState {
    */
   @Override
   public void draw( PApplet p ) {
-    p.background( 0, 0, 0 );
+    p.background( 0 );
 
+    // TODO: don't use debug font, make this pretty and mirror to both directions
+    p.pushMatrix(  );
+    p.fill( 255 );
+    p.translate( p.width / 2, p.height / 2 );
+    p.textAlign( PConstants.CENTER );
+    p.textFont( game.getDebugFont(  ), 32 );
+    p.text( "Game Over", 0, p.textAscent(  ) / 2 );
+    p.popMatrix(  );
+
+    // TODO: draw PAUSED/RESUME button (?)
+
+    // draw debug text
     if ( game.isDebugMode(  ) ) {
       game.printDebugLine( "Game State: Over" );
       game.printDebugLine( "Frame Rate: " + (int) ( p.frameRate + 0.5f ) + " f/s" );

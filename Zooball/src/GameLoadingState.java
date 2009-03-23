@@ -47,6 +47,7 @@ public class GameLoadingState implements GameState {
     prgBarUpper.draw( p );
     prgBarLower.draw( p );
 
+    // TODO: create generalized "Spinner" class
     p.pushMatrix(  );
     // move to center of screen
     p.translate( p.width / 2, p.height / 2 );
