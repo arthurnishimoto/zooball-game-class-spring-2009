@@ -2,6 +2,9 @@ package ise.foosball;
 
 import ise.game.GameState;
 
+import ise.ui.Font;
+import ise.ui.MirroredLabel;
+
 import ise.utilities.Timer;
 
 import processing.core.PApplet;
@@ -13,9 +16,10 @@ import tacTile.net.TouchAPI;
  * TODO: DOCUMENT ME!
  *
  * @author Andy Bursavich
- * @version 0.1
+ * @version 0.2
  */
 public class FoosballPausedState implements GameState {
+  MirroredLabel mlblPaused;
   private FoosballGame game;
   private PApplet p;
   private Timer timer;
@@ -30,6 +34,8 @@ public class FoosballPausedState implements GameState {
     this.p = p;
     this.game = game;
     timer = new Timer(  );
+    mlblPaused = new MirroredLabel( p, "PAUSED", Font.getInstance( p, "Arial", 36 ),
+                                    p.width * 0.5f, p.height * 0.5f );
   } // end FoosballPausedState()
 
   /**
@@ -43,6 +49,8 @@ public class FoosballPausedState implements GameState {
     // draw black translucent overlay
     p.fill( 0, 0, 0, 128 );
     p.rect( 0, 0, p.width, p.height );
+
+    mlblPaused.draw(  );
 
     // TODO: draw PAUSED/RESUME button (?)
 
