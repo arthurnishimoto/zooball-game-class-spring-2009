@@ -1,8 +1,10 @@
+package ise.utilities;
+
 /**
- * Clock intended to track time elapsed
+ * Timer intended to track time elapsed
  *
  * @author Andy Bursavich
- * @version 0.1
+ * @version 0.2
  */
 public class Timer {
   private boolean active;
@@ -34,7 +36,7 @@ public class Timer {
     else if ( !active && this.active ) {
       activeTime += ( time - lastTime );
       lastTime = time;
-      active = false;
+      this.active = false;
     } // end else if
   } // end setActive()
 

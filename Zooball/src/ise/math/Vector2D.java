@@ -1,3 +1,5 @@
+package ise.math;
+
 /**
  * Represents a Two-Dimensional Vector
  *
