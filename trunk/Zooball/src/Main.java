@@ -1,3 +1,7 @@
+import ise.foosball.FoosballGame;
+
+import ise.game.GameState;
+
 import processing.core.PApplet;
 import processing.core.PConstants;
 
@@ -19,8 +23,9 @@ public class Main extends PApplet {
   private static final int DATA_PORT = 7000;
   private static final int MSG_PORT = 7340;
   private static String tacTileHost = "";
-  private Game game;
+  private FoosballGame game;
   private TouchAPI tacTile;
+  private boolean played = false;
 
   /**
    * Main method
@@ -46,7 +51,7 @@ public class Main extends PApplet {
    * Method called repeatedly by Processing
    */
   public void draw(  ) {
-    game.loop( this, tacTile );
+    game.loop( tacTile );
   } // end draw()
 
   /**
@@ -63,13 +68,20 @@ public class Main extends PApplet {
         GameState state = game.getGameState(  );
 
         if ( state == game.getMenuState(  ) ) {
+          game.getPlayState().init();
           game.setState( game.getPlayState(  ) );
         } // end if
         else if ( state == game.getPlayState(  ) ) {
-          game.setState( game.getPausedState(  ) );
+        	if (played) {
+        		game.setState( game.getOverState(  ) );
+        	}
+        	else {
+        		game.setState( game.getPausedState(  ) );
+        	}
+        	played = !played;
         } // end else if
         else if ( state == game.getPausedState(  ) ) {
-          game.setState( game.getOverState(  ) );
+          game.setState( game.getPlayState(  ) );
         } // end else if
         else if ( state == game.getOverState(  ) ) {
           game.setState( game.getMenuState(  ) );
@@ -88,6 +100,6 @@ public class Main extends PApplet {
     // I haven't been able to get the TouchAPI to run in eclipse
     //tacTile = new TouchAPI( this, DATA_PORT, MSG_PORT, tacTileHost );
     size( screen.width, screen.height, PConstants.OPENGL );
-    game = new Game( this );
+    game = new FoosballGame( this );
   } // end setup()
 } // end Main
