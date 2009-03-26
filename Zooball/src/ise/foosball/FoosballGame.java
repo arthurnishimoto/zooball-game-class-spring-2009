@@ -10,8 +10,6 @@ import processing.core.PApplet;
 
 import tacTile.net.TouchAPI;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Random;
 
 
@@ -19,15 +17,15 @@ import java.util.Random;
  * TODO: DOCUMENT ME!
  *
  * @author Andy Bursavich
- * @version 0.1
+ * @version 0.2
  */
 public class FoosballGame extends Game {
+  private DebugOutput lblDebug;
   private FoosballLeavingState leavingState;
   private FoosballMenuState menuState;
   private FoosballOverState overState;
   private FoosballPausedState pausedState;
   private FoosballPlayState playState;
-  private DebugOutput lblDebug;
   private PApplet p;
   private boolean debugMode = false;
   private volatile boolean loaded;
@@ -50,9 +48,9 @@ public class FoosballGame extends Game {
     setState( new FoosballLoadingState( p, this ) );
     // debug label 
     lblDebug = new DebugOutput( p, Font.getInstance( p, "Arial Bold", 14 ), 20, 20 );
-    lblDebug.setAnchor( Label.LEFT, Label.TOP );
+    lblDebug.setAnchor( DebugOutput.LEFT, DebugOutput.TOP );
     lblDebug.setTextAlignment( Label.LEFT, Label.TOP );
-  } // end Foosball()
+  } // end FoosballGame()
 
   /**
    * DOCUMENT ME!
@@ -140,7 +138,7 @@ public class FoosballGame extends Game {
    */
   public void load(  ) {
     // spin a while to test the loading screen
-    int max = Integer.MAX_VALUE >> 6;
+    int max = Integer.MAX_VALUE >> 5;
     Random r = new Random(  );
 
     for ( int i = 0; i < max; i++ ) {
@@ -158,6 +156,7 @@ public class FoosballGame extends Game {
   @Override
   public void loop( TouchAPI tacTile ) {
     if ( debugMode ) {
+      lblDebug.clearLines(  );
       addDebugLine( "Game State: " + state.toString(  ) );
       addDebugLine( "Frame Rate: " + (int) ( p.frameRate + 0.5f ) + " f/s" );
     } // end if
@@ -165,7 +164,12 @@ public class FoosballGame extends Game {
     super.loop( tacTile );
 
     if ( debugMode ) {
-    	lblDebug.draw();
+      lblDebug.setLocation( 20, 20 );
+      lblDebug.setFacingDirection( DebugOutput.BOTTOM );
+      lblDebug.draw(  );
+      lblDebug.setLocation( p.width - 20, p.height - 20 );
+      lblDebug.setFacingDirection( DebugOutput.TOP );
+      lblDebug.draw(  );
     } // end if
   } // end loop()
 
@@ -175,4 +179,4 @@ public class FoosballGame extends Game {
   public void toggleDebugMode(  ) {
     debugMode = !debugMode;
   } // end toggleDebugMode()
-} // end Foosball
+} // end FoosballGame

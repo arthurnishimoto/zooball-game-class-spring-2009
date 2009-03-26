@@ -16,7 +16,7 @@ import tacTile.net.TouchAPI;
  * TODO: DOCUMENT ME!
  *
  * @author Andy Bursavich
- * @version 0.1
+ * @version 0.2
  */
 public class FoosballLeavingState implements GameState {
   private FoosballGame game;
@@ -94,5 +94,8 @@ public class FoosballLeavingState implements GameState {
     if ( timer.getMillisecondsActive(  ) >= 2000 ) {
       System.exit( 0 );
     } // end if
+    else if(game.isDebugMode()) {
+    	game.addDebugLine("Timer: " + timer.getTimeActive());
+    }
   } // end update()
 } // end FoosballLeavingState

@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * TODO: DOCUMENT ME!
  *
  * @author Andy Bursavich
- * @version 0.1
+ * @version 0.2
  */
 public class DebugOutput extends Label {
   protected ArrayList<String> lines;
@@ -22,7 +22,7 @@ public class DebugOutput extends Label {
    * @param y DOCUMENT ME!
    */
   public DebugOutput( PApplet p, float x, float y ) {
-    super( p, new String[] {}, x, y );
+    super( p, new String[] {  }, x, y );
 
     // TODO Auto-generated constructor stub
   } // end DebugOutput()
@@ -36,7 +36,7 @@ public class DebugOutput extends Label {
    * @param y DOCUMENT ME!
    */
   public DebugOutput( PApplet p, Font font, float x, float y ) {
-    super( p, new String[] {}, font, x, y );
+    super( p, new String[] {  }, font, x, y );
 
     // TODO Auto-generated constructor stub
   } // end DebugOutput()
@@ -52,7 +52,7 @@ public class DebugOutput extends Label {
    * @param height DOCUMENT ME!
    */
   public DebugOutput( PApplet p, Font font, float x, float y, float width, float height ) {
-    super( p, new String[] {}, font, x, y, width, height );
+    super( p, new String[] {  }, font, x, y, width, height );
 
     // TODO Auto-generated constructor stub
   } // end DebugOutput()
@@ -78,9 +78,7 @@ public class DebugOutput extends Label {
   /**
    * TODO: DOCUMENT ME!
    */
-  @Override
-  protected void drawComponent(  ) {
-    super.drawComponent(  );
-    text = new String[] {};
-  } // end drawComponent()
+  public void clearLines(  ) {
+    text = new String[] {  };
+  } // end clearLines()
 } // end DebugOutput
