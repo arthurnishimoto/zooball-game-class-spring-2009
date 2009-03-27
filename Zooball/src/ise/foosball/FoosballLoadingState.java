@@ -3,8 +3,8 @@ package ise.foosball;
 import ise.game.GameState;
 
 import ise.ui.Font;
+import ise.ui.MirroredLabel;
 import ise.ui.ProgressBar;
-import ise.ui.RotatingMirroredLabel;
 
 import ise.utilities.Timer;
 
@@ -18,14 +18,14 @@ import tacTile.net.TouchAPI;
  * TODO: DOCUMENT ME!
  *
  * @author Andy Bursavich
- * @version 0.2
+ * @version 0.3
  */
 public class FoosballLoadingState implements GameState {
   private FoosballGame game;
   private PApplet p;
   private ProgressBar prgBarLower;
   private ProgressBar prgBarUpper;
-  private RotatingMirroredLabel rlblLoading;
+  private MirroredLabel mlblLoading;
   private Timer timer;
 
 /**
@@ -39,10 +39,9 @@ public class FoosballLoadingState implements GameState {
     this.game = game;
     timer = new Timer(  );
 
-    rlblLoading = new RotatingMirroredLabel( p, "LOADING", Font.getInstance( p, "Arial", 36 ),
+    mlblLoading = new MirroredLabel( p, "LOADING", Font.getInstance( p, "Arial", 36 ),
                                              p.width * 0.5f, p.height * 0.5f );
-    rlblLoading.setTimer( timer );
-    rlblLoading.setRevolutionsPerSecond( 0.25f );
+    mlblLoading.setRevolutionsPerSecond( 0.25f, timer );
 
     float padding = 35.0f;
     float height = 35.0f;
@@ -66,8 +65,8 @@ public class FoosballLoadingState implements GameState {
 
     // Rotate clockwise by pi/3 radians (60 degrees) per second
     float rotation = PConstants.TWO_PI * 0.25f * timer.getSecondsActive(  );
-    float innerRadius = ( (float) Math.sqrt( ( rlblLoading.getWidth(  ) * rlblLoading.getWidth(  ) ) +
-                                             ( rlblLoading.getHeight(  ) * rlblLoading.getHeight(  ) ) ) * 0.5f ) +
+    float innerRadius = ( (float) Math.sqrt( ( mlblLoading.getWidth(  ) * mlblLoading.getWidth(  ) ) +
+                                             ( mlblLoading.getHeight(  ) * mlblLoading.getHeight(  ) ) ) * 0.5f ) +
                         10;
     float outterRadius = innerRadius + 35f;
     int sections = 64;
@@ -98,7 +97,7 @@ public class FoosballLoadingState implements GameState {
 
     prgBarUpper.draw(  );
     prgBarLower.draw(  );
-    rlblLoading.draw(  );
+    mlblLoading.draw(  );
   } // end draw()
 
   /**
@@ -161,7 +160,7 @@ public class FoosballLoadingState implements GameState {
       // TODO: Rewrite ProgressBar as a Component
       prgBarUpper.update( timer );
       prgBarLower.update( timer );
-      rlblLoading.update(  );
+      //mlblLoading.update(  );
     } // end else
   } // end update()
 } // end FoosballLoadingState
