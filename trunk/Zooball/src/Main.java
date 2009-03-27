@@ -61,10 +61,10 @@ public class Main extends PApplet {
    */
   public void keyPressed( KeyEvent e ) {
     if ( game != null ) {
-      if ( e.getKeyChar(  ) == 'd' ) {
+      if ( e.getKeyChar(  ) == 'd' || e.getKeyChar(  ) == 'D' ) {
         game.toggleDebugMode(  );
       } // end if
-      else if ( game.isDebugMode(  ) && ( e.getKeyChar(  ) == 's' ) ) {
+      else if ( game.isDebugMode(  ) && ( e.getKeyChar(  ) == 's' || e.getKeyChar(  ) == 'S' ) ) {
         GameState state = game.getGameState(  );
 
         if ( state == game.getMenuState(  ) ) {
