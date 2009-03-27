@@ -2,6 +2,8 @@ package ise.ui;
 
 import ise.math.Vector2D;
 
+import ise.utilities.Timer;
+
 import processing.core.PApplet;
 import processing.core.PConstants;
 
@@ -12,7 +14,7 @@ import processing.core.PConstants;
  * checkboxes, and images of a typical graphical user interface.
  *
  * @author Andy Bursavich
- * @version 0.1
+ * @version 0.2
  */
 public abstract class Component {
   public static final int LEFT = 0;
@@ -22,11 +24,14 @@ public abstract class Component {
   public static final int MIDDLE = 4;
   public static final int BOTTOM = 5;
   protected PApplet p;
+  protected Timer timer;
   protected boolean visible = true;
   protected float height = 0;
   protected float preferredHeight = 0;
   protected float preferredWidth = 0;
+  protected float radiansPerSecond = 0;
   protected float rotation = 0;
+  protected float rotationFacing = 0;
   protected float width = 0;
   protected float x = 0;
   protected float y = 0;
@@ -64,16 +69,16 @@ public abstract class Component {
    */
   public void setFacingDirection( int direction ) {
     if ( direction == BOTTOM ) {
-      rotation = 0f;
+      rotationFacing = 0f;
     } // end if
     else if ( direction == TOP ) {
-      rotation = PConstants.PI;
+      rotationFacing = PConstants.PI;
     } // end else if
     else if ( direction == RIGHT ) {
-      rotation = PConstants.PI + PConstants.HALF_PI;
+      rotationFacing = PConstants.PI + PConstants.HALF_PI;
     } // end else if
     else { // LEFT
-      rotation = PConstants.HALF_PI;
+      rotationFacing = PConstants.HALF_PI;
     } // end else
   } // end setFacingDirection()
 
@@ -137,27 +142,31 @@ public abstract class Component {
   } // end getLocation()
 
   /**
-   * TODO: DOCUMENT ME!
+   * Sets the preferred height for this Component. The component decides whether or not to
+   * honor the request. For example, if the preferred height is too small for a Label to display
+   * its text in its font, the Label will set its height to the smallest possible to fit its text.
    *
-   * @param height DOCUMENT ME!
+   * @param height The preferred height.
    */
   public void setPreferredHeight( float height ) {
     preferredHeight = height;
   } // end setPreferredHeight()
 
   /**
-   * TODO: DOCUMENT ME!
+   * Gets the preferred height of this component.
    *
-   * @return DOCUMENT ME!
+   * @return This component's preferred height.
    */
   public float getPreferredHeight(  ) {
     return preferredHeight;
   } // end getPreferredHeight()
 
   /**
-   * TODO: DOCUMENT ME!
+   * Sets the preferred size for this Component. The component decides whether or not to
+   * honor the request. For example, if the preferred height is too small for a Label to display
+   * its text in its font, the Label will set its height to the smallest possible to fit its text.
    *
-   * @param size DOCUMENT ME!
+   * @param size The preferred size. The x value represents width. The y value represents height.
    */
   public void setPreferredSize( Vector2D size ) {
     preferredWidth = size.x;
@@ -165,10 +174,12 @@ public abstract class Component {
   } // end setPreferredSize()
 
   /**
-   * TODO: DOCUMENT ME!
+   * Sets the preferred size for this Component. The component decides whether or not to
+   * honor the request. For example, if the preferred height is too small for a Label to display
+   * its text in its font, the Label will set its height to the smallest possible to fit its text.
    *
-   * @param width DOCUMENT ME!
-   * @param height DOCUMENT ME!
+   * @param width The preferred width.
+   * @param height The preferred height.
    */
   public void setPreferredSize( float width, float height ) {
     preferredWidth = width;
@@ -176,34 +187,37 @@ public abstract class Component {
   } // end setPreferredSize()
 
   /**
-   * TODO: DOCUMENT ME!
+   * Gets the preferred size of this Component.
    *
-   * @return DOCUMENT ME!
+   * @return A Vector2D representing the preferred size. The x value represents width. The y value
+   *         represents height.
    */
   public Vector2D getPreferredSize(  ) {
     return new Vector2D( preferredWidth, preferredHeight );
   } // end getPreferredSize()
 
   /**
-   * TODO: DOCUMENT ME!
+   * Sets the preferred width for this Component. The component decides whether or not to
+   * honor the request. For example, if the preferred width is too small for a Label to display
+   * its text in its font, the Label will set its width to the smallest possible to fit its text.
    *
-   * @param width DOCUMENT ME!
+   * @param width The preferred width.
    */
   public void setPreferredWidth( float width ) {
     preferredWidth = width;
   } // end setPreferredWidth()
 
   /**
-   * TODO: DOCUMENT ME!
+   * Gets the preferred width of this Component.
    *
-   * @return DOCUMENT ME!
+   * @return The preferred width.
    */
   public float getPreferredWidth(  ) {
     return preferredWidth;
   } // end getPreferredWidth()
 
   /**
-   * Gets the rotation of this Component.
+   * Gets the rotation of this Component relative to its facing direction.
    *
    * @return The rotation of this Component in radians.
    */
@@ -262,51 +276,99 @@ public abstract class Component {
    * This method must be implemented to draw the component.
    */
   public final void draw(  ) {
-    float x = 0;
-    float y = 0;
-    p.pushMatrix(  );
+    if ( visible ) {
+      float xTranslation = 0;
+      float yTranslation = 0;
+      float zRotation = rotationFacing + rotation;
 
-    p.translate( this.x, this.y );
-    p.rotateZ( rotation );
+      if ( timer != null ) {
+        zRotation += ( radiansPerSecond * timer.getSecondsActive() );
+      }
 
-    // If verticalAnchor == TOP, do nothing
-    if ( verticalAnchor == MIDDLE ) {
-      y = -0.5f * height;
+      p.pushMatrix(  );
+
+      p.translate( this.x, this.y );
+      p.rotateZ( zRotation );
+
+      // If verticalAnchor == TOP, do nothing
+      if ( verticalAnchor == MIDDLE ) {
+        yTranslation = -0.5f * height;
+      } // end if
+      else if ( verticalAnchor == BOTTOM ) {
+        yTranslation = -height;
+      } // end else if
+
+      // If horizontalAnchor == LEFT, do nothing
+      if ( horizontalAnchor == CENTER ) {
+        xTranslation = -0.5f * width;
+      } // end if
+      else if ( horizontalAnchor == RIGHT ) {
+        xTranslation = -width;
+      } // end else if
+
+      p.translate( xTranslation, yTranslation );
+
+      /*
+         // DEBUG - Box Around Component
+         p.stroke( 225, 0, 0 );
+         p.fill( 0, 0, 0, 0 );
+         p.rect( 0, 0, width, height );
+         // END DEBUG
+       */
+      drawComponent(  );
+
+      p.popMatrix(  );
     } // end if
-    else if ( verticalAnchor == BOTTOM ) {
-      y = -height;
-    } // end else if
-
-    // If horizontalAnchor == LEFT, do nothing
-    if ( horizontalAnchor == CENTER ) {
-      x = -0.5f * width;
-    } // end if
-    else if ( horizontalAnchor == RIGHT ) {
-      x = -width;
-    } // end else if
-
-    p.translate( x, y );
-
-    /*
-       // DEBUG - Box Around Component
-       p.stroke( 225, 0, 0 );
-       p.fill( 0, 0, 0, 0 );
-       p.rect( 0, 0, width, height );
-       // END DEBUG
-     */
-    drawComponent(  );
-
-    p.popMatrix(  );
   } // end draw()
 
   /**
-   * TODO: DOCUMENT ME!
+   * Sets the current rotation of this Component. If
    *
    * @param rotation DOCUMENT ME!
    */
   public void setRotation( float rotation ) {
     this.rotation = rotation;
   } // end setRotation()
+
+  /**
+   * Sets the revolutions the Label will make per second. The Timer must also be set for rotation to occur.
+   *
+   * @param revolutionsPerSecond Revolutions per second. Positive values result in clockwise
+   *        rotation. Negative values result in counter-clockwise rotation.
+   */
+  public void setRevolutionsPerSecond( float revolutionsPerSecond ) {
+    this.radiansPerSecond = PConstants.TWO_PI * revolutionsPerSecond;
+  } // end setRotationsPerSecond()
+  
+  /**
+   * Sets the revolutions the Label will make per second.
+   *
+   * @param revolutionsPerSecond Revolutions per second. Positive values result in clockwise
+   *        rotation. Negative values result in counter-clockwise rotation.
+   * @param timer The timer used to rotate the Component. Rotation only occurs while the Timer is active.
+   */
+  public void setRevolutionsPerSecond( float revolutionsPerSecond, Timer timer ) {
+	this.timer = timer;
+	setRevolutionsPerSecond(revolutionsPerSecond);
+  } // end setRotationsPerSecond()
+
+  /**
+   * Sets the timer associated with this Component. The Timer is used to calculate rotation but may also be used for other animation purposes.
+   * 
+   * @param timer The Timer.
+   */
+  public void setTimer(Timer timer) {
+	  this.timer = timer;
+  }
+  
+  /**
+   * Gets the timer associated with this Component. The Timer is used to calculate rotation but may also be used for other animation purposes.
+   * 
+   * @param timer The Timer.
+   */
+  public void getTimer(Timer timer) {
+	  
+  }
 
   /**
    * Gets the width of this Component.
@@ -352,11 +414,6 @@ public abstract class Component {
   public float getY(  ) {
     return y;
   } // end getY()
-
-  /**
-   * Updates this Component.
-   */
-  public void update(  ) {}
 
   /**
    * This draws the Component. When called, the PApplet's current transformation matrix is
