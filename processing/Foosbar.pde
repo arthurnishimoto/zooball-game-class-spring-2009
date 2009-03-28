@@ -1,20 +1,38 @@
-
-class MTFoosBar{
-  float xPos, yPos, barWidth, barHeight, yMinTouchArea = 0, yMaxTouchArea = screenHeight/2;
+/**---------------------------------------------
+ * Foosbar.pde
+ *
+ * Description: Foosbar object containing foosmen
+ *
+ * Class: CS 426 Spring 2009
+ * System: Processing 1.0.1, Windows XP SP2/Windows Vista
+ * Author: Arthur Nishimoto - Infinite State Entertainment
+ * Version: 0.1
+ * 
+ * Version Notes:
+ * 3/1/09    - Initial version
+ * 3/28/09    - FSM implementation
+ */
+ 
+class Foosbar{
+  float xPos, yPos, barWidth, barHeight, yMinTouchArea, yMaxTouchArea;
   color teamColor;
   float buttonPos;
   float buttonValue;
   boolean pressed, active, xSwipe, ySwipe, hasBall, atTopEdge, atBottomEdge;
   float xMove, yMove, rotation;
   float swipeThreshold = 30.0;
-  int nPlayers;
+  int sliderMultiplier = 2;
+  int nPlayers, zoneFlag;
   MTFinger fingerTest;
-  FoosPlayer[] foosPlayers;
+  Foosman[] foosPlayers;
+  Ball[] ballArray;
   
   int playerWidth = 65;
   int playerHeight = 100;
   
-  MTFoosBar(float new_xPos, float new_yPos, float new_barWidth, float new_barHeight, int players, color tColor, int zoneFlag){
+  int screenWidth, screenHeight, borderWidth, borderHeight;
+  
+  Foosbar(float new_xPos, float new_yPos, float new_barWidth, float new_barHeight, int players, color tColor, int zoneFlg){
     xPos = new_xPos;
     yPos = new_yPos;
     barWidth = new_barWidth;
@@ -25,7 +43,10 @@ class MTFoosBar{
     atTopEdge = false;
     atBottomEdge = false;
     teamColor = tColor;
-    
+    zoneFlag = zoneFlg;
+  }// CTOR
+  
+  void generateBars(){
     if(zoneFlag == 0){
       yMinTouchArea = borderHeight;
       yMaxTouchArea = height/2;
@@ -34,10 +55,10 @@ class MTFoosBar{
       yMaxTouchArea = height/2 - borderHeight;
     }
     
-    foosPlayers = new FoosPlayer[nPlayers];
+    foosPlayers = new Foosman[nPlayers];
     //FoosPlayer( int x, int y, int newWidth, int newHeight)
     for( int i = 0; i < nPlayers; i++ ){
-      foosPlayers[i] = new FoosPlayer( xPos+barWidth/2, (i+1)*barHeight/(nPlayers+1)-playerWidth, playerWidth, playerHeight , this);
+      foosPlayers[i] = new Foosman( xPos+barWidth/2, (i+1)*barHeight/(nPlayers+1)-playerWidth, playerWidth, playerHeight, ballArray.length , this);
     }
   }// ScrollBar CTOR
   
@@ -61,9 +82,6 @@ class MTFoosBar{
     }else{
       ySwipe = false;
     }// if xSwipe
-    
-    
-
   }// display
   
   void displayZones(){
@@ -77,7 +95,7 @@ class MTFoosBar{
     rect(xPos, yMinTouchArea, barWidth, yMaxTouchArea);
   }// displayZones
   
-  void displayDebug(){
+  void displayDebug(color debugColor, PFont font){
     fill(debugColor);
     textFont(font,12);
 
@@ -92,7 +110,7 @@ class MTFoosBar{
       text("atBottomEdge", xPos, yPos+barHeight-16*2);
     
     for( int i = 0; i < nPlayers; i++ )
-      foosPlayers[i].displayDebug();
+      foosPlayers[i].displayDebug(debugColor, font);
   }// displayDebug
   
   boolean isHit( float xCoord, float yCoord ){
@@ -152,7 +170,7 @@ class MTFoosBar{
   }// isHit
   
   boolean ballInArea(Ball[] balls){
-    for( int i = 0; i < nBalls; i++ ){
+    for( int i = 0; i < balls.length; i++ ){
       if( !balls[i].isActive() )
         return false;
       if( balls[i].xPos > xPos && balls[i].xPos < xPos + barWidth ){
@@ -188,37 +206,77 @@ class MTFoosBar{
         foosPlayers[i].collide(balls);
     return false;
   }// collide
+ 
+  void reset(){
+    pressed = false;
+    xMove = 0;
+    yMove = 0;
+  }// reset
+  
+  // Setters and Getters
   
   void setButtonPos(float pos){
     buttonPos = -1*(yPos*pos-barWidth*pos-barHeight*pos-yPos);
     buttonValue = (yPos-buttonPos)/(yPos-barWidth-barHeight); // Update debug display
   }// setButtonPos
   
-  void reset(){
-    pressed = false;
-    xMove = 0;
-    yMove = 0;
-  }// reset
-}// class
+  // Setups ball pointers and screen dimentions before bar generation
+  void setupBars(int[] screenDim, Ball[] balls){
+    // Sets the screen size and border size - Used for edge collision
+    screenWidth = screenDim[0];
+    screenHeight = screenDim[1];
+    borderWidth = screenDim[2];
+    borderHeight = screenDim[3];
+    ballArray = balls;
+    generateBars(); // Create foosbars after screen/border dimentions are known
+  }// setupBars  
+}// class Foosbar
 
-class FoosPlayer{
+/**---------------------------------------------
+ * Foosmen.pde
+ *
+ * Description: Foosbar object containing foosmen
+ *
+ * Class: CS 426 Spring 2009
+ * System: Processing 1.0.1, Windows XP SP2/Windows Vista
+ * Author: Arthur Nishimoto - Infinite State Entertainment
+ * Version: 0.1
+ * 
+ * Version Notes:
+ * 3/1/09    - Initial version
+ * 3/28/09   - FSM implementation
+ */
+ 
+class Foosman{
+  PImage topImage = loadImage("foosman_top_h100.gif");
   float xPos, yPos, playerWidth, playerHeight, orig_Width;
   float hitBuffer = 20;
   boolean active, atTopEdge, atBottomEdge;
-  MTFoosBar parent;
-  int ballsRecentlyHit[] = new int[nBalls];
+  Foosbar parent;
+  int ballsRecentlyHit[];
+  int nBalls;
     
   //GLOBAL button time
   double buttonDownTime = 0.3;
   double buttonLastPressed = 0;
   
-  FoosPlayer( float x, float y, int newWidth, int newHeight, MTFoosBar new_parent){
+  int screenWidth, screenHeight, borderWidth, borderHeight;
+  
+  Foosman( float x, float y, int newWidth, int newHeight, int numBalls, Foosbar new_parent){
     xPos = x;
     yPos = y;
     playerWidth = newWidth;
     orig_Width = newWidth;
     playerHeight = newHeight;
     parent = new_parent;
+    ballsRecentlyHit = new int[numBalls];
+    nBalls = numBalls;
+    
+    // Sets the screen size and border size - Used for edge collision
+    screenWidth = parent.screenWidth;
+    screenHeight = parent.screenHeight;
+    borderWidth = parent.borderWidth;
+    borderHeight = parent.borderHeight;
   }// CTOR
   
   void display(){
@@ -241,14 +299,23 @@ class FoosPlayer{
     }
     fill( #000000 );
     playerWidth = 4*orig_Width*parent.rotation;
+    
+    
+    
+    
     rect(xPos, yPos, playerWidth, playerHeight);
+
+    image(topImage, xPos-orig_Width/2+17, yPos+playerHeight/2);
+    imageMode(CENTER);
     
     // Player Color
-    fill( parent.teamColor );
+    fill( parent.teamColor, 100 );
     rect(xPos-orig_Width/2, yPos, orig_Width, playerHeight);
+    
+
   }// display
   
-  void displayDebug(){
+  void displayDebug(color debugColor, PFont font){
     fill(debugColor);
     textFont(font,12);
 
@@ -411,4 +478,4 @@ class FoosPlayer{
     }// if-else-if button pressed
     return false;
   }// setDelay
-}//class
+}//class Foosman

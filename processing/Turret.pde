@@ -1,4 +1,18 @@
-
+/**---------------------------------------------
+ * Turret.pde
+ *
+ * Description: Rotating turret which can fire a projectile at a given angle and velocity.
+ *
+ * Class: CS 426 Spring 2009
+ * System: Processing 1.0.1, Windows XP SP2/Windows Vista
+ * Author: Arthur Nishimoto (anishimo)
+ * Version: 0.1
+ *
+ * Version Notes:
+ * 3/20/09	- Initial version 0.1
+ * ---------------------------------------------
+ */
+ 
 class Turret{
   float diameter, xPos, yPos;
   float rotateDiameter, rotateButtonPos, xCord, yCord, angle;
@@ -6,6 +20,7 @@ class Turret{
   boolean active, pressed, rotatePressed, hasImage, isRound, canRotate, facingUp;
   boolean alwaysShowRotate = false;
   boolean enable = false;
+  boolean armed = false;
   
   double buttonDownTime = 1;
   double buttonLastPressed = -1; // Starts active if < 0
@@ -98,7 +113,8 @@ class Turret{
     noStroke();
     translate(xPos, yPos);
     rotate(radians(angle));
-    //rect(-26 + currentRecoil, -13, -72, 25); // turret barrel
+    if(pressed)
+      rect(-26 + currentRecoil, -13, -72, 25); // turret barrel
     if( enable )
       fill(enabled_cl);
     else
@@ -107,7 +123,7 @@ class Turret{
     popMatrix();
   }// displayTurret
   
-  void displayDebug(){
+  void displayDebug(color debugColor, PFont font){
     fill(debugColor);
     textFont(font,16);
 
@@ -123,6 +139,7 @@ class Turret{
       text("Button Downtime Remain: 0", xPos+diameter, yPos-diameter/2+16*6);
   }// displayDebug
   
+  // Checks if central button has been hit
   boolean isHit( float xCoord, float yCoord ){
     if(!active || !enable)
       return false;
@@ -132,14 +149,20 @@ class Turret{
       }else if ( buttonLastPressed + buttonDownTime < timer_g){
         buttonLastPressed = timer_g;
         pressed = true;
-        shoot();
+        armed = true;
+        //shoot();
         return true;
       }// if-else-if button pressed
+
     }// if x, y in area
-    //pressed = false;
+     else if( armed && !rotatePressed){
+      shoot();
+      armed = false;
+    }
     return false;
   }// isHit
   
+  // Checks if outer rotate area has been hit
   boolean rotateIsHit( float xCoord, float yCoord ){
     if(!active || !enable)
       return false;
@@ -152,7 +175,7 @@ class Turret{
         yCord = yCoord-yPos;
         
         rotatePressed = true;
-        if( xCoord > rotate_xCord-rotateButtonDiameter/2 && xCoord < rotate_xCord+rotateButtonDiameter/2 && yCoord > rotate_yCord-rotateButtonDiameter/2 && yCoord < rotate_yCord+rotateButtonDiameter/2){
+        //if( xCoord > rotate_xCord-rotateButtonDiameter/2 && xCoord < rotate_xCord+rotateButtonDiameter/2 && yCoord > rotate_yCord-rotateButtonDiameter/2 && yCoord < rotate_yCord+rotateButtonDiameter/2){
           rotate_xCord = xCord+xPos;
           rotate_yCord = yCord+yPos;
         
@@ -162,7 +185,7 @@ class Turret{
           //buttonLastPressed = timer_g;
           canRotate = true;
           return true;
-        }// if touch in rotate button
+        //}// if touch in rotate button
       //}// if-else-if button pressed
     }// if x, y in area
   
@@ -170,19 +193,23 @@ class Turret{
   }// isHit
   
   void shoot(){
+    
     if( ballQueue == nBalls )
        ballQueue = 0;
     
     currentRecoil = recoil;
-    balls[ballQueue].xPos = xPos;
+    
+    float newXVel = fireVelocity*cos(radians(angle+180));
+    float newYVel = fireVelocity*sin(radians(angle+180));
+    float newXPos = xPos;
+    float newYPos;
     
     if( facingUp)
-      balls[ballQueue].yPos = yPos-50;
+      newYPos = yPos-50;
     else
-      balls[ballQueue].yPos = yPos+50;
-    balls[ballQueue].xVel = fireVelocity*cos(radians(angle+180));
-    balls[ballQueue].yVel = fireVelocity*sin(radians(angle+180));
-    balls[ballQueue].setActive();
+      newYPos = yPos+50;
+
+    balls[ballQueue].launchBall(newXPos, newYPos, newXVel, newYVel);
     ballsInPlay++;
     ballQueue++;
     disable();
@@ -205,4 +232,4 @@ class Turret{
   float getAngle(){
     return angle;
   }// getAngle
-}// class
+}// class Turret

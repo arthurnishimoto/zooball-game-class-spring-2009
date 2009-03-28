@@ -1,4 +1,17 @@
-
+/**---------------------------------------------
+ * MTButton.pde
+ *
+ * Description: Simple button class. Either uses a rectangular image or a basic circle
+ *
+ * Class: CS 426 Spring 2009
+ * System: Processing 1.0.1, Windows XP SP2/Windows Vista
+ * Author: Arthur Nishimoto - Infinite State Entertainment
+ * Version: 0.1
+ * 
+ * Version Notes:
+ * 2/6/09    - Initial version
+ */
+ 
 class Button{
   PImage buttonImage;
   int xPos, yPos;

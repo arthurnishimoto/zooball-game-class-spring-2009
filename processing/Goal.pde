@@ -1,4 +1,18 @@
-
+/**---------------------------------------------
+ * Goal.pde
+ *
+ * Description: Foosbar goal zone
+ *
+ * Class: CS 426 Spring 2009
+ * System: Processing 1.0.1, Windows XP SP2/Windows Vista
+ * Author: Arthur Nishimoto - Infinite State Entertainment
+ * Version: 0.1
+ * 
+ * Version Notes:
+ * 3/20/09    - Initial version
+ * 3/28/09    - FSM implementation
+ */
+ 
 class Goal{
   int state;
   final static int ACTIVE = 1;
@@ -6,16 +20,20 @@ class Goal{
   
   float xPos, yPos, goalWidth, goalHeight;
   float barWidth = 10;
-  int teamNumber;
+  int teamNumber, nBalls;
+  Ball[] balls;
   
-  int ballsRecentlyHit[] = new int[nBalls];
+  int ballsRecentlyHit[];
  
-  Goal( float new_xPos, float new_yPos, float newWidth, float newHeight, int teamNo ){
+  Goal( float new_xPos, float new_yPos, float newWidth, float newHeight, int teamNo, Ball[] theBalls){
     xPos = new_xPos;
     yPos = new_yPos - newHeight/2;
     goalWidth = newWidth;
     goalHeight = newHeight;
     teamNumber = teamNo;
+    balls = theBalls;
+    nBalls = balls.length;
+    ballsRecentlyHit = new int[nBalls];
   }// goal CTOR
   
   void display(){
@@ -25,12 +43,11 @@ class Goal{
     
     fill( 100 , 50 , 0 );
     stroke( 100 , 50 , 0 );
-    
     rect( xPos, 0, goalWidth, yPos ); // Top bar
     rect( xPos, yPos + goalHeight - barWidth, goalWidth, yPos ); // Bottom bar
   }// display
   
-  void displayDebug(){
+  void displayDebug(color debugColor, PFont font){
     textFont(font,16);
     fill(debugColor);
     for( int i = 0; i < nBalls; i++)
@@ -41,6 +58,7 @@ class Goal{
     return false;
   }// scored
   
+  // Check for balls colliding with the goal bars
   boolean collide(Ball[] balls){
     
     for( int i = 0; i < nBalls; i++ ){
@@ -65,9 +83,7 @@ class Goal{
         }// if
         if( ballX < xPos + goalWidth/2 ){ // GOOOOOOOAL!
           balls[i].setInactive();
-          bottomScore++;
-          lastScored = 1;
-          ballsInPlay--;
+          scored();
           continue;
         }
         if(ballsRecentlyHit[i] == 1)
@@ -86,9 +102,11 @@ class Goal{
         }// if
         if( ballX > xPos + goalWidth/2 ){ // GOOOOOOOAL!
           balls[i].setInactive();
-          topScore++;
-          lastScored = 0;
-          ballsInPlay--;
+          scored();
+          
+          //topScore++;
+          //lastScored = 0;
+          //ballsInPlay--;
           continue;
         }
         if(ballsRecentlyHit[i] == 1)
@@ -103,5 +121,5 @@ class Goal{
     return false;
   }// hasBall
   
-}// class
+}// class Goal
 
