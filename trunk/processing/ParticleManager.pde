@@ -57,7 +57,7 @@ class ParticleManager{
       particlesInUse = 0;
   }// moveParticles
   
-  void displayDebug(){
+  void displayDebug(color debugColor, PFont font){
     fill(debugColor);
     textFont(font,16);
     text("Particles: "+particlesInUse+" out of "+particleDensity, width-300 , 16 );
@@ -159,4 +159,4 @@ class ParticleManager{
      particlesInUse += effectDensity;
   }// waterCannonParticles
   
-}// class
+}// class ParticleManager

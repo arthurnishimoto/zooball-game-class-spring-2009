@@ -1,5 +1,5 @@
 /**---------------------------------------------
- * MTHandI.pro
+ * MTHandI.pde
  *
  * Description: Multi-Touch Hand Interface
  *
@@ -150,6 +150,24 @@
   }// calibrate
   
  }// class MTHandI
+ 
+ 
+ /**---------------------------------------------
+ * MTFinger.pde
+ *
+ * Description: Multi-Touch Finger used with MTHandI
+ *
+ * Class:
+ * System: Processing 1.0.1, Windows Vista
+ * Author: Arthur Nishimoto
+ * Version: 0.1
+ *
+ * Version Notes:
+ * 2/13/09	- Initial Version
+ *              - Uses timer_g and text needs a font
+ * 2/27/09      - Added support for horizontal or vertical finger swipes
+ * ---------------------------------------------
+ */
  
  class MTFinger{
    double buttonDownTime = 0.2;

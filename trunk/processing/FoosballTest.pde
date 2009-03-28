@@ -6,7 +6,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto (anishimo) - Infinite State Entertainment
- * Version: 0.3
+ * Version: 0.31
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -39,16 +39,22 @@
                 - [ADDED] Goals and scoring
                 - [FIXED] Minor bugs with collision for ball, foosmen, and goal zone.
                 - [ADDED] After scoring, ball is given to other team. Launcher activated - Only tested with one ball
+   3/28/09      - Version 0.31 - All classes except Turret have been modified to be independent of variables in main class. (ex debugColor/font, screenDim)
+                - [Modified] Turret control revised. Rotate shows direction choice and ball now fires on button release, not press.
+                - [Bugged] Revision of Goal class now prevents proper score keeping
+                - [Added] Foosman now accepts a single .gif image
  * Notes:
  	- [TODO] Physics engine?
         - [TODO] 1-to-1 control over goalie zone?
         - [TODO] Full bar rotation?
         - [TODO] Rewrite to FSM format
+        - [TODO] Every class should have its own setDebugText/color method. Also certain classes ( ball, foosplayer) should have a setPlayEdge(screenDimentions) method.
+                 Also complete comments and documentation for all classes.
         - [NOTE] Two close fingers to move bars works well on tacTile.
  * ---------------------------------------------
  */
 
-import processing.opengl.*; // Disabled for applet
+//import processing.opengl.*; // Disabled for applet
 
 import processing.net.*;
 import tacTile.net.*;
@@ -60,7 +66,7 @@ float versionNo = 0.3;
 boolean connectToTacTile = false;
 boolean usingMouse = true;
 boolean applet = true;
-boolean debugText = false;
+boolean debugText = true;
 boolean debug2Text = false;
 
 color debugColor = color( 255, 255, 255 );
@@ -97,15 +103,17 @@ int lastScored = -1;
 int borderWidth = 0;
 int borderHeight = 100;
 
+int[] screenDimentions = new int[4];
+
 float coinToss;
 int sliderMultiplier = 2;
 float tableFriction = 0.00; // Default = 0.01
-int fieldLines = 9; // Divisions, not actual lines. 1 line appears on screen edge - should be odd #. Default = 9
+int fieldLines = 5; // Divisions, not actual lines. 1 line appears on screen edge - should be odd #. Default = 9
 int nBars = fieldLines - 1;
-FoosBarManager barManager;
+FoosbarManager barManager;
 ParticleManager particleManager;
 
-int nBalls = 1;
+int nBalls = 10;
 int ballsInPlay = 0;
 int ballQueue = 0;
 Ball[] balls;
@@ -160,6 +168,10 @@ void setup() {
         //screenHeight = 1080;
         size( screenWidth, screenHeight, OPENGL);
       }
+      screenDimentions[0] = screenWidth;
+      screenDimentions[1] = screenHeight;
+      screenDimentions[2] = borderWidth;
+      screenDimentions[3] = borderHeight;
   }
 
   //color of the background
@@ -179,7 +191,7 @@ void setup() {
   ballsInPlay = 0;
   bottomScore = 0;
   topScore = 0;
-  barManager = new FoosBarManager( fieldLines, 200 );
+  barManager = new FoosbarManager( fieldLines, 200, screenDimentions, balls );
   particleManager = new ParticleManager( 2000, 5 );
   
   ballLauncher_bottom = new Turret( 75 , screenWidth/2 , screenHeight - 100, 150, 50);
@@ -204,8 +216,8 @@ void setup() {
   quitButton.setIdleColor(color(0,100,100));
   quitButton.setButtonText("QUIT");
 
-  leftGoal = new Goal( borderWidth, height/2, 100, 300 , 0);
-  rightGoal = new Goal( screenWidth-borderWidth-100, height/2, 100, 300 , 1);
+  leftGoal = new Goal( borderWidth, height/2, 100, 300 , 0, balls);
+  rightGoal = new Goal( screenWidth-borderWidth-100, height/2, 100, 300 , 1, balls);
   
   debugTextButton = new Button( 50, screenWidth - 50, screenHeight - borderHeight/2 - 75*1 );
   debugTextButton.setIdleColor(color(0,50,50));
@@ -216,7 +228,7 @@ void setup() {
   for( int i = 0; i < nBalls; i++ ){
     // Syntax: Ball(float newX, float newY, float newDiameter, int ID, Ball[] otr)
     //balls[i] = new Ball( width-borderWidth-50, height/2, 50, i, balls);
-    balls[i] = new Ball( borderWidth+random(width-borderWidth-100), borderHeight+random(height+borderHeight), 50, i, balls);
+    balls[i] = new Ball( borderWidth+random(width-borderWidth-100), borderHeight+random(height+borderHeight), 50, i, balls, screenDimentions);
     balls[i].friction = tableFriction;
   }
   
@@ -272,7 +284,7 @@ void draw() {
   leftGoal.collide(balls);
   rightGoal.collide(balls);
   
-  barManager.display();
+  barManager.process(balls);
 
   leftGoal.display();
   if( leftGoal.scored() )
@@ -317,12 +329,12 @@ void draw() {
     }
     // Program specific debug info
     if( state == GAMEPLAY && debug2Text){
-      barManager.displayDebug();
-      particleManager.displayDebug();
-      leftGoal.displayDebug();
-      rightGoal.displayDebug();
+      barManager.displayDebug(debugColor, font);
+      particleManager.displayDebug(debugColor, font);
+      leftGoal.displayDebug(debugColor, font);
+      rightGoal.displayDebug(debugColor, font);
       for( int i = 0; i < nBalls; i++ )
-        balls[i].displayDebug();
+        balls[i].displayDebug(debugColor, font);
     }
   }// if debugtext
   
@@ -374,7 +386,8 @@ void checkInput(){
                 // ANY CHANGES HERE MUST BE COPIED TO MOUSE IF ABOVE
                 checkButtonHit(xCoord, yCoord, finger);
 	}// for touchList
-  } */else {
+  }*/ else {
+    checkButtonHit(-100,-100,-1);
     // Reset objects based on timer_g
     for( int x = 0 ; x < fieldLines ; x++ ){
       barManager.reset();

@@ -1,3 +1,18 @@
+/**---------------------------------------------
+ * Particle.pde
+ *
+ * Description: Simple particle object with various preset colors
+ *              Used with the ParticleManager to generate particle effects
+ *
+ * Class: CS 426 Spring 2009
+ * System: Processing 1.0.1, Windows XP SP2/Windows Vista
+ * Author: Arthur Nishimoto - Infinite State Entertainment
+ * Version: 0.1
+ * 
+ * Version Notes:
+ * 2/6/09    - Initial version
+ */
+ 
 class Particle{
   boolean active = true;
   boolean gravity = false;
@@ -107,4 +122,4 @@ class Particle{
     ellipse(xPos, yPos, diameter, diameter);
 
   }// display
-}//class Bug
+}//class Particle
