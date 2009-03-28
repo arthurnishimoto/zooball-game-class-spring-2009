@@ -9,6 +9,7 @@
 || 0.22    || Gameplay borders, foosman collision box fixes ||
 || 0.3     || Goal zone, scoring ||
 || 0.3a    || Goal zone, scoring - Java/Eclipse port ||
+|| 0.31    || Changes to bar rotate mechanic - Spring loaded catapult? ||
 || 0.35    || Basic artwork/sound integration  ||
 || 0.4     || Mid-Semester Demo  ||
 || 0.6     || Advanced artwork/sound integration  ||
