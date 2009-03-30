@@ -3,6 +3,8 @@ package ise.foosball;
 import ise.game.GameState;
 
 import ise.ui.Font;
+import ise.ui.Label;
+import ise.ui.MirroredLabel;
 import ise.ui.MirroredLabel;
 import ise.ui.ProgressBar;
 
@@ -22,10 +24,10 @@ import tacTile.net.TouchAPI;
  */
 public class FoosballLoadingState implements GameState {
   private FoosballGame game;
+  private Label mlblLoading;
   private PApplet p;
   private ProgressBar prgBarLower;
   private ProgressBar prgBarUpper;
-  private MirroredLabel mlblLoading;
   private Timer timer;
 
 /**
@@ -39,9 +41,13 @@ public class FoosballLoadingState implements GameState {
     this.game = game;
     timer = new Timer(  );
 
-    mlblLoading = new MirroredLabel( p, "LOADING", Font.getInstance( p, "Arial", 36 ),
-                                             p.width * 0.5f, p.height * 0.5f );
+    mlblLoading = new MirroredLabel( p, new String[] { "LOADING" }, Font.getInstance( p, "Arial", 36 ),
+                                      p.width * 0.5f, p.height * 0.5f );
     mlblLoading.setRevolutionsPerSecond( 0.25f, timer );
+    mlblLoading.setPadding(10, 10, 10, 5);
+    //mlblLoading.setBackgroundColor( 255, 255, 255, 50);
+    //mlblLoading.setForegroundColor( 255, 255, 255 );
+    //mlblLoading.setBorderSize(5);
 
     float padding = 35.0f;
     float height = 35.0f;
@@ -66,8 +72,7 @@ public class FoosballLoadingState implements GameState {
     // Rotate clockwise by pi/3 radians (60 degrees) per second
     float rotation = PConstants.TWO_PI * 0.25f * timer.getSecondsActive(  );
     float innerRadius = ( (float) Math.sqrt( ( mlblLoading.getWidth(  ) * mlblLoading.getWidth(  ) ) +
-                                             ( mlblLoading.getHeight(  ) * mlblLoading.getHeight(  ) ) ) * 0.5f ) +
-                        10;
+                                             ( mlblLoading.getHeight(  ) * mlblLoading.getHeight(  ) ) ) * 0.5f );
     float outterRadius = innerRadius + 35f;
     int sections = 64;
     float theta = PConstants.TWO_PI / sections;
@@ -160,6 +165,7 @@ public class FoosballLoadingState implements GameState {
       // TODO: Rewrite ProgressBar as a Component
       prgBarUpper.update( timer );
       prgBarLower.update( timer );
+
       //mlblLoading.update(  );
     } // end else
   } // end update()

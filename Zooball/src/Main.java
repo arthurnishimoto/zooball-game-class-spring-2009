@@ -68,10 +68,10 @@ public class Main extends PApplet {
         GameState state = game.getGameState(  );
 
         if ( state == game.getMenuState(  ) ) {
-          game.getPlayState().init();
-          game.setState( game.getPlayState(  ) );
+          game.getTestState().init();
+          game.setState( game.getTestState(  ) );
         } // end if
-        else if ( state == game.getPlayState(  ) ) {
+        else if ( state == game.getTestState(  ) ) {
         	if (played) {
         		game.setState( game.getOverState(  ) );
         	}
@@ -81,7 +81,7 @@ public class Main extends PApplet {
         	played = !played;
         } // end else if
         else if ( state == game.getPausedState(  ) ) {
-          game.setState( game.getPlayState(  ) );
+          game.setState( game.getTestState(  ) );
         } // end else if
         else if ( state == game.getOverState(  ) ) {
           game.setState( game.getMenuState(  ) );

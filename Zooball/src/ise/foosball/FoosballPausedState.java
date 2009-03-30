@@ -36,6 +36,7 @@ public class FoosballPausedState implements GameState {
     timer = new Timer(  );
     mlblPaused = new MirroredLabel( p, "PAUSED", Font.getInstance( p, "Arial", 36 ),
                                     p.width * 0.5f, p.height * 0.5f );
+    mlblPaused.setPadding(0, 0, 10, 0);
   } // end FoosballPausedState()
 
   /**
@@ -44,7 +45,7 @@ public class FoosballPausedState implements GameState {
   @Override
   public void draw(  ) {
     // draw underlying game
-    game.getPlayState(  ).draw(  );
+    game.getTestState(  ).draw(  );
 
     // draw black translucent overlay
     p.fill( 0, 0, 0, 128 );

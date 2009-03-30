@@ -36,6 +36,7 @@ public class FoosballOverState implements GameState {
     timer = new Timer(  );
     mlblOver = new MirroredLabel( p, "GAME OVER", Font.getInstance( p, "Arial", 36 ),
                                   p.width * 0.5f, p.height * 0.5f );
+    mlblOver.setPadding(0, 0, 10, 0);
   } // end FoosballOverState()
 
   /**

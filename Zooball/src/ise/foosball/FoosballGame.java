@@ -26,6 +26,7 @@ public class FoosballGame extends Game {
   private FoosballOverState overState;
   private FoosballPausedState pausedState;
   private FoosballPlayState playState;
+  private FoosballTestState testState;
   private PApplet p;
   private boolean debugMode = false;
   private volatile boolean loaded;
@@ -44,8 +45,10 @@ public class FoosballGame extends Game {
     overState = new FoosballOverState( p, this );
     pausedState = new FoosballPausedState( p, this );
     playState = new FoosballPlayState( p, this );
+    testState = new FoosballTestState( p, this );
     leavingState = new FoosballLeavingState( p, this );
     setState( new FoosballLoadingState( p, this ) );
+    //setState( new FoosballTestState( p, this ) );
     // debug label 
     lblDebug = new DebugOutput( p, Font.getInstance( p, "Arial Bold", 14 ), 20, 20 );
     lblDebug.setAnchor( DebugOutput.LEFT, DebugOutput.TOP );
@@ -123,6 +126,15 @@ public class FoosballGame extends Game {
   public FoosballPlayState getPlayState(  ) {
     return playState;
   } // end getPlayState()
+
+  /**
+   * TODO: DOCUMENT ME!
+   *
+   * @return DOCUMENT ME!
+   */
+  public FoosballTestState getTestState(  ) {
+    return testState;
+  } // end getTestState()
 
   /**
    * Adds a line to the debug output

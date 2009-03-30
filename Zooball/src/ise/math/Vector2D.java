@@ -168,6 +168,121 @@ public class Vector2D implements Cloneable {
   } // end interpolate()
 
   /**
+   * Calculates the distance of this Vector2D to another Vector2D.
+   *
+   * @param v1 The other Vector2D.
+   *
+   * @return The distance.
+   */
+  public float distance( Vector2D v1 ) {
+    return (float) Math.sqrt( distanceSquared( v1 ) );
+  } // end distance()
+
+  /**
+   * Calculates the distance between two Vector2D objects.
+   *
+   * @param v1 The first Vector2D.
+   * @param v2 The second Vector2D.
+   *
+   * @return The distance.
+   */
+  public static float distance( Vector2D v1, Vector2D v2 ) {
+    return (float) Math.sqrt( distanceSquared( v1, v2 ) );
+  } // end distance()
+
+  /**
+   * Calculates the distance squared of this Vector2D to another Vector2D.
+   *
+   * @param v1 The other Vector2D.
+   *
+   * @return The distance squared.
+   */
+  public float distanceSquared( Vector2D v1 ) {
+    float dx = v1.x - x;
+    float dy = v1.y - y;
+
+    return ( dx * dx ) + ( dy * dy );
+  } // end distanceSquared()
+
+  /**
+   * Calculates the distance squared between two Vector2D objects.
+   *
+   * @param v1 The first Vector2D.
+   * @param v2 The second Vector2D.
+   *
+   * @return The distance squared.
+   */
+  public static float distanceSquared( Vector2D v1, Vector2D v2 ) {
+    float dx = v1.x - v2.x;
+    float dy = v1.y - v2.y;
+
+    return ( dx * dx ) + ( dy * dy );
+  } // end distanceSquared()
+
+  /**
+   * Gets the magnitude of this vector.
+   *
+   * @return The magnitude.
+   */
+  public float magnitude(  ) {
+    return (float) Math.sqrt( ( x * x ) + ( y * y ) );
+  } // end magnitude()
+
+  /**
+   * Normalizes this vector to the magnitude equal to 1. No change occurs if the current
+   * magnitude is 0.
+   */
+  public void normalize(  ) {
+    float m = magnitude(  );
+
+    if ( m != 0 ) {
+      x /= m;
+      y /= m;
+    } // end if
+  } // end normalise()
+
+  /**
+   * Gets the normalized vector with a magnitude equal to 1. No change occurs if the
+   * magnitude is 0.
+   *
+   * @param v1 The vector.
+   *
+   * @return The normalized vector.
+   */
+  public static Vector2D normalize( Vector2D v1 ) {
+    Vector2D value = new Vector2D( v1 );
+    float m = value.magnitude(  );
+
+    if ( m != 0 ) {
+      value.x /= m;
+      value.y /= m;
+    } // end if
+
+    return value;
+  } // end normalize()
+
+  /**
+   * TODO: DOCUMENT ME!
+   *
+   * @param obj DOCUMENT ME!
+   *
+   * @return DOCUMENT ME!
+   */
+  @Override
+  public boolean equals( Object obj ) {
+    if ( obj instanceof Vector2D ) {
+      return ( ( (Vector2D) obj ).x == x ) && ( ( (Vector2D) obj ).y == y );
+    } else {
+      return false;
+    }
+  } // end equals()
+  
+  public void negate() {
+	  x = -x;
+	  y = -y;
+  }
+
+  /**
    * Returns a string that contains the values of this Vector2D. The form is (x,y,z).
    *
    * @return the String representation
