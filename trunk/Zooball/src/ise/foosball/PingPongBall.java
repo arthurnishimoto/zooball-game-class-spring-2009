@@ -1,5 +1,6 @@
-package ise.objects;
+package ise.foosball;
 
+import ise.objects.Ball;
 import ise.utilities.Timer;
 import processing.core.PApplet;
 

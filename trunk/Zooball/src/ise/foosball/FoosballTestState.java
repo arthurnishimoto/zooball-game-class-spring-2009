@@ -7,10 +7,7 @@ import ise.game.GameState;
 import ise.math.Vector2D;
 
 import ise.objects.Ball;
-import ise.objects.BowlingBall;
-import ise.objects.FoosBall;
 import ise.objects.Line;
-import ise.objects.PingPongBall;
 
 import ise.utilities.Timer;
 
