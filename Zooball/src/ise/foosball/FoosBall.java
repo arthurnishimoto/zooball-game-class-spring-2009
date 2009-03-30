@@ -1,6 +1,7 @@
-package ise.objects;
+package ise.foosball;
 
 import ise.math.Vector2D;
+import ise.objects.Ball;
 import ise.utilities.Timer;
 import processing.core.PApplet;
 
