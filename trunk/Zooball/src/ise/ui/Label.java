@@ -203,6 +203,16 @@ public class Label extends Component {
     super.setPreferredWidth( width );
     updateSize(  );
   } // end setPreferredWidth()
+  
+  /**
+   * TODO: DOCUMENT ME!
+   *
+   * @param width DOCUMENT ME!
+   */
+  public void setPadding( float left, float right, float top, float bottom ) {
+    super.setPadding( left, right, top, bottom );
+    updateSize(  );
+  } // end setPreferredWidth()
 
   /**
    * Sets the single line of text for this Label.
@@ -254,86 +264,107 @@ public class Label extends Component {
   } // end setVerticalTextAlignment()
 
   /**
+   * TODO: DOCUMENT ME!
+   *
+   * @return DOCUMENT ME!
+   */
+  protected Vector2D getTextSize(  ) {
+    Vector2D size = new Vector2D( 0, 0 );
+    float lineWidth = 0;
+    size.y = ( text.length < 2 ) ? font.height : ( font.height + ( font.size * ( text.length - 1 ) ) );
+
+    p.textFont( font.pFont );
+
+    for ( int i = 0; i < text.length; i++ ) {
+      lineWidth = p.textWidth( text[i] );
+
+      if ( lineWidth > size.x ) {
+        size.x = lineWidth;
+      } // end if
+    } // end for
+
+    return size;
+  } // end getTextSize()
+  
+  protected Vector2D getTextTranslation(float width, float height) {
+	  Vector2D translation = new Vector2D(0, 0);
+
+	    // horizontal alignment
+	    if ( horizontalTextAlignment == LEFT ) {
+	    	translation.x = 0.0f;
+	      p.textAlign( PConstants.LEFT );
+	    } // end if
+	    else if ( horizontalTextAlignment == CENTER ) {
+	    	translation.x = width * 0.5f;
+	      p.textAlign( PConstants.CENTER );
+	    } // end else if
+	    else { // RIGHT
+	    	translation.x = width;
+	      p.textAlign( PConstants.RIGHT );
+	    } // end else
+
+	    // vertical alignment
+	    if ( verticalTextAlignment == TOP ) {
+	    	translation.y = font.ascent;
+	    } // end if
+	    else if ( verticalTextAlignment == MIDDLE ) {
+	    	translation.y = ( 0.5f * ( height - ( font.height + ( font.size * ( text.length - 1 ) ) ) ) ) +
+	          font.ascent;
+	    } // end else if
+	    else { // BOTTOM
+	    	translation.y = height - ( font.height + ( font.size * ( text.length - 1 ) ) ) + font.ascent;
+	    } // end else
+	    
+	    return translation;
+  }
+
+  /**
    * Draws this Label.
    */
   @Override
   protected void drawComponent(  ) {
-    float x;
-    float y;
-
-    // horizontal alignment
-    if ( horizontalTextAlignment == LEFT ) {
-      x = 0.0f;
-      p.textAlign( PConstants.LEFT );
-    } // end if
-    else if ( horizontalTextAlignment == CENTER ) {
-      x = width * 0.5f;
-      p.textAlign( PConstants.CENTER );
-    } // end else if
-    else { // RIGHT
-      x = width;
-      p.textAlign( PConstants.RIGHT );
-    } // end else
-
-    // vertical alignment
-    if ( verticalTextAlignment == TOP ) {
-      y = font.ascent;
-    } // end if
-    else if ( verticalTextAlignment == MIDDLE ) {
-      y = ( 0.5f * ( height - ( font.height + ( font.size * ( text.length - 1 ) ) ) ) ) +
-          font.ascent;
-    } // end else if
-    else { // BOTTOM
-      y = height - ( font.height + ( font.size * ( text.length - 1 ) ) ) + font.ascent;
-    } // end else
-
-    p.pushMatrix(  );
-    p.translate( x, y );
-
-    // TODO: Font Color
-    p.fill( 255 );
-    p.textFont( font.pFont );
-
-    // draw text
-    for ( int i = 0; i < text.length; i++ ) {
-      p.text( text[i], 0, 0 );
-      /*
-         // DEBUG - Red line at acent, Green Line at baseline, Blue line at descent
-         p.stroke(255, 0, 0);
-         p.line(-100, -font.ascent, 100, -font.ascent);
-         p.stroke(0, 255, 0);
-         p.line(-100, 0, 100, 0);
-         p.stroke(0, 0, 255);
-         p.line(-100, font.descent, 100, font.descent);
-         // END DEBUG
-       */
-      p.translate( 0, font.size );
-    } // end for
-
-    p.popMatrix(  );
+		Vector2D translation = getTextTranslation(width - padding.left - padding.right, height - padding.top - padding.bottom);
+	    p.pushMatrix(  );
+	    p.translate( translation.x + padding.top, translation.y + padding.left );
+	    drawText();
+	    p.popMatrix(  );
   } // end drawComponent()
+  
+  protected void drawText() {
+	    p.pushMatrix(  );
+
+	    p.fill( foregroundColor );
+	    p.textFont( font.pFont );
+
+	    // draw text
+	    for ( int i = 0; i < text.length; i++ ) {
+	      p.text( text[i], 0, 0 );
+	      /*
+	         // DEBUG - Red line at acent, Green Line at baseline, Blue line at descent
+	         p.stroke(255, 0, 0);
+	         p.line(-100, -font.ascent, 100, -font.ascent);
+	         p.stroke(0, 255, 0);
+	         p.line(-100, 0, 100, 0);
+	         p.stroke(0, 0, 255);
+	         p.line(-100, font.descent, 100, font.descent);
+	         // END DEBUG
+	      */
+	      p.translate( 0, font.size );
+	    } // end for
+
+	    p.popMatrix(  );
+  }
 
   /**
    * Updates the width and height values for this Label. Uses preferred sizes if possible, or
    * the smallest value to fit the text.
    */
   protected void updateSize(  ) {
-    p.textFont( font.pFont );
-
-    float minHeight = ( text.length < 2 ) ? font.height
-                                          : ( font.height + ( font.size * ( text.length - 1 ) ) );
-    float minWidth = 0;
-    float lineWidth = 0;
-
-    for ( int i = 0; i < text.length; i++ ) {
-      lineWidth = p.textWidth( text[i] );
-
-      if ( lineWidth > minWidth ) {
-        minWidth = lineWidth;
-      } // end if
-    } // end for
-
-    width = ( preferredWidth < minWidth ) ? minWidth : preferredWidth;
-    height = ( preferredHeight < minHeight ) ? minHeight : preferredHeight;
+	Vector2D size = getTextSize(  );
+    size.x = size.x + padding.left + padding.right + borderSize + borderSize;
+    size.y = size.y+ padding.top + padding.bottom + borderSize  + borderSize ;
+    
+    width = ( preferredWidth < size.x ) ? size.x : preferredWidth;
+    height = ( preferredHeight < size.y ) ? size.y : preferredHeight;
   } // end updateSize()
 } // end Label

@@ -3,20 +3,18 @@ package ise.ui;
 import ise.math.Vector2D;
 
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 
 /**
- * A display area for one or more short text strings. The message is displayed facing opposite
- * direction.
+ *  TODO: DOCUMENT ME!
  *
  * @author Andy Bursavich
- * @version 0.1
- */
-public class MirroredLabel extends Component {
-  Label label;
-
-/**
-   * Creates a new MirroredLabel object.
+ * @version 0.2
+  */
+public class MirroredLabel extends Label {
+  /**
+   * Creates a new MirroredLabel2 object.
    *
    * @param p DOCUMENT ME!
    * @param text DOCUMENT ME!
@@ -24,18 +22,13 @@ public class MirroredLabel extends Component {
    * @param y DOCUMENT ME!
    */
   public MirroredLabel( PApplet p, String text, float x, float y ) {
-    super( p );
-    this.x = x;
-    this.y = y;
-    label = new Label( p, text, 0, 0 );
-    label.setAnchor( CENTER, TOP );
-    updateSize(  );
+    super( p, text, x, y );
 
     // TODO Auto-generated constructor stub
-  } // end MirroredLabel()
+  } // end MirroredLabel2()
 
-/**
-   * Creates a new MirroredLabel object.
+  /**
+   * Creates a new MirroredLabel2 object.
    *
    * @param p DOCUMENT ME!
    * @param text DOCUMENT ME!
@@ -43,16 +36,13 @@ public class MirroredLabel extends Component {
    * @param y DOCUMENT ME!
    */
   public MirroredLabel( PApplet p, String[] text, float x, float y ) {
-    super( p );
-    this.x = x;
-    this.y = y;
-    label = new Label( p, text, 0, 0 );
-    label.setAnchor( CENTER, TOP );
-    updateSize(  );
-  } // end MirroredLabel()
+    super( p, text, x, y );
 
-/**
-   * Creates a new MirroredLabel object.
+    // TODO Auto-generated constructor stub
+  } // end MirroredLabel2()
+
+  /**
+   * Creates a new MirroredLabel2 object.
    *
    * @param p DOCUMENT ME!
    * @param text DOCUMENT ME!
@@ -61,17 +51,13 @@ public class MirroredLabel extends Component {
    * @param y DOCUMENT ME!
    */
   public MirroredLabel( PApplet p, String text, Font font, float x, float y ) {
-    super( p );
-    this.x = x;
-    this.y = y;
-    label = new Label( p, text, font, 0, 0 );
-    label.horizontalAnchor = CENTER;
-    label.verticalAnchor = BOTTOM;
-    updateSize(  );
-  } // end MirroredLabel()
+    super( p, text, font, x, y );
 
-/**
-   * Creates a new MirroredLabel object.
+    // TODO Auto-generated constructor stub
+  } // end MirroredLabel2()
+
+  /**
+   * Creates a new MirroredLabel2 object.
    *
    * @param p DOCUMENT ME!
    * @param text DOCUMENT ME!
@@ -80,17 +66,13 @@ public class MirroredLabel extends Component {
    * @param y DOCUMENT ME!
    */
   public MirroredLabel( PApplet p, String[] text, Font font, float x, float y ) {
-    super( p );
-    this.x = x;
-    this.y = y;
-    label = new Label( p, text, font, 0, 0 );
-    label.horizontalAnchor = CENTER;
-    label.verticalAnchor = BOTTOM;
-    updateSize(  );
-  } // end MirroredLabel()
+    super( p, text, font, x, y );
 
-/**
-   * Creates a new MirroredLabel object.
+    // TODO Auto-generated constructor stub
+  } // end MirroredLabel2()
+
+  /**
+   * Creates a new MirroredLabel2 object.
    *
    * @param p DOCUMENT ME!
    * @param text DOCUMENT ME!
@@ -101,21 +83,14 @@ public class MirroredLabel extends Component {
    * @param height DOCUMENT ME!
    */
   public MirroredLabel( PApplet p, String text, Font font, float x, float y, float width,
-                        float height ) {
-    super( p );
-    this.x = x;
-    this.y = y;
-    this.preferredWidth = width;
-    this.preferredHeight = height;
-    label = new Label( p, text, font, 0, 0 );
-    label.horizontalAnchor = CENTER;
-    label.verticalAnchor = BOTTOM;
-    label.setPreferredSize( width, height * 0.5f );
-    updateSize(  );
-  } // end MirroredLabel()
+                         float height ) {
+    super( p, text, font, x, y, width, height );
 
-/**
-   * Creates a new MirroredLabel object.
+    // TODO Auto-generated constructor stub
+  } // end MirroredLabel2()
+
+  /**
+   * Creates a new MirroredLabel2 object.
    *
    * @param p DOCUMENT ME!
    * @param text DOCUMENT ME!
@@ -126,147 +101,47 @@ public class MirroredLabel extends Component {
    * @param height DOCUMENT ME!
    */
   public MirroredLabel( PApplet p, String[] text, Font font, float x, float y, float width,
-                        float height ) {
-    super( p );
-    this.x = x;
-    this.y = y;
-    this.preferredWidth = width;
-    this.preferredHeight = height;
-    label = new Label( p, text, font, 0, 0 );
-    label.horizontalAnchor = CENTER;
-    label.verticalAnchor = BOTTOM;
-    label.setPreferredSize( width, height * 0.5f );
-    updateSize(  );
-  } // end MirroredLabel()
+                         float height ) {
+    super( p, text, font, x, y, width, height );
+
+    // TODO Auto-generated constructor stub
+  } // end MirroredLabel2()
 
   /**
-   * Sets the font of this Label.  Note: It may a side-effect of changing the PApplet's
-   * current font.
-   *
-   * @param font The font to use for this Label.
+   * Draws this Label.
    */
-  public void setFont( Font font ) {
-    label.setFont( font );
-    updateSize(  );
-  } // end setFont()
-
-  /**
-   * Sets the horizontal alignment for this Label.
-   *
-   * @param alignment The horizontal text alignment for this Label. Possible values: LEFT, CENTER,
-   *        RIGHT.
-   */
-  public void setHorizontalTextAlignment( int alignment ) {
-    label.setHorizontalTextAlignment( alignment );
-  } // end setHorizontalTextAlignment()
-
-  /**
-   * TODO: DOCUMENT ME!
-   *
-   * @param height DOCUMENT ME!
-   */
-  public void setPreferredHeight( float height ) {
-    super.setPreferredHeight( height );
-    label.setPreferredHeight( height * 0.5f );
-    updateSize(  );
-  } // end setPreferredHeight()
-
-  /**
-   * TODO: DOCUMENT ME!
-   *
-   * @param size DOCUMENT ME!
-   */
-  public void setPreferredSize( Vector2D size ) {
-    super.setPreferredSize( size );
-    label.setPreferredSize( new Vector2D( size.x, size.y * 0.5f ) );
-    updateSize(  );
-  } // end setPreferredSize()
-
-  /**
-   * TODO: DOCUMENT ME!
-   *
-   * @param width DOCUMENT ME!
-   * @param height DOCUMENT ME!
-   */
-  public void setPreferredSize( float width, float height ) {
-    super.setPreferredSize( width, height );
-    label.setPreferredSize( width, height * 0.5f );
-    updateSize(  );
-  } // end setPreferredSize()
-
-  /**
-   * TODO: DOCUMENT ME!
-   *
-   * @param width DOCUMENT ME!
-   */
-  public void setPreferredWidth( float width ) {
-    super.setPreferredWidth( width );
-    label.setPreferredWidth( width );
-    updateSize(  );
-  } // end setPreferredWidth()
-
-  /**
-   * Sets the single line of text for this Label.
-   *
-   * @param text The single line of text for this Label.
-   */
-  public void setText( String text ) {
-    label.setText( text );
-    updateSize(  );
-  } // end setText()
-
-  /**
-   * Sets the lines of text for this Label.
-   *
-   * @param text The lines of text for this Label.
-   */
-  public void setText( String[] text ) {
-    label.setText( text );
-    updateSize(  );
-  } // end setText()
-
-  /**
-   * Sets the horizontal and vertical alignments for this Label.
-   *
-   * @param horizontalAlignment The horizontal text alignment for this Label. Possible values:
-   *        LEFT, CENTER, RIGHT.
-   * @param verticalAlignment The vertical text alignment for this Label. Possible values: TOP,
-   *        MIDDLE, BOTTOM.
-   */
-  public void setTextAlignment( int horizontalAlignment, int verticalAlignment ) {
-    label.setTextAlignment( horizontalAlignment, verticalAlignment );
-  } // end setTextAlignment()
-
-  /**
-   * Sets the vertical alignment for this Label.
-   *
-   * @param alignment The vertical text alignment for this Label. Possible values: TOP, MIDDLE,
-   *        BOTTOM.
-   */
-  public void setVerticalTextAlignment( int alignment ) {
-    label.setVerticalTextAlignment( alignment );
-  } // end setVerticalTextAlignment()
+  @Override
+  protected void drawComponent(  ) {
+	  float height = this.height * 0.5f - borderSize - padding.top - padding.bottom;
+	  float width = this.width - borderSize - borderSize - padding.left - padding.right;
+	  
+		Vector2D translation = getTextTranslation(width, height);
+		
+		// draw top text
+	    p.pushMatrix(  );
+	    p.translate( translation.x + padding.left, translation.y + height + padding.top + padding.top + padding.bottom);
+	    drawText();
+	    p.popMatrix(  );
+	    
+	    // draw bottom text
+	    p.pushMatrix(  );
+	    p.translate(width + padding.right, height + padding.bottom);
+	    p.rotateZ(PConstants.PI);
+	    p.translate( translation.x, translation.y );
+	    drawText();
+	    p.popMatrix(  );
+  } // end drawComponent()
 
   /**
    * TODO: DOCUMENT ME!
    */
   @Override
-  protected void drawComponent(  ) {
-    label.y = height;
-    label.setFacingDirection( BOTTOM );
-    label.draw(  );
-    label.y = 0;
-    label.setFacingDirection( TOP );
-    label.draw(  );
-  } // end drawComponent()
-
-  /**
-   * Updates the width and height values for this Label. Uses preferred sizes if possible, or
-   * the smallest value to fit the text.
-   */
   protected void updateSize(  ) {
-    width = label.width;
-    height = ( ( label.height * 2f ) + label.font.size ) - label.font.ascent;
-    label.x = width * 0.5f;
+    Vector2D size = getTextSize(  );
+    size.x = size.x + padding.left + padding.right + borderSize + borderSize;
+    size.y = (size.y + borderSize + padding.top + padding.bottom) * 2f;
+
+    width = ( preferredWidth < size.x ) ? size.x : preferredWidth;
+    height = ( preferredHeight < size.y ) ? size.y : preferredHeight;
   } // end updateSize()
-} // end MirroredLabel
+} // end MirroredLabel2

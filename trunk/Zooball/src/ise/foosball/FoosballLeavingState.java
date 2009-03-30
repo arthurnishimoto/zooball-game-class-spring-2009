@@ -34,12 +34,12 @@ public class FoosballLeavingState implements GameState {
     this.p = p;
     this.game = game;
     timer = new Timer(  );
-    mlblLeaving = new MirroredLabel( p, new String[] {
-            "Thanks for playing ZOOBALL!", "Infinite State Entertainment"},
-            Font.getInstance( p, "Arial", 36 ), p.width * 0.5f,
-            p.height * 0.5f );
-    mlblLeaving.setVerticalTextAlignment(MirroredLabel.BOTTOM);
-    mlblLeaving.setPreferredHeight(mlblLeaving.getHeight() + 30);
+    mlblLeaving = new MirroredLabel( p,
+                                     new String[] {
+                                       "Thanks for playing ZOOBALL!", "Infinite State Entertainment"
+                                     }, Font.getInstance( p, "Arial", 36 ), p.width * 0.5f,
+                                     p.height * 0.5f );
+    mlblLeaving.setPadding(0, 0, 20, 0);
   } // end FoosballLeavingState()
 
   /**
@@ -94,8 +94,8 @@ public class FoosballLeavingState implements GameState {
     if ( timer.getMillisecondsActive(  ) >= 2000 ) {
       System.exit( 0 );
     } // end if
-    else if(game.isDebugMode()) {
-    	game.addDebugLine("Timer: " + timer.getTimeActive());
-    }
+    else if ( game.isDebugMode(  ) ) {
+      game.addDebugLine( "Timer: " + timer.getTimeActive(  ) );
+    } // end else if
   } // end update()
 } // end FoosballLeavingState

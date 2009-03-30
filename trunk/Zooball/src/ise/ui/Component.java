@@ -18,14 +18,16 @@ import processing.core.PConstants;
  */
 public abstract class Component {
   public static final int LEFT = 0;
-  public static final int CENTER = 1;
-  public static final int RIGHT = 2;
-  public static final int TOP = 3;
-  public static final int MIDDLE = 4;
-  public static final int BOTTOM = 5;
+  public static final int CENTER = 4;
+  public static final int RIGHT = 1;
+  public static final int TOP = 2;
+  public static final int MIDDLE = 5;
+  public static final int BOTTOM = 3;
   protected PApplet p;
+  protected Padding padding;
   protected Timer timer;
   protected boolean visible = true;
+  protected float borderSize;
   protected float height = 0;
   protected float preferredHeight = 0;
   protected float preferredWidth = 0;
@@ -35,16 +37,23 @@ public abstract class Component {
   protected float width = 0;
   protected float x = 0;
   protected float y = 0;
+  protected int backgroundColor;
+  protected int borderColor;
+  protected int foregroundColor;
   protected int horizontalAnchor = CENTER;
   protected int verticalAnchor = MIDDLE;
 
 /**
    * Creates a new Component object.
    *
-   * @param p DOCUMENT ME!
+   * @param p The Processing sketch.
    */
   public Component( PApplet p ) {
     this.p = p;
+    padding = new Padding();
+    backgroundColor = p.color( 255, 255, 255, 0 );
+    foregroundColor = p.color( 255, 255, 255 );
+    borderColor = p.color( 255, 255, 255 );
   } // end Component()
 
   /**
@@ -60,6 +69,108 @@ public abstract class Component {
     horizontalAnchor = horizontal;
     verticalAnchor = vertical;
   } // end setAnchor()
+
+  /**
+   * Sets the background color. The default is transparent.
+   *
+   * @param backgroundColor The background color.
+   */
+  public void setBackgroundColor( int backgroundColor ) {
+    this.backgroundColor = backgroundColor;
+  } // end setBackgroundColor()
+
+  /**
+   * Sets the background color. The default is transparent.
+   *
+   * @param red The red value of the color.
+   * @param green The green value of the color.
+   * @param blue The blue value of the color.
+   */
+  public void setBackgroundColor( int red, int green, int blue ) {
+    backgroundColor = p.color( red, green, blue );
+  } // end setBackgroundColor()
+
+  /**
+   * Sets the background color. The default is transparent.
+   *
+   * @param red The red value of the color.
+   * @param green The green value of the color.
+   * @param blue The blue value of the color.
+   * @param alpha The alpha value of the color.
+   */
+  public void setBackgroundColor( int red, int green, int blue, int alpha ) {
+    backgroundColor = p.color( red, green, blue, alpha );
+  } // end setBackgroundColor()
+
+  /**
+   * Gets the background color.
+   *
+   * @return The background color.
+   */
+  public int getBackgroundColor(  ) {
+    return backgroundColor;
+  } // end getBackgroundColor()
+
+  /**
+   * Sets the border color. The default is white.
+   *
+   * @param borderColor The border color.
+   */
+  public void setBorderColor( int borderColor ) {
+    this.borderColor = borderColor;
+  } // end setBorderColor()
+
+  /**
+   * Sets the border color. The default is white.
+   *
+   * @param red The red value of the color.
+   * @param green The green value of the color.
+   * @param blue The blue value of the color.
+   */
+  public void setBorderColor( int red, int green, int blue ) {
+    borderColor = p.color( red, green, blue );
+  } // end setBorderColor()
+
+  /**
+   * Sets the border color. The default is white.
+   *
+   * @param red The red value of the color.
+   * @param green The green value of the color.
+   * @param blue The blue value of the color.
+   * @param alpha The alpha value of the color.
+   */
+  public void setBorderColor( int red, int green, int blue, int alpha ) {
+    borderColor = p.color( red, green, blue, alpha );
+  } // end setBorderColor()
+
+  /**
+   * Gets the border color.
+   *
+   * @return The border color.
+   */
+  public int getBorderColor(  ) {
+    return borderColor;
+  } // end getBorderColor()
+
+  /**
+   * Sets the size of this Component's border. The default is 0.
+   *
+   * @param borderSize The border size.
+   */
+  public void setBorderSize( float borderSize ) {
+    width = width - this.borderSize - this.borderSize + borderSize + borderSize;
+    height = height - this.borderSize - this.borderSize + borderSize + borderSize;
+    this.borderSize = borderSize;
+  } // end setBorderSize()
+
+  /**
+   * Gets the size of this Component's border.
+   *
+   * @return The border size.
+   */
+  public float getBorderSize(  ) {
+    return borderSize;
+  } // end getBorderSize()
 
   /**
    * Sets the rotation of this Component to face the provided direction.
@@ -81,6 +192,51 @@ public abstract class Component {
       rotationFacing = PConstants.HALF_PI;
     } // end else
   } // end setFacingDirection()
+
+  /**
+   * Sets the foreground color. This is the main color used by this Component. For example,
+   * the color of text in a Label or the color of the bar in a ProgressBar.
+   *
+   * @param foregroundColor The foreground color.
+   */
+  public void setForegroundColor( int foregroundColor ) {
+    this.foregroundColor = foregroundColor;
+  } // end setForegroundColor()
+
+  /**
+   * Sets the foreground color. This is the main color used by this Component. For example,
+   * the color of text in a Label or the color of the bar in a ProgressBar.
+   *
+   * @param red The red value of the color.
+   * @param green The green value of the color.
+   * @param blue The blue value of the color.
+   */
+  public void setForegroundColor( int red, int green, int blue ) {
+    foregroundColor = p.color( red, green, blue, 255 );
+  } // end setForegroundColor()
+
+  /**
+   * Sets the foreground color. This is the main color used by this Component. For example,
+   * the color of text in a Label or the color of the bar in a ProgressBar.
+   *
+   * @param red The red value of the color.
+   * @param green The green value of the color.
+   * @param blue The blue value of the color.
+   * @param alpha The alpha value of the color.
+   */
+  public void setForegroundColor( int red, int green, int blue, int alpha ) {
+    foregroundColor = p.color( red, green, blue, alpha );
+  } // end setForegroundColor()
+
+  /**
+   * Gets the foreground color. This is the main color used by this Component. For example,
+   * the color of text in a Label or the color of the bar in a ProgressBar.
+   *
+   * @return The foreground color.
+   */
+  public int getForegroundColor(  ) {
+    return foregroundColor;
+  } // end getForegroundColor()
 
   /**
    * Gets the height of this Component.
@@ -282,8 +438,8 @@ public abstract class Component {
       float zRotation = rotationFacing + rotation;
 
       if ( timer != null ) {
-        zRotation += ( radiansPerSecond * timer.getSecondsActive() );
-      }
+        zRotation += ( radiansPerSecond * timer.getSecondsActive(  ) );
+      } // end if
 
       p.pushMatrix(  );
 
@@ -307,6 +463,18 @@ public abstract class Component {
       } // end else if
 
       p.translate( xTranslation, yTranslation );
+      
+      if(borderSize > 0) {
+    	p.fill( borderColor );
+      	p.quad(0, 0, borderSize, borderSize, width - borderSize, borderSize, width, 0);
+      	p.quad(0, 0, borderSize, borderSize, borderSize, height - borderSize, 0, height);
+      	p.quad(width, height, width - borderSize, height - borderSize, width-borderSize, borderSize, width, 0);
+      	p.quad(width, height, width - borderSize, height - borderSize, borderSize, height - borderSize, 0, height);
+      }
+
+      p.translate( borderSize, borderSize );
+      p.fill( backgroundColor );
+      p.rect( 0, 0, width - borderSize - borderSize, height - borderSize - borderSize );
 
       /*
          // DEBUG - Box Around Component
@@ -322,6 +490,54 @@ public abstract class Component {
   } // end draw()
 
   /**
+   * TODO: DOCUMENT ME!
+   *
+   * @param left DOCUMENT ME!
+   * @param right DOCUMENT ME!
+   * @param top DOCUMENT ME!
+   * @param bottom DOCUMENT ME!
+   */
+  public void setPadding( float left, float right, float top, float bottom ) {
+    padding.left = left;
+    padding.right = right;
+    padding.top = top;
+    padding.bottom = bottom;
+  } // end setPadding()
+
+  /**
+   * TODO: DOCUMENT ME!
+   *
+   * @return DOCUMENT ME!
+   */
+  public Padding getPadding(  ) {
+    return padding;
+  } // end getPadding()
+
+  /**
+   * Sets the revolutions the Label will make per second. The Timer must also be set for
+   * rotation to occur.
+   *
+   * @param revolutionsPerSecond Revolutions per second. Positive values result in clockwise
+   *        rotation. Negative values result in counter-clockwise rotation.
+   */
+  public void setRevolutionsPerSecond( float revolutionsPerSecond ) {
+    this.radiansPerSecond = PConstants.TWO_PI * revolutionsPerSecond;
+  } // end setRevolutionsPerSecond()
+
+  /**
+   * Sets the revolutions the Label will make per second.
+   *
+   * @param revolutionsPerSecond Revolutions per second. Positive values result in clockwise
+   *        rotation. Negative values result in counter-clockwise rotation.
+   * @param timer The timer used to rotate the Component. Rotation only occurs while the Timer is
+   *        active.
+   */
+  public void setRevolutionsPerSecond( float revolutionsPerSecond, Timer timer ) {
+    this.timer = timer;
+    setRevolutionsPerSecond( revolutionsPerSecond );
+  } // end setRevolutionsPerSecond()
+
+  /**
    * Sets the current rotation of this Component. If
    *
    * @param rotation DOCUMENT ME!
@@ -331,44 +547,22 @@ public abstract class Component {
   } // end setRotation()
 
   /**
-   * Sets the revolutions the Label will make per second. The Timer must also be set for rotation to occur.
+   * Sets the timer associated with this Component. The Timer is used to calculate rotation
+   * but may also be used for other animation purposes.
    *
-   * @param revolutionsPerSecond Revolutions per second. Positive values result in clockwise
-   *        rotation. Negative values result in counter-clockwise rotation.
+   * @param timer The Timer.
    */
-  public void setRevolutionsPerSecond( float revolutionsPerSecond ) {
-    this.radiansPerSecond = PConstants.TWO_PI * revolutionsPerSecond;
-  } // end setRotationsPerSecond()
-  
-  /**
-   * Sets the revolutions the Label will make per second.
-   *
-   * @param revolutionsPerSecond Revolutions per second. Positive values result in clockwise
-   *        rotation. Negative values result in counter-clockwise rotation.
-   * @param timer The timer used to rotate the Component. Rotation only occurs while the Timer is active.
-   */
-  public void setRevolutionsPerSecond( float revolutionsPerSecond, Timer timer ) {
-	this.timer = timer;
-	setRevolutionsPerSecond(revolutionsPerSecond);
-  } // end setRotationsPerSecond()
+  public void setTimer( Timer timer ) {
+    this.timer = timer;
+  } // end setTimer()
 
   /**
-   * Sets the timer associated with this Component. The Timer is used to calculate rotation but may also be used for other animation purposes.
-   * 
+   * Gets the timer associated with this Component. The Timer is used to calculate rotation
+   * but may also be used for other animation purposes.
+   *
    * @param timer The Timer.
    */
-  public void setTimer(Timer timer) {
-	  this.timer = timer;
-  }
-  
-  /**
-   * Gets the timer associated with this Component. The Timer is used to calculate rotation but may also be used for other animation purposes.
-   * 
-   * @param timer The Timer.
-   */
-  public void getTimer(Timer timer) {
-	  
-  }
+  public void getTimer( Timer timer ) {}
 
   /**
    * Gets the width of this Component.
@@ -421,4 +615,39 @@ public abstract class Component {
    * Component should be drawn at (0, 0) and the bottom right should be drawn at (width,height).
    */
   protected abstract void drawComponent(  );
+
+  /**
+   *  TODO: DOCUMENT ME!
+   *
+   * @author Andy Bursavich
+   * @version 0.1
+    */
+  public class Padding {
+    public float bottom;
+    public float left;
+    public float right;
+    public float top;
+
+    /**
+     * Creates a new Padding object.
+     */
+    public Padding(  ) {
+      left = right = top = bottom = 0;
+    } // end Padding()
+
+    /**
+     * Creates a new Padding object.
+     *
+     * @param left DOCUMENT ME!
+     * @param right DOCUMENT ME!
+     * @param top DOCUMENT ME!
+     * @param bottom DOCUMENT ME!
+     */
+    public Padding( float left, float right, float top, float bottom ) {
+      this.left = left;
+      this.right = right;
+      this.top = top;
+      this.bottom = bottom;
+    } // end Padding()
+  } // end Padding
 } // end Component

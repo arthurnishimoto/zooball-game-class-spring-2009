@@ -4,6 +4,7 @@ import ise.game.GameState;
 
 import ise.ui.Font;
 import ise.ui.MirroredLabel;
+
 import ise.utilities.Timer;
 
 import processing.core.PApplet;
@@ -19,9 +20,9 @@ import tacTile.net.TouchAPI;
  */
 public class FoosballMenuState implements GameState {
   private FoosballGame game;
+  private MirroredLabel mlblMenu;
   private PApplet p;
   private Timer timer;
-  private MirroredLabel mlblMenu;
 
 /**
    * Creates a new FoosballMenuState object.
@@ -33,9 +34,9 @@ public class FoosballMenuState implements GameState {
     this.p = p;
     this.game = game;
     timer = new Timer(  );
-    mlblMenu = new MirroredLabel( p, "ZOOBALL",
-            Font.getInstance( p, "Arial", 36 ), p.width * 0.5f,
-            p.height * 0.5f );
+    mlblMenu = new MirroredLabel( p, "ZOOBALL", Font.getInstance( p, "Arial", 36 ), p.width * 0.5f,
+                                  p.height * 0.5f );
+    mlblMenu.setPadding(0, 0, 10, 0);
   } // end FoosballMenuState()
 
   /**
@@ -43,8 +44,8 @@ public class FoosballMenuState implements GameState {
    */
   @Override
   public void draw(  ) {
-    p.background( 0, 0, 255 );
-    mlblMenu.draw();
+    p.background( 0, 0x33, 0x66 );
+    mlblMenu.draw(  );
   } // end draw()
 
   /**
