@@ -42,7 +42,7 @@ public class Main extends PApplet {
 
     if ( response != -1 ) {
       tacTileHost = hostNames[response];
-
+      
       PApplet.main( new String[] { "--present", "Main" } );
     } // end if
   } // end main()
@@ -86,11 +86,26 @@ public class Main extends PApplet {
         else if ( state == game.getOverState(  ) ) {
           game.setState( game.getMenuState(  ) );
         } // end else if
+        else if ( state == game.getPrototypeState() ){
+        	game.setState( game.getMenuState(  ) );
+        }// end else if
+        
       } // end else if
       else if ( e.getKeyCode(  ) == KeyEvent.VK_ESCAPE ) {
         game.setState( game.getLeavingState(  ) );
       } // end else if
     } // end if
+    
+    if ( e.getKeyChar(  ) == 'p' || e.getKeyChar(  ) == 'P' ) {
+    	GameState state = game.getGameState(  );
+      if ( state != game.getPrototypeState(  ) ) {
+          game.getPrototypeState().init();
+          game.setState( game.getPrototypeState(  ) );
+      }else{
+      	game.setState( game.getMenuState(  ) );
+      }
+    }// end if
+    
   } // end keyPressed()
 
   /**
@@ -98,8 +113,9 @@ public class Main extends PApplet {
    */
   public void setup(  ) {
     // I haven't been able to get the TouchAPI to run in eclipse
-    //tacTile = new TouchAPI( this, DATA_PORT, MSG_PORT, tacTileHost );
-    size( screen.width, screen.height, PConstants.OPENGL );
+	size( screen.width, screen.height, PConstants.OPENGL );
+    tacTile = new TouchAPI( this, DATA_PORT, MSG_PORT, tacTileHost );
+    
     game = new FoosballGame( this );
   } // end setup()
 } // end Main
