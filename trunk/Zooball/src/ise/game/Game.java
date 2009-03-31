@@ -46,8 +46,8 @@ public abstract class Game {
    * @param tacTile DOCUMENT ME!
    */
   public void loop( TouchAPI tacTile ) {
-    state.input( tacTile );
     state.update(  );
     state.draw(  );
+    state.input( tacTile );
   } // end loop()
 } // end Game

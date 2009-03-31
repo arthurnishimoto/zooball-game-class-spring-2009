@@ -6,11 +6,20 @@ import processing.core.*;
 
 
 /**
- * --------------------------------------------- Ball.java Description: Ball object. Class: CS
- * 426 Spring 2009 System: Processing 1.0.1, Eclipse 3.4.1, Windows XP SP2/Windows Vista Author:
- * Arthur Nishimoto - Infinite State Entertainment Version: 0.3a  Version Notes: 3/1/09    -
- * Initial version 3/18/09   - Version 0.2 - Initial FSM conversion 3/25/09   - Version 0.3 -
- * Encapsulation fixes for code clarity and easier Java conversion
+ * --------------------------------------------- 
+ * Ball.java
+ * 
+ * Description: Ball object.
+ * 
+ * Class: CS 426 Spring 2009
+ * System: Processing 1.0.1, Eclipse 3.4.1, Windows XP SP2/Windows Vista
+ * Author: Arthur Nishimoto - Infinite State Entertainment
+ * Version: 0.3a
+ * 
+ * Version Notes:
+ * 3/1/09    - Initial version
+ * 3/18/09   - Version 0.2 - Initial FSM conversion
+ * 3/25/09   - Version 0.3 - Encapsulation fixes for code clarity and easier Java conversion
  */
 public class Ball extends PApplet {
   static final int ACTIVE = 1;
@@ -18,14 +27,14 @@ public class Ball extends PApplet {
   Ball[] others;
   double timer_g;
   float angle;
-  float diameter;
-  float friction = 0.001f;
+  public float diameter;
+  private float friction = 0.001f;
   float maxVel = 10;
   float vel;
-  float xPos;
-  float xVel;
-  float yPos;
-  float yVel;
+  public float xPos;
+  public float xVel;
+  public float yPos;
+  public float yVel;
   int ID_no;
   int ballColor = color( 0xffFFFFFF );
 
@@ -223,19 +232,11 @@ public class Ball extends PApplet {
     yVel += yVeloc;
   } // end kickBall()
 
-  /* Ball was launched with a specific location using a specific velocity.
+  /** Ball was launched with a specific location using a specific velocity.
    * @param x : initial x position
    * @param y : initial y position
    * @param xVeloc : initial x velocity
    * @param yVeloc : initial y velocity
-   */
-  /**
-   * TODO: DOCUMENT ME!
-   *
-   * @param x DOCUMENT ME!
-   * @param y DOCUMENT ME!
-   * @param xVeloc DOCUMENT ME!
-   * @param yVeloc DOCUMENT ME!
    */
   public void launchBall( float x, float y, float xVeloc, float yVeloc ) {
     xPos = x;
@@ -245,10 +246,8 @@ public class Ball extends PApplet {
     setActive(  );
   } // end launchBall()
 
-  /* Moves the position of the ball based on its velocity
-   */
   /**
-   * TODO: DOCUMENT ME!
+   * Moves the position of the ball based on its velocity
    */
   public void move(  ) {
     vel = sqrt( abs( sq( xVel ) ) + abs( sq( yVel ) ) );
@@ -265,15 +264,15 @@ public class Ball extends PApplet {
     yPos += yVel;
 
     if ( xVel > 0 ) {
-      xVel -= friction;
+      xVel -= getFriction();
     } else if ( xVel < 0 ) {
-      xVel += friction;
+      xVel += getFriction();
     }
 
     if ( yVel > 0 ) {
-      yVel -= friction;
+      yVel -= getFriction();
     } else if ( yVel < 0 ) {
-      yVel += friction;
+      yVel += getFriction();
     }
 
     // Checks if object reaches edge of screen, bounce
@@ -296,10 +295,8 @@ public class Ball extends PApplet {
     } // end else if
   } // end move()
 
-  /* Performs actions of the Ball class based on current state
-   */
   /**
-   * TODO: DOCUMENT ME!
+   * Performs actions of the Ball class based on its current state
    *
    * @param p DOCUMENT ME!
    */
@@ -312,4 +309,12 @@ public class Ball extends PApplet {
       // inactive state
     } // end else if
   } // end process()
+
+public void setFriction(float friction) {
+	this.friction = friction;
+}
+
+public float getFriction() {
+	return friction;
+}
 } // end Ball

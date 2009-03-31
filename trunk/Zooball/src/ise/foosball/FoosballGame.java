@@ -27,6 +27,7 @@ public class FoosballGame extends Game {
   private FoosballPausedState pausedState;
   private FoosballPlayState playState;
   private FoosballTestState testState;
+  private FoosballPrototypeState prototypeState;
   private PApplet p;
   private boolean debugMode = false;
   private volatile boolean loaded;
@@ -46,6 +47,7 @@ public class FoosballGame extends Game {
     pausedState = new FoosballPausedState( p, this );
     playState = new FoosballPlayState( p, this );
     testState = new FoosballTestState( p, this );
+    prototypeState = new FoosballPrototypeState( p, this );
     leavingState = new FoosballLeavingState( p, this );
     setState( new FoosballLoadingState( p, this ) );
     //setState( new FoosballTestState( p, this ) );
@@ -136,6 +138,15 @@ public class FoosballGame extends Game {
     return testState;
   } // end getTestState()
 
+  /**
+   * Gets the Prototype state for this Game - used for quick Processing import testing
+   *
+   * @return the GameProtoTypeState for this Game
+   */
+  public FoosballPrototypeState getPrototypeState(  ) {
+    return prototypeState;
+  } // end getPrototypeState()
+  
   /**
    * Adds a line to the debug output
    *
