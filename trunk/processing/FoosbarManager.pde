@@ -51,6 +51,29 @@ class FoosbarManager{
         bars[5] = new Foosbar( (5+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team1, 0);
         bars[6] = new Foosbar( (6+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team2, 1);
         bars[7] = new Foosbar( (7+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team2, 1);
+        bars[0].setupBars(screenDim, balls);
+        bars[1].setupBars(screenDim, balls);
+        bars[2].setupBars(screenDim, balls);
+        bars[3].setupBars(screenDim, balls);
+        bars[4].setupBars(screenDim, balls);
+        bars[5].setupBars(screenDim, balls);
+        bars[6].setupBars(screenDim, balls);
+        bars[7].setupBars(screenDim, balls);
+        break;
+      }else if( nBars == 6 ){
+        bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 0);
+        bars[1] = new Foosbar( (1+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team1, 0);
+        bars[2] = new Foosbar( (2+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team2, 1);
+        bars[3] = new Foosbar( (3+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team1, 0);
+        bars[4] = new Foosbar( (4+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team2, 1);
+        bars[5] = new Foosbar( (5+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team2, 1);
+        bars[0].setupBars(screenDim, balls);
+        bars[1].setupBars(screenDim, balls);
+        bars[2].setupBars(screenDim, balls);
+        bars[3].setupBars(screenDim, balls);
+        bars[4].setupBars(screenDim, balls);
+        bars[5].setupBars(screenDim, balls);
+        break;
       }else if( x%2 == 0 ){ // If even
         if( x == 0 || x == nBars) // Goalie - One player position
           bars[x] = new Foosbar( (x+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 0);
@@ -68,12 +91,13 @@ class FoosbarManager{
   }// CTOR
   
   // Process manager tasks based on current state
-  void process(Ball[] balls){
+  void process(Ball[] balls, double timer_g){
     if( state == ACTIVE ){
       for( int x = 0 ; x < nBars ; x++ ){
         bars[x].display();
         bars[x].ballInArea(balls);
         bars[x].collide(balls);
+        bars[x].setGameTimer(timer_g);
       }// for
     }else if ( state == INACTIVE ){
       // Inactive state

@@ -20,7 +20,7 @@ class Goal{
   
   float xPos, yPos, goalWidth, goalHeight;
   float barWidth = 10;
-  int teamNumber, nBalls;
+  int teamNumber, nBalls, points;
   Ball[] balls;
   
   int ballsRecentlyHit[];
@@ -54,8 +54,8 @@ class Goal{
     text("RecentlyHit["+i+"]: "+ballsRecentlyHit[i], xPos, yPos + 16*(3+i));
   }// displayDebug
   
-  boolean scored(){
-    return false;
+  int scored(){
+    return points;
   }// scored
   
   // Check for balls colliding with the goal bars
@@ -81,11 +81,16 @@ class Goal{
           }
 
         }// if
+        
         if( ballX < xPos + goalWidth/2 ){ // GOOOOOOOAL!
           balls[i].setInactive();
-          scored();
+          points++;
+          
+          lastScored = 1;
+          ballsInPlay--;
           continue;
         }
+        
         if(ballsRecentlyHit[i] == 1)
           ballsRecentlyHit[i] = 0;
       }else if( teamNumber == 1 ){ // Red team, right goal
@@ -100,15 +105,17 @@ class Goal{
           }
 
         }// if
+        
         if( ballX > xPos + goalWidth/2 ){ // GOOOOOOOAL!
           balls[i].setInactive();
-          scored();
+          points++;
           
           //topScore++;
-          //lastScored = 0;
-          //ballsInPlay--;
+          lastScored = 0;
+          ballsInPlay--;
           continue;
         }
+        
         if(ballsRecentlyHit[i] == 1)
           ballsRecentlyHit[i] = 0; 
       }// team if-else-if 

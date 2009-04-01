@@ -1,10 +1,11 @@
-/**---------------------------------------------
+/**
+ * ---------------------------------------------
  * MTHandI.pde
  *
  * Description: Multi-Touch Hand Interface
  *
  * Class:
- * System: Processing 1.0.1, Windows Vista
+ * System: Processing 1.0.1/Eclipse 3.4.1, Windows Vista/Windows XP SP2
  * Author: Arthur Nishimoto
  * Version: 0.1
  *
@@ -12,15 +13,20 @@
  * 2/13/09	- Initial Version
  *              - Uses timer_g and text needs a font
  * 2/27/09      - Added support for horizontal or vertical finger swipes
+ * 3/20/09      - MTFinger modifications for gesture tracking use
+ * 3/31/09      - Updated with getGameTimer() and setting debugColor and font
  * ---------------------------------------------
  */
  
- class MTHandI{
+ public class MTHandI{
    float xPos, yPos, padDiameter, fingerDistance, handTilt;
    float pinkyDistX, pinkyDistY, thumbDistX, thumbDistY;
    int nFingers;
    boolean active, pressed, leftHand, rightHand;
    MTFinger[] fingers;
+   
+   color pressed_cl = color( 0, 255, 255 );
+   color idle_cl = color( 0, 255, 0 );
    
    MTHandI(float x, float y, float padDia, int numFing, float fingDia){
      xPos = x;
@@ -29,19 +35,19 @@
      fingers = new MTFinger[numFing];
      nFingers = numFing;
      for(int i = 0; i < numFing; i++){
-       fingers[i] = new MTFinger(xPos-padDiameter/2+fingDia/2+ i*(padDiameter/4.5), height/2, fingDia, this);
+       fingers[i] = new MTFinger(xPos-padDiameter/2+fingDia/2+ i*(padDiameter/4.5f), height/2, fingDia, this);
      }// for fingerGeneration
    }// MTHandI CTOR
    
-   void display(){
+   public void display(){
      active = true;  
      if(pressed){
-       fill(#00FFFF, 100);
-       stroke(#00FF00);
+       fill(pressed_cl, 100);
+       stroke(pressed_cl);
        ellipse(xPos, yPos, padDiameter, padDiameter);
      }else{
-       fill(#00FF00, 100);
-       stroke(#00FF00);
+       fill(idle_cl, 100);
+       stroke(idle_cl);
        ellipse(xPos, yPos, padDiameter, padDiameter);
      }
      
@@ -65,7 +71,7 @@
      }
    }// display
    
-   boolean isPressed( float xCoord, float yCoord, int finger, float intensity){
+   public boolean isPressed( float xCoord, float yCoord, int finger, float intensity){
      if( !active )
        return false;
      if( xCoord > xPos-padDiameter/2 && xCoord < xPos+padDiameter/2 && yCoord > yPos-padDiameter/2 && yCoord < yPos+padDiameter/2){
@@ -82,39 +88,39 @@
      return false;
    }// isPressed
 
-  void displayDebug(){
-    fill(#000000);
+  public void displayDebug(color debugColor, PFont font){
+    fill(debugColor);
     textFont(font,16);
     text("Pressed: "+pressed, 10, 100);
     text("Hand Span: "+fingerDistance, 10, 100+16);
     text("Hand Tilt: "+handTilt, 10, 100+16*2);
 
     for(int i = 0; i < nFingers; i++){
-      fingers[i].displayDebug();
+      fingers[i].displayDebug(debugColor, font);
     }// for fingers
   }// displayDebug
   
-  void displayFinger(color newColor){
+  public void displayFinger(int newColor){
     for(int i = 0; i < nFingers; i++){
       fingers[i].displayFinger(newColor);
     }// for fingers
   }// displayDebug
   
-  void setDelay(double newDelay){
+  public void setDelay(double newDelay){
     for(int i = 0; i < nFingers; i++){
       fingers[i].buttonDownTime = newDelay;
     }// for fingers
   }// setDelay
   
-  float getSpan(){
+  public float getSpan(){
     return fingerDistance;
   }// getSpan
   
-  float getTilt(){
+  public float getTilt(){
     return handTilt;
   }// getTilt
 
-  void reset(){
+  public void reset(){
     active = false;
     pressed = false;
     for(int i = 0; i < nFingers; i++){
@@ -122,7 +128,7 @@
     }// for fingers
   }// reset
   
-  void calibrate(String hand){
+  public void calibrate(String hand){
     
     // Left-handed calibration
     if( hand == "LEFT" ){
@@ -149,29 +155,34 @@
     }// if-else left/right-handed
   }// calibrate
   
+  void setGameTimer( double timer_g ){
+    for(int i = 0; i < nFingers; i++){
+      fingers[i].setGameTimer(timer_g);
+    }// for fingers
+  }// setGameTimer
+   
  }// class MTHandI
  
- 
- /**---------------------------------------------
- * MTFinger.pde
+ /**
+ * ---------------------------------------------
+ * MTFinger
  *
- * Description: Multi-Touch Finger used with MTHandI
+ * Description: Multi-Touch Finger object
  *
  * Class:
- * System: Processing 1.0.1, Windows Vista
+ * System: Processing 1.0.1/Eclipse 3.4.1, Windows Vista/Windows XP SP2
  * Author: Arthur Nishimoto
  * Version: 0.1
  *
  * Version Notes:
- * 2/13/09	- Initial Version
- *              - Uses timer_g and text needs a font
- * 2/27/09      - Added support for horizontal or vertical finger swipes
  * ---------------------------------------------
  */
  
  class MTFinger{
    double buttonDownTime = 0.2;
-   double buttonLastPressed = 0;
+   double buttonLastPressed = -1;
+   double gameTimer;
+   
    float swipeThreshold = 30.0;
    float xPos, yPos, intensity;
    float diameter;
@@ -180,6 +191,13 @@
    float xMove, yMove;
    int fingerID;
    MTHandI hand;
+   ArrayList others = new ArrayList(); // List of all other touches
+   
+   color pressed_cl = color( 255, 0, 0 );
+   color clicked_cl = color( 0, 255, 0 );
+   color idle_cl = color( 0, 0, 0 );
+   
+   //PFont font;
    
    MTFinger(float x, float y, float dia, MTHandI newHand){
      xPos = x;
@@ -193,23 +211,37 @@
      diameter = dia;
      hand = newHand;
    }// MTFinger CTOR
+
+   MTFinger(float x, float y, float dia, int ID, ArrayList otherList){
+     xPos = x;
+     yPos = y;
+     pinky = false;
+     ring = false;
+     middle = false;
+     index = false;
+     thumb = false;
+     calibrated = false;
+     diameter = dia;
+     others = otherList;
+     fingerID = ID;
+   }// MTFinger CTOR
    
-   void display(){
+   public void display(){
      active = true;
      if(fingerID == -1 && !pressed)
-       buttonLastPressed = timer_g;
-       
+       buttonLastPressed = gameTimer;
+     
      if(pressed && !clicked){
-       fill(#0000FF);
-       stroke(#00FF00);
+       fill(pressed_cl);
+       stroke(pressed_cl);
        ellipse(xPos, yPos, diameter, diameter);
      }else if(clicked){
-       fill(#FF0000);
-       stroke(#00FF00);
+       fill(clicked_cl);
+       stroke(clicked_cl);
        ellipse(xPos, yPos, diameter, diameter);
      }else{
-       fill(#000000);
-       stroke(#00FF00);
+       fill(idle_cl);
+       stroke(idle_cl);
        ellipse(xPos, yPos, diameter, diameter); 
      }
      
@@ -227,11 +259,11 @@
      }else{
        ySwipe = false;
      }// if xSwipe
-     
+
    }// display
  
-   void displayDebug(){
-     fill(#000000);
+   public void displayDebug(color debugColor, PFont font){
+     fill(debugColor);
      textFont(font,16);
 
      text("Pressed: "+pressed, xPos+diameter, yPos-diameter/2);
@@ -239,6 +271,7 @@
      text("Movement: "+xMove+" , "+yMove, xPos+diameter, yPos-diameter/2-16);
      text("FingerID: "+fingerID+" Intensity: "+intensity, xPos+diameter, yPos-diameter/2+16*2);
      text("Button Delay: "+buttonDownTime, xPos+diameter, yPos-diameter/2+16*3);
+     
      if(buttonLastPressed + buttonDownTime > timer_g)
        text("Button Downtime Remain: "+((buttonLastPressed + buttonDownTime)-timer_g), xPos+diameter, yPos-diameter/2+16*4);
      else
@@ -253,31 +286,32 @@
        text("INDEX", xPos+diameter, yPos-diameter/2+16*5);
      else if(thumb)
        text("THUMB", xPos+diameter, yPos-diameter/2+16*5);
+     
    }// displayDebug 
    
-   void displayFinger(color newColor){
+   public void displayFinger(int newColor){
      fill(newColor);
      textFont(font,16);
      if(pinky)
-       text("PINKY", xPos, yPos-diameter*.6);
+       text("PINKY", xPos, yPos-diameter*.6f);
      else if(ring)
-       text("RING", xPos, yPos-diameter*.6);
+       text("RING", xPos, yPos-diameter*.6f);
      else if(middle)
-       text("MIDDLE", xPos, yPos-diameter*.6);
+       text("MIDDLE", xPos, yPos-diameter*.6f);
      else if(index)
-       text("INDEX", xPos, yPos-diameter*.6);
+       text("INDEX", xPos, yPos-diameter*.6f);
      else if(thumb)
-       text("THUMB", xPos, yPos-diameter*.6);
+       text("THUMB", xPos, yPos-diameter*.6f);
    }// displayFinger
    
-   boolean isPressed( float xCoord, float yCoord, int finger, float intensityVal){
+   public boolean isPressed( float xCoord, float yCoord, int finger, float intensityVal){
      if( xCoord > xPos-diameter/2 && xCoord < xPos+diameter/2 && yCoord > yPos-diameter/2 && yCoord < yPos+diameter/2){
        if (buttonLastPressed == 0){
-         buttonLastPressed = timer_g;
-       }else if ( buttonLastPressed + buttonDownTime < timer_g){
+         buttonLastPressed = gameTimer;
+       }else if ( buttonLastPressed + buttonDownTime < gameTimer){
          if(fingerID != finger){
            clicked = true;
-           buttonLastPressed = timer_g;
+           buttonLastPressed = gameTimer;
 
          }
          pressed = true;
@@ -301,7 +335,7 @@
    }// isPressed
  
  
-    void calibrate( float xCoord, float yCoord, int finger){
+    public void calibrate( float xCoord, float yCoord, int finger){
      if( xCoord > xPos-diameter/2 && xCoord < xPos+diameter/2 && yCoord > yPos-diameter/2 && yCoord < yPos+diameter/2){
        switch(finger){
          case(1):
@@ -337,21 +371,36 @@
      return;
    }// calibrate
    
-   void shoot(int style){
+   public void shoot(int style){
      //particleManager.explodeParticles(100, xPos, yPos, 0, 0, style);
    }// shoot
    
-   void reset(){
+   public void reset(){
      fingerID = -1;
      pressed = false;
    }// reset
    
-  void setButtonDelay(double newDelay){
-    buttonDownTime = newDelay;
-  }// setDelay
+   // Setters and getters 
+   
+   public void setButtonDelay(double newDelay){
+     buttonDownTime = newDelay;
+   }// setDelay
   
-  void setSwipeThreshold(float newThreshold){
-    swipeThreshold = newThreshold;
-  }// setSwipeThreshold
+   public void setSwipeThreshold(float newThreshold){
+     swipeThreshold = newThreshold;
+   }// setSwipeThreshold
+  
+   void setGameTimer( double timer_g ){
+     gameTimer = timer_g;
+   }// setGameTimer
+  
+   public float getXPos(){
+     return xPos;
+   }// getXPos
+  
+   public float getYPos(){
+     return yPos;
+   }// getYPos
   
  }// class MTFinger
+
