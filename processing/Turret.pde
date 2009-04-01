@@ -24,6 +24,7 @@ class Turret{
   
   double buttonDownTime = 1;
   double buttonLastPressed = -1; // Starts active if < 0
+  double gameTimer;
   
   color idle_cl = color( 0, 0, 0 );
   color pressed_cl = color( 255, 0, 0 );
@@ -72,6 +73,12 @@ class Turret{
     enable = false;
   }// disable
   
+  void process(double timer_g){
+    display();
+    displayTurret();
+    setGameTimer(timer_g);
+  }//process
+  
   void display(){
     active = true;
 
@@ -101,7 +108,7 @@ class Turret{
     }
     
     if( currentRecoil > 0 ){
-      currentRecoil = recoil*(float)((buttonLastPressed + buttonDownTime)-timer_g);
+      currentRecoil = recoil*(float)((buttonLastPressed + buttonDownTime)-gameTimer);
     }else
       currentRecoil = 0;
 
@@ -133,8 +140,8 @@ class Turret{
     text("yCord: "+yCord, xPos+diameter, yPos-diameter/2+16*3);
     text("Angle: "+angle, xPos+diameter, yPos-diameter/2+16*4);
     text("Button Delay: "+buttonDownTime, xPos+diameter, yPos-diameter/2+16*5);
-    if(buttonLastPressed + buttonDownTime > timer_g)
-      text("Button Downtime Remain: "+((buttonLastPressed + buttonDownTime)-timer_g), xPos+diameter, yPos-diameter/2+16*6);
+    if(buttonLastPressed + buttonDownTime > gameTimer)
+      text("Button Downtime Remain: "+((buttonLastPressed + buttonDownTime)-gameTimer), xPos+diameter, yPos-diameter/2+16*6);
     else
       text("Button Downtime Remain: 0", xPos+diameter, yPos-diameter/2+16*6);
   }// displayDebug
@@ -145,9 +152,9 @@ class Turret{
       return false;
     if( xCoord > xPos-diameter/2 && xCoord < xPos+diameter/2 && yCoord > yPos-diameter/2 && yCoord < yPos+diameter/2){
       if (buttonLastPressed == 0){
-        buttonLastPressed = timer_g;
-      }else if ( buttonLastPressed + buttonDownTime < timer_g){
-        buttonLastPressed = timer_g;
+        buttonLastPressed = gameTimer;
+      }else if ( buttonLastPressed + buttonDownTime < gameTimer){
+        buttonLastPressed = gameTimer;
         pressed = true;
         armed = true;
         //shoot();
@@ -229,6 +236,10 @@ class Turret{
     return true;  
   }// setAngle
   
+  void setGameTimer( double timer_g ){
+    gameTimer = timer_g;
+  }// setGameTimer
+
   float getAngle(){
     return angle;
   }// getAngle

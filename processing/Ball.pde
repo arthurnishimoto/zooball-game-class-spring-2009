@@ -1,10 +1,11 @@
-/**---------------------------------------------
+/**
+ * --------------------------------------------- 
  * Ball.pde
- *
+ * 
  * Description: Ball object.
- *
+ * 
  * Class: CS 426 Spring 2009
- * System: Processing 1.0.1, Windows XP SP2/Windows Vista
+ * System: Processing 1.0.1/Eclipse 3.4.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
  * Version: 0.3
  * 
@@ -13,22 +14,33 @@
  * 3/18/09   - Version 0.2 - Initial FSM conversion
  * 3/25/09   - Version 0.3 - Encapsulation fixes for code clarity and easier Java conversion
  * 3/28/09   - displayDebug now takes in a color and font as parameters.
+ * --------------------------------------------- 
  */
-
 class Ball{
   int state;
   final static int ACTIVE = 1;
   final static int INACTIVE = 0;
   float friction = 0.001;
   float xPos, yPos, xVel, yVel, vel, angle;
-  float maxVel = 10;
+  float maxVel = 20;
   float diameter;
   int ID_no;
   Ball[] others;
   color ballColor = color(#FFFFFF);
   
   int screenWidth, screenHeight, borderWidth, borderHeight;
+  double gameTimer;
   
+  /**
+   * Creates a new Ball object.
+   *
+   * @param newX - initial x position
+   * @param newY - initial y position
+   * @param newDiameter - initial diameter
+   * @param ID - unique Ball ID
+   * @param otr - Array of all other Ball objects for collision purposes
+   * @param screenDim - Screen and border parameters for edge collision
+   */
   Ball(float newX, float newY, float newDiameter, int ID, Ball[] otr, int[] screenDim){
     // Sets the screen size and border size - Used for edge collision
     screenWidth = screenDim[0];
@@ -46,18 +58,26 @@ class Ball{
     others = otr;
   }// Ball CTOR
   
-  /* Performs actions of the Ball class based on current state
+  /**
+   * Performs actions of the Ball class based on its current state
+   *
+   * @param p - PApplet used for Processing graphics/text
+   * @param timer_g - double used as the game timer
    */
-  void process(){
+  void process(double timer_g){
     if(state == ACTIVE){
       display();
       //displayDebug();
+      setGameTimer(timer_g);
       move();
     }else if(state == INACTIVE){
       // inactive state
     }// state if-else
   }// process
   
+  /**
+   * Sets the ball to its active state.
+   */
   boolean isActive(){
     if(state == ACTIVE)
       return true;
@@ -65,13 +85,18 @@ class Ball{
       return false;  
   }// isActive
   
-  /* Changes the direction and velocity of the ball.
+  /**
+   * Changes the direction and velocity of the ball.
    * Used for ball/wall or ball/foosmen collision
+   *
+   * @param hitDirection - 1: reverses x velocity, 2: reverses y velocity, 3: reverse both x and y
+   * @param xVeloc - x velocity added
+   * @param yVeloc - y velocity added
    */
   void kickBall( int hitDirection, float xVeloc, float yVeloc ){
     if(state == INACTIVE)
       return;
-      
+
     // Basic implementation
     if( hitDirection == 1 || hitDirection == 3) // Reverse x
       xVel *= -1;
@@ -81,7 +106,9 @@ class Ball{
     yVel += yVeloc;
   }// kickBall
   
-  /* Ball was launched with a specific location using a specific velocity.
+  /** 
+   * Ball was launched with a specific location using a specific velocity.
+   *
    * @param x : initial x position
    * @param y : initial y position
    * @param xVeloc : initial x velocity
@@ -95,7 +122,9 @@ class Ball{
     setActive();
   }//launchBall 
   
-  /* Checks if ball was hit from an input device
+  /**
+   * Checks if ball was hit from an input device
+   *
    * @param x : input x coordinate
    * @param y : input y coordinate
    */
@@ -118,14 +147,16 @@ class Ball{
     }// if
   }// is Hit
   
-  /* @TODO To be used for ball/ball collision
+  /**
+   * TODO: To be used for ball/ball collision
    */
   void collide() {
     if(state == INACTIVE)
       return;
   }// collide
   
-  /* Moves the position of the ball based on its velocity
+  /**
+   * Moves the position of the ball based on its velocity
    */
   void move() {
     vel = sqrt(abs(sq(xVel))+abs(sq(yVel)));
@@ -146,8 +177,8 @@ class Ball{
       yVel -= friction;
     else if( yVel < 0 )
       yVel += friction;
-    
-    // Checks if object reaches edge of screen, bounce
+        
+    // Checks if object reaches edge of border/screen, bounce
     if ( xPos+diameter/4 > screenWidth-borderWidth){
       xVel *= -1;
       xPos += xVel;
@@ -164,11 +195,22 @@ class Ball{
     }
   }// move
   
+  /**
+   * Displays Ball
+   *
+   * @param p DOCUMENT ME!
+   */
   void display(){
     fill(ballColor, 255);
     ellipse(xPos, yPos, diameter, diameter);
   }// display
   
+  /**
+   * Displays debug information
+   *
+   * @param 
+   * @param
+   */
   void displayDebug(color debugColor, PFont font){
      fill(debugColor);
      textFont(font,16);
@@ -177,9 +219,6 @@ class Ball{
   
   // Getters/Setters
   
-  /* Returns the speed of the ball
-   * @return float - speed of the ball
-   */
   float getSpeed(){
     return sqrt(sq(xVel)+sq(yVel));
   }// getSpeed
@@ -187,11 +226,11 @@ class Ball{
   void setActive(){
     state = ACTIVE;
   }// setActive
-  
+
   void setInactive(){
     state = INACTIVE;
   }// setActive
-  
+    
   void setMaxVel(float newMax){
     maxVel = newMax;
   }//setMaxVel
@@ -199,4 +238,9 @@ class Ball{
   void setColor(color newColor){
     ballColor = newColor;
   }// setColor
+
+  void setGameTimer( double timer_g ){
+    gameTimer = timer_g;
+  }// setGameTimer
+
 }//class Ball

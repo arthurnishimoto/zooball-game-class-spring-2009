@@ -1,16 +1,19 @@
-/**---------------------------------------------
+/**
+ * ---------------------------------------------
  * Foosbar.pde
  *
  * Description: Foosbar object containing foosmen
  *
  * Class: CS 426 Spring 2009
- * System: Processing 1.0.1, Windows XP SP2/Windows Vista
+ * System: Processing 1.0.1/Eclipse 3.4.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 0.1
+ * Version: 0.1a
  * 
  * Version Notes:
  * 3/1/09    - Initial version
- * 3/28/09    - FSM implementation
+ * 3/28/09   - FSM implementation
+ * 4/1/09    - "Spring-loaded" foosbar option added
+ * ---------------------------------------------
  */
  
 class Foosbar{
@@ -26,6 +29,9 @@ class Foosbar{
   MTFinger fingerTest;
   Foosman[] foosPlayers;
   Ball[] ballArray;
+  boolean springEnabled = true;
+  float spring = 0.01;
+  float rotateVel;
   
   int playerWidth = 65;
   int playerHeight = 100;
@@ -98,7 +104,9 @@ class Foosbar{
   void displayDebug(color debugColor, PFont font){
     fill(debugColor);
     textFont(font,12);
-
+    
+    text("Spring: "+spring, xPos, yPos+barHeight-16*9);
+    text("Rotate Velocity: "+rotateVel, xPos, yPos+barHeight-16*8);
     text("Active: "+pressed, xPos, yPos+barHeight-16*7);
     text("Y Position: "+buttonValue, xPos, yPos+barHeight-16*6);
     text("Movement: "+xMove+" , "+yMove, xPos, yPos+barHeight-16*5);
@@ -131,6 +139,7 @@ class Foosbar{
         rotation = (xCoord-(xPos+barWidth/2))/barWidth; // Rotation: value from -0.5 (fully up to the left) to 0.5 (fully up to the right)
     
         xMove = fingerTest.xMove*sliderMultiplier;
+        xMove = constrain(xMove, -10, 10);
         if( abs(fingerTest.yMove-yMove) < 100) // Prevents sudden sliding of bar
           yMove = fingerTest.yMove*sliderMultiplier;
 
@@ -159,12 +168,32 @@ class Foosbar{
             foosPlayers[i].yPos += yMove;
           }
         }
-        
-
-        
         buttonPos = yCoord;
         return true;
     }// if x, y in area
+    
+    // If spring == true, bar will "spring" back to down position
+    if( springEnabled ){
+      //if(pressed || rotateVel != 0) // Debug text - prints velocity
+      //  println(rotateVel);
+      
+      if( rotation < 0 ){
+        rotateVel += spring;
+        rotation += rotateVel;
+      }else if( rotation > 0 ){
+        rotateVel -= spring;
+        rotation += rotateVel;
+      }
+      xMove = rotateVel*100;
+      
+      // Stops spring
+      if( rotation < 0.1 && rotation > -0.1 ){
+        rotateVel = 0;
+        rotation = 0;
+      }
+  
+    }// if spring enabled
+    
     pressed = false;
     return false;
   }// isHit
@@ -209,7 +238,7 @@ class Foosbar{
  
   void reset(){
     pressed = false;
-    xMove = 0;
+    //xMove = 0;
     yMove = 0;
   }// reset
   
@@ -219,6 +248,11 @@ class Foosbar{
     buttonPos = -1*(yPos*pos-barWidth*pos-barHeight*pos-yPos);
     buttonValue = (yPos-buttonPos)/(yPos-barWidth-barHeight); // Update debug display
   }// setButtonPos
+  
+  void setGameTimer( double timer_g ){
+    for( int i = 0; i < nPlayers; i++ )
+        foosPlayers[i].setGameTimer(timer_g);
+  }// setGameTimer
   
   // Setups ball pointers and screen dimentions before bar generation
   void setupBars(int[] screenDim, Ball[] balls){
@@ -259,6 +293,7 @@ class Foosman{
   //GLOBAL button time
   double buttonDownTime = 0.3;
   double buttonLastPressed = 0;
+  double gameTimer;
   
   int screenWidth, screenHeight, borderWidth, borderHeight;
   
@@ -299,10 +334,7 @@ class Foosman{
     }
     fill( #000000 );
     playerWidth = 4*orig_Width*parent.rotation;
-    
-    
-    
-    
+
     rect(xPos, yPos, playerWidth, playerHeight);
 
     image(topImage, xPos-orig_Width/2+17, yPos+playerHeight/2);
@@ -468,12 +500,16 @@ class Foosman{
     return false;
   }// collide
   
+  void setGameTimer( double timer_g ){
+    gameTimer = timer_g;
+  }// setGameTimer
+  
   boolean setDelay(){
     if(buttonLastPressed == 0){
-      buttonLastPressed = ((buttonLastPressed + buttonDownTime)-timer_g);
+      buttonLastPressed = ((buttonLastPressed + buttonDownTime)-gameTimer);
       return false;
-    }else if ( buttonLastPressed + buttonDownTime < timer_g){
-      buttonLastPressed = timer_g;
+    }else if ( buttonLastPressed + buttonDownTime < gameTimer){
+      buttonLastPressed = gameTimer;
       return true;
     }// if-else-if button pressed
     return false;
