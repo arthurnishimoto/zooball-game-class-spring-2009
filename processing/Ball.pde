@@ -14,9 +14,12 @@
  * 3/18/09   - Version 0.2 - Initial FSM conversion
  * 3/25/09   - Version 0.3 - Encapsulation fixes for code clarity and easier Java conversion
  * 3/28/09   - displayDebug now takes in a color and font as parameters.
+ * 4/1/09    - Ball image support added. Ball image rotates based on ball vector
+ *           - Bouncing ball issue at very low velocities fixed.
  * --------------------------------------------- 
  */
 class Ball{
+  PImage ball_img_1 = loadImage("ball_50.gif");
   int state;
   final static int ACTIVE = 1;
   final static int INACTIVE = 0;
@@ -144,6 +147,7 @@ class Ball{
       while( newVel < 4 && newVel > -4 )
         newVel =  random(-10, 11);
       yVel = newVel;
+      soundManager.playKick();
     }// if
   }// is Hit
   
@@ -160,7 +164,13 @@ class Ball{
    */
   void move() {
     vel = sqrt(abs(sq(xVel))+abs(sq(yVel)));
-        
+    
+    // Prevents bouncing ball when velocity is almost 0
+    if( vel < 0.1 && vel > -0.1){
+      xVel = 0;
+      yVel = 0;
+    }
+    
     if ( xVel > maxVel )
       xVel = maxVel;
     if ( yVel > maxVel )
@@ -182,17 +192,22 @@ class Ball{
     if ( xPos+diameter/4 > screenWidth-borderWidth){
       xVel *= -1;
       xPos += xVel;
+      soundManager.playBounce();
     }else if ( xPos-diameter/4 < borderWidth){
       xVel *= -1;
       xPos += xVel;
+      soundManager.playBounce();
     }
     if ( yPos+diameter/4 > screenHeight-borderHeight){
       yVel *= -1;
       yPos += yVel;
+      soundManager.playBounce();
     }else if ( yPos-diameter/4 < borderHeight ){
       yVel *= -1;
       yPos += yVel;
+      soundManager.playBounce();
     }
+    
   }// move
   
   /**
@@ -201,8 +216,14 @@ class Ball{
    * @param p DOCUMENT ME!
    */
   void display(){
-    fill(ballColor, 255);
-    ellipse(xPos, yPos, diameter, diameter);
+    //fill(ballColor, 255);
+    //ellipse(xPos, yPos, diameter, diameter);
+    imageMode(CENTER);
+    pushMatrix();
+    translate(xPos, yPos);
+    rotate(atan2(yVel,xVel));
+    image(ball_img_1, 0, 0);
+    popMatrix();
   }// display
   
   /**

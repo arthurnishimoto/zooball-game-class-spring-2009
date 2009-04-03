@@ -1,4 +1,5 @@
-/**---------------------------------------------
+/**
+ * ---------------------------------------------
  * FoosbarManager.pde
  *
  * Description: Foosbar manager. Generates and organizes all foosbars
@@ -122,6 +123,17 @@ class FoosbarManager{
      for( int i = 0 ; i < nBars ; i++ )
         bars[i].isHit(x,y);
   }// barsPressed
+  
+  void setSpringEnabled(boolean enable){
+    for( int x = 0 ; x < nBars ; x++ )
+      bars[x].setSpringEnabled(enable);
+  }// setSpringEnabled
+  
+  boolean isSpringEnabled(){
+    for( int x = 0 ; x < nBars ; x++ )
+      return bars[x].isSpringEnabled();
+    return false;
+  }// isSpringEnabled
   
   // Reset bars - used to fix edge collision sticking
   void reset(){
