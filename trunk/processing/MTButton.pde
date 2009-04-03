@@ -12,6 +12,8 @@
  * Version Notes:
  * 2/6/09    - Initial version
  * 3/28/09   - Added button text
+ * 4/1/09    - Support for rectuangular buttons
+ *           - Button text displays up and down
  * ---------------------------------------------
  */
  
@@ -23,31 +25,49 @@ class Button{
   double gameTimer;
   boolean hasImage = false;
   boolean isRound = false;
+  boolean isRectangle = false;
   boolean pressed, xSwipe, ySwipe;
   float diameter;
+  float rHeight, rWidth;
   color idle_cl = color(#000000);
   color pressed_cl = color(#FF0000);
+
   boolean active;
   String buttonText = "";
+  color buttonTextColor = color(0,0,0);
+  boolean doubleSidedText = true;
+  boolean invertText = false;
+  
+  int fadeAmount = 1;
+  int fadeSpeed = 5;
+  boolean fadeIn, fadeOut;
+  color fadeColor = color(0,0,0);
+  boolean fadeEnable = false;
+  boolean doneFading = true;
    
-  Button( float newDia , int new_xPos, int new_yPos){
+  Button( int new_xPos, int new_yPos, float newDia ){
     diameter = newDia;
     xPos = new_xPos;
     yPos = new_yPos;
-    hasImage = false;
     isRound = true;
   }// Button CTOR
+
+  Button( int new_xPos, int new_yPos, float newWidth, float newHeight ){
+    rWidth = newWidth;
+    rHeight = newHeight;
+    xPos = new_xPos;
+    yPos = new_yPos;
+    isRectangle = true;
+  }// Button CTOR
   
-  Button( String newImage , int new_xPos, int new_yPos ){
+  Button( int new_xPos, int new_yPos, String newImage ){
     buttonImage = loadImage(newImage);
     xPos = new_xPos-buttonImage.width/2;
     yPos = new_yPos-buttonImage.height/2;
     diameter = buttonImage.width;
     hasImage = true;
   }// Button CTOR
-  
 
-  
   void process(PFont font, double timer_g){
     display(font);
     //displayDebug(color(0,255,0), font);
@@ -56,27 +76,77 @@ class Button{
   }// process
   
   void display(PFont font){
-    active = true;
+    if( fadeAmount <= 1 )
+      active = true;
    
     if(hasImage)
       image( buttonImage, xPos, yPos );
-    else if(isRound && !pressed){
+    else if(!pressed){
       fill(idle_cl);
       stroke(idle_cl);
-      ellipse( xPos, yPos, diameter, diameter );
-    }else if(isRound && pressed){
+      if(isRound)
+        ellipse( xPos, yPos, diameter, diameter );
+      else if(isRectangle)
+        rect( xPos, yPos, rWidth, rHeight );
+    }else if(pressed){
       fill(pressed_cl);
       stroke(pressed_cl);
-      ellipse( xPos, yPos, diameter, diameter );
+      if(isRound)
+        ellipse( xPos, yPos, diameter, diameter );
+      else if(isRectangle)
+        rect( xPos, yPos, rWidth, rHeight );
     }
     
-    fill(#000000);
+    fill(buttonTextColor);
     textFont(font,16);
     textAlign(CENTER);
-    text(buttonText, xPos, yPos);
-    textAlign(LEFT);
-  }// display
   
+    int textShift = 0;
+    if( doubleSidedText )
+      textShift = 16;
+    
+    if( doubleSidedText || !invertText ){
+      if( isRound )
+        text(buttonText, xPos, yPos + textShift);
+      else if( hasImage )
+        text(buttonText, xPos + buttonImage.width/2, yPos + buttonImage.height/2 + textShift);
+      else if ( isRectangle )
+        text(buttonText, xPos + rWidth/2, yPos + rHeight/2 + textShift);
+    }// if text not inverted
+    
+    if( doubleSidedText || invertText ){
+      pushMatrix();
+      if( isRound )
+        translate(xPos, yPos - textShift);
+      else if( hasImage )
+        translate(xPos + buttonImage.width/2, yPos + buttonImage.height/2 - textShift);
+      else if ( isRectangle )
+        translate(xPos + rWidth/2, yPos + rHeight/2 - textShift);
+      rotate(radians(180));
+      textAlign(CENTER);
+      text(buttonText, 0, 0);  
+      popMatrix();
+    }// if doubleSidedtext
+    
+    if(fadeEnable){
+      if(fadeIn && fadeAmount > 0)
+        fadeAmount -= fadeSpeed;
+      else if(fadeOut && fadeAmount < 256)
+        fadeAmount += fadeSpeed;
+      else
+        doneFading = true;
+    }// if fadeEnable
+    
+    fill(fadeColor,fadeAmount);
+    noStroke();
+    if(hasImage)
+      rect( xPos, yPos, buttonImage.width, buttonImage.height );
+    if(isRectangle)
+      rect( xPos, yPos, rWidth, rHeight );
+    if(isRound)
+      ellipse( xPos, yPos, diameter, diameter );
+  }// display
+    
   void displayEdges(color debugColor){
     fill(debugColor);
 
@@ -90,7 +160,12 @@ class Button{
       ellipse( xPos+buttonImage.width, yPos+buttonImage.height, 10, 10 ); // Bottom Right
       ellipse( xPos+buttonImage.width, yPos, 10, 10 ); // Top right
       ellipse( xPos, yPos+buttonImage.height, 10, 10 );// Bottom Left 
-    } 
+    }else if(isRectangle){
+      ellipse( xPos, yPos, 10, 10 ); // Top left
+      ellipse( xPos+rWidth, yPos+rHeight, 10, 10 ); // Bottom Right
+      ellipse( xPos+rWidth, yPos, 10, 10 ); // Top right
+      ellipse( xPos, yPos+rHeight, 10, 10 );// Bottom Left       
+    }
   }//  displayEdges
   
   void displayDebug(color debugColor, PFont font){
@@ -106,7 +181,7 @@ class Button{
   }// displayDebug
     
   boolean isHit( float xCoord, float yCoord ){
-    if( !active )
+    if( !active || fadeAmount > 1 )
       return false;
     if(isRound){
       if( xCoord > xPos-diameter/2 && xCoord < xPos+diameter/2 && yCoord > yPos-diameter/2 && yCoord < yPos+diameter/2){
@@ -128,6 +203,16 @@ class Button{
           return true;
         }// if-else-if button pressed
       }// if x, y in area
+    }else if(isRectangle){
+       if( xCoord > xPos && xCoord < xPos+rWidth && yCoord > yPos && yCoord < yPos+rHeight){
+        if (buttonLastPressed == 0){
+          buttonLastPressed = gameTimer;
+        }else if ( buttonLastPressed + buttonDownTime < gameTimer){
+          buttonLastPressed = gameTimer;
+          pressed = true;
+          return true;
+        }// if-else-if button pressed
+      }// if x, y in area     
     }
     pressed = false;
     return false;
@@ -150,7 +235,20 @@ class Button{
   void setButtonText(String newText){
     buttonText = newText;
   }// setButtonText  
+  
+  void setButtonTextColor(color newColor){
+    buttonTextColor = newColor;
+  }// setButtonText 
 
+  void setDoubleSidedText( boolean newBool ){
+    doubleSidedText = newBool;
+  }// setDoubleSidedText
+  
+  void setInvertedText( boolean newBool ){
+    invertText = newBool;
+    doubleSidedText = !newBool;
+  }// setInvertedText
+  
   void setDelay(double newDelay){
     buttonDownTime = newDelay;
   }// setDelay
@@ -158,6 +256,32 @@ class Button{
   void setGameTimer( double timer_g ){
     gameTimer = timer_g;
   }// setGameTimer
+
+  void setFadeOut(){
+    fadeAmount = 1;
+    fadeOut = true;
+    fadeIn = false;
+    doneFading = false;
+  }// setFadeOut
+  
+  void setFadeIn(){
+    fadeAmount = 255;
+    fadeOut = false;
+    fadeIn = true;
+    doneFading = false;
+  }// setFadeOut
+  
+  void setFadeColor(color newColor){
+    fadeColor = newColor;
+  }// setFadeColor
+  
+  void fadeEnable(){
+    fadeEnable = true;
+  }// fadeEnable
+  
+  void fadeDisable(){
+    fadeEnable = true;
+  }// fadeEnable   
  
   boolean isActive(){
     if(active)
@@ -165,5 +289,9 @@ class Button{
     else
       return false;  
   }// isActive
+  
+  boolean isDoneFading(){
+    return doneFading;
+  }// isDoneFading
 }// class Button
 

@@ -23,6 +23,8 @@ class Goal{
   int teamNumber, nBalls, points;
   Ball[] balls;
   
+  FoosballDemo parent;
+  
   int ballsRecentlyHit[];
  
   Goal( float new_xPos, float new_yPos, float newWidth, float newHeight, int teamNo, Ball[] theBalls){
@@ -76,6 +78,7 @@ class Goal{
           
           if( ballY <= yPos || ballY >= yPos + goalHeight ){
             balls[i].kickBall( 1, 0, 0 );
+            soundManager.playBounce();
             ballsRecentlyHit[i] = 1;
             continue;
           }
@@ -85,9 +88,10 @@ class Goal{
         if( ballX < xPos + goalWidth/2 ){ // GOOOOOOOAL!
           balls[i].setInactive();
           points++;
-          
-          lastScored = 1;
-          ballsInPlay--;
+          soundManager.playGoal();
+          parent.bottomScore++;
+          parent.lastScored = 1;
+          parent.ballsInPlay--;
           continue;
         }
         
@@ -100,6 +104,7 @@ class Goal{
           
           if( ballY <= yPos || ballY >= yPos + goalHeight ){
             balls[i].kickBall( 1, 0, 0 );
+            soundManager.playBounce();
             ballsRecentlyHit[i] = 1;
             continue;
           }
@@ -109,10 +114,10 @@ class Goal{
         if( ballX > xPos + goalWidth/2 ){ // GOOOOOOOAL!
           balls[i].setInactive();
           points++;
-          
-          //topScore++;
-          lastScored = 0;
-          ballsInPlay--;
+          soundManager.playGoal();
+          parent.topScore++;
+          parent.lastScored = 0;
+          parent.ballsInPlay--;
           continue;
         }
         
@@ -128,5 +133,8 @@ class Goal{
     return false;
   }// hasBall
   
+  void setParentClass(FoosballDemo newParent){
+    parent = newParent;
+  }// setParentClass
 }// class Goal
 

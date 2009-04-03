@@ -1,4 +1,5 @@
-/**---------------------------------------------
+/**
+ * ---------------------------------------------
  * Turret.pde
  *
  * Description: Rotating turret which can fire a projectile at a given angle and velocity.
@@ -21,6 +22,7 @@ class Turret{
   boolean alwaysShowRotate = false;
   boolean enable = false;
   boolean armed = false;
+  boolean shootOnRelease = true;
   
   double buttonDownTime = 1;
   double buttonLastPressed = -1; // Starts active if < 0
@@ -34,6 +36,8 @@ class Turret{
   float recoil = 50;
   float currentRecoil = 0;
   int shotNo = 0;
+  
+  FoosballDemo parent;
   
   Turret( float newDia , int new_xPos, int new_yPos, float rotateDia, float rotateButtonDia){
     diameter = newDia;
@@ -157,12 +161,13 @@ class Turret{
         buttonLastPressed = gameTimer;
         pressed = true;
         armed = true;
-        //shoot();
+        if(!shootOnRelease)
+          shoot();
         return true;
       }// if-else-if button pressed
 
     }// if x, y in area
-     else if( armed && !rotatePressed){
+    else if( armed && !rotatePressed && shootOnRelease){
       shoot();
       armed = false;
     }
@@ -200,9 +205,10 @@ class Turret{
   }// isHit
   
   void shoot(){
+    soundManager.playKick();
     
-    if( ballQueue == nBalls )
-       ballQueue = 0;
+    if( parent.ballQueue == parent.nBalls )
+       parent.ballQueue = 0;
     
     currentRecoil = recoil;
     
@@ -216,11 +222,15 @@ class Turret{
     else
       newYPos = yPos+50;
 
-    balls[ballQueue].launchBall(newXPos, newYPos, newXVel, newYVel);
-    ballsInPlay++;
-    ballQueue++;
+    parent.balls[parent.ballQueue].launchBall(newXPos, newYPos, newXVel, newYVel);
+    parent.ballsInPlay++;
+    parent.ballQueue++;
     disable();
   }// shoot
+  
+  void setParentClass(FoosballDemo newParent){
+    parent = newParent;
+  }// setParentClass
   
   void resetButton(){
     pressed = false;
@@ -239,7 +249,15 @@ class Turret{
   void setGameTimer( double timer_g ){
     gameTimer = timer_g;
   }// setGameTimer
-
+  
+  void setShootOnRelease(boolean enable){
+    shootOnRelease = enable;
+  }// setShootOnRelease
+  
+  boolean isShootOnRelease(){
+    return shootOnRelease;
+  }// isShootOnRelease
+  
   float getAngle(){
     return angle;
   }// getAngle
