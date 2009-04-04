@@ -1,24 +1,49 @@
 #summary Preliminary Project Plan.
+#labels Phase-Design,Phase-Requirements,Phase-QA
 
 = Project Plan Projection =
-Updated 3/19/09
+Updated 4/4/09
 
-||   || *Date*|| *Event*            || *Overall Goals*      ||
-||W  || 3/18 || Meeting             || 
-||F  || 3/19 || Class               || 
-||W  || 3/25 || UIC Spring Break    || 
-||F  || 3/27 || UIC Spring Break    || 
-||M  || 3/30 ||                     || Prepare demo elements - Adding artwork, sound to demo ||
-||W  || 4/1  || Meeting             || Finalize Demo        ||
-||Th || 4/2  ||                     || Test demo on TacTile ||
-||F  || 4/3  || Mid-Semester Review || 
-||W  || 4/8  || LSU Spring Break    || Planning advanced game elements ||
-||F  || 4/10 || LSU Spring Break    || 
-||W  || 4/15 || Meeting             || Finalize advanced game elements ||
-||F  || 4/17 || Class               || 
-||W  || 4/22 || Meeting             || Coding/Testing advanced game elements ||
-||F  || 4/24 || Class               || Integrating final sounds, artwork, code ||
-||W  || 4/8  || Meeting             || Finalize Project ||
-||F  || 4/10 || Class               || 
-||W  || 4/29 || Meeting             || Testing, bug checking ||
-||F  || 5/1  || Final Presentation  || 
+|| *Days To Final* ||   || *Date*|| *Event*            || *Overall Goals*      ||
+||  ||W  || 3/18 || Meeting             || 
+||  ||F  || 3/19 || Class               || 
+||  ||W  || 3/25 || UIC Spring Break    || 
+||  ||F  || 3/27 || UIC Spring Break    || 
+||  ||M  || 3/30 ||                     || Prepare demo elements - Adding artwork, sound to demo ||
+||  ||W  || 4/1  || Meeting             || Finalize Demo        ||
+||  ||Th || 4/2  ||                     || Test demo on TacTile ||
+|| 34 || F  || 4/3  || Mid-Semester Review || 
+|| 33 || Sa || 4/4  || LSU Spring Break    ||
+|| 32 || Su || 4/5  || LSU Spring Break    ||
+|| 31 || M  || 4/6  || LSU Spring Break    ||
+|| 30 || Tu || 4/7  || LSU Spring Break    ||
+|| 29 || W  || 4/8  || LSU Spring Break    || Think about how to make project "more innovative" than traditional Foosball ||
+|| 28 || Th || 4/9  || LSU Spring Break    ||
+|| 27 || F  || 4/10 || LSU Spring Break    ||
+|| 26 || Sa || 4/11 || LSU Spring Break    ||
+|| 25 || Su || 4/12 || LSU Spring Break    ||
+|| 24 || M  || 4/13 ||                     ||
+|| 23 || Tu || 4/14 ||                     ||
+|| 22 || W  || 4/15 || Meeting             || Final discussion on "innovative" game play elements. Discuss Mid-Semester review feedback ||
+|| 21 || Th || 4/16 ||                     || Begin coding "innovative" game play ||
+|| 20 || F  || 4/17 || Class - Game Physics ||
+|| 19 || Sa || 4/18 ||                     ||
+|| 18 || Su || 4/19 ||                     ||
+|| 17 || M  || 4/20 ||                     || Deadline to make sure Java export will work on TacTile ||
+|| 16 || Tu || 4/21 ||                     ||
+|| 15 || W  || 4/22 || Meeting             || Game play stress test - Test for stability, correct physics, "fun-ness". Discuss final code/artwork/sound/gameplay/website changes. ||
+|| 14 || Th || 4/23 ||                     ||
+|| 13 || F  || 4/24 || Class - Guest Speaker/Catchup ||
+|| 12 || Sa || 4/25 ||                     ||
+|| 11 || Su || 4/26 ||                     ||
+|| 10 || M  || 4/27 ||                     ||
+||  9 || Tu || 4/28 ||                     || Deadline for artwork and sounds ||
+||  8 || W  || 4/29 || Meeting             || Have PowerPoint presentations ready - Internal presentation of final game and website ||
+||  7 || Th || 4/30 ||                     || No major code changes after test. Final demo testing - Polycom rehearsal? Finalize website. ||
+||  6 || F  || 5/1  || Class - Final Presentation  ||
+||  5 || Sa || 5/2  ||                     ||
+||  4 || Su || 5/3  ||                     ||
+||  3 || M  || 5/4  ||                     ||
+||  2 || Tu || 5/5  ||                     ||
+||  1 || W  || 5/6  ||                     ||
+||  0 || Th || 5/7  || Final Project Due   || 
