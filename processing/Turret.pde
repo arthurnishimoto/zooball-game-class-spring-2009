@@ -75,6 +75,9 @@ class Turret{
   }// enable
   void disable(){
     enable = false;
+    pressed = false;
+    rotatePressed = false;
+    canRotate = false;
   }// disable
   
   void process(double timer_g){
@@ -171,6 +174,7 @@ class Turret{
       shoot();
       armed = false;
     }
+    pressed = false; 
     return false;
   }// isHit
   
@@ -180,27 +184,28 @@ class Turret{
       return false;
       
     if( xCoord > xPos-rotateDiameter/2 && xCoord < xPos+rotateDiameter/2 && yCoord > yPos-rotateDiameter/2 && yCoord < yPos+rotateDiameter/2){
-      //if (buttonLastPressed == 0){
-      //  buttonLastPressed = timer_g;
-      //}else if ( buttonLastPressed + buttonDownTime < timer_g){
-        xCord = xCoord-xPos;
-        yCord = yCoord-yPos;
+      xCord = xCoord-xPos;
+      yCord = yCoord-yPos;
         
-        rotatePressed = true;
-        //if( xCoord > rotate_xCord-rotateButtonDiameter/2 && xCoord < rotate_xCord+rotateButtonDiameter/2 && yCoord > rotate_yCord-rotateButtonDiameter/2 && yCoord < rotate_yCord+rotateButtonDiameter/2){
-          rotate_xCord = xCord+xPos;
-          rotate_yCord = yCord+yPos;
+      rotatePressed = true;
+      rotate_xCord = xCord+xPos;
+      rotate_yCord = yCord+yPos;
         
-          // Calculates angle based on standard x,y grid (+y is up)
-          angle = degrees( atan2(yCord,xCord) );
+      // Calculates angle based on standard x,y grid (+y is up)
+      angle = degrees( atan2(yCord,xCord) );
 
-          //buttonLastPressed = timer_g;
-          canRotate = true;
-          return true;
-        //}// if touch in rotate button
-      //}// if-else-if button pressed
+      canRotate = true;
+      return true;
     }// if x, y in area
-  
+    
+    if( armed && shootOnRelease){
+      shoot();
+      armed = false;
+    }
+    
+    pressed = false;
+    rotatePressed = false;
+    canRotate = false;
     return false;
   }// isHit
   

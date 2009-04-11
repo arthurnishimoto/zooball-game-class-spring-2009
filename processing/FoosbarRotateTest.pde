@@ -1,6 +1,6 @@
 /**
  * ---------------------------------------------
- * Foosbar.pde
+ * Foosbar2.pde
  *
  * Description: Foosbar object containing foosmen
  *
@@ -14,10 +14,12 @@
  * 3/28/09   - FSM implementation
  * 4/1/09    - "Spring-loaded" foosbar option added
  * 4/3/09    - Added barRotation and support for 360 images
+ * 4/10/09   - Basic hit zones added. Bar rotation multipler.
+ *           - Ball/bar basic top,left,bottom,right zone collision implemented. Bar at certain angle stops ball
  * ---------------------------------------------
  */
  
-class Foosbar_360{
+class Foosbar2{
   float xPos, yPos, barWidth, barHeight, yMinTouchArea, yMaxTouchArea;
   color teamColor;
   float buttonPos;
@@ -26,6 +28,7 @@ class Foosbar_360{
   float xMove, yMove, rotation;
   float swipeThreshold = 30.0;
   int sliderMultiplier = 2;
+  int rotateMultiplier = 2;
   int nPlayers, zoneFlag;
   MTFinger fingerTest;
   Foosman2[] foosPlayers;
@@ -41,7 +44,7 @@ class Foosbar_360{
   
   int screenWidth, screenHeight, borderWidth, borderHeight;
   
-  Foosbar_360(float new_xPos, float new_yPos, float new_barWidth, float new_barHeight, int players, color tColor, int zoneFlg){
+  Foosbar2(float new_xPos, float new_yPos, float new_barWidth, float new_barHeight, int players, color tColor, int zoneFlg){
     xPos = new_xPos;
     yPos = new_yPos;
     barWidth = new_barWidth;
@@ -81,29 +84,61 @@ class Foosbar_360{
     active = true;
   
     // Swipe
-    if( abs(xMove) >= swipeThreshold ){
+    if( abs(xMove) <= swipeThreshold ){
       xSwipe = true;
       //shoot(4);
     }else{
       xSwipe = false;
     }// if xSwipe
 
-    if( abs(yMove) >= swipeThreshold ){
+    if( abs(yMove) <= swipeThreshold ){
       ySwipe = true;
       //shoot(5);
     }else{
       ySwipe = false;
     }// if xSwipe
+
+
+    // Bar rotation
+    if( zoneFlag == 0 ){
+      if( xMove > 0 ){
+        barRotation += xMove * rotateMultiplier;
+        xMove -= barFriction;
+        rotateVel = xMove * rotateMultiplier;
+      }else if( xMove < 0 ){
+        barRotation += xMove * rotateMultiplier;
+        xMove += barFriction;
+        rotateVel = xMove * rotateMultiplier;
+      }
+    }else if( zoneFlag == 1 ){
+      if( xMove > 0 ){
+        barRotation -= xMove * rotateMultiplier;
+        xMove -= barFriction;
+        rotateVel = xMove * rotateMultiplier;
+      }else if( xMove < 0 ){
+        barRotation -= xMove * rotateMultiplier;
+        xMove += barFriction;
+        rotateVel = xMove * rotateMultiplier;
+      }
+    }
+
+    if( barRotation >= 360 )
+      barRotation = 0;
+    else if( barRotation < 0 )
+      barRotation = 359;
   }// display
   
   void displayZones(){
+    noStroke();
+    
     // Zone Bar
-    if(pressed)
-      fill( #00FF00, 50);
-    else if(hasBall)
-      fill( #FF0000, 50);
-    else
-      fill( #AAAAAA, 50);
+    //if(pressed)
+    //  fill( #00FF00, 50);
+    //else if(hasBall)
+    //  fill( #FF0000, 50);
+    //else
+    fill( #AAAAAA, 50);
+    noStroke();
     rect(xPos, yMinTouchArea, barWidth, yMaxTouchArea);
   }// displayZones
   
@@ -123,8 +158,8 @@ class Foosbar_360{
     else if(atBottomEdge)
       text("atBottomEdge", xPos, yPos+barHeight-16*2);
     
-    //for( int i = 0; i < nPlayers; i++ )
-    //  foosPlayers[i].displayDebug(debugColor, font);
+    for( int i = 0; i < nPlayers; i++ )
+      foosPlayers[i].displayDebug(debugColor, font);
   }// displayDebug
   
   boolean isHit( float xCoord, float yCoord ){
@@ -197,22 +232,8 @@ class Foosbar_360{
         rotateVel = 0;
         rotation = 0;
       }
-  
     }// if spring enabled
-    else{
-      if( xMove > 0 ){
-        barRotation += xMove;
-        xMove -= barFriction;
-      }else if( xMove < 0 ){
-        barRotation += xMove;
-        xMove += barFriction;
-      }
-      
-      if( barRotation > 360 )
-        barRotation = 0;
-      else if( barRotation < 0 )
-        barRotation = 360;
-    }// if spring - else rotate
+
     
     pressed = false;
     return false;
@@ -259,7 +280,7 @@ class Foosbar_360{
   void reset(){
     pressed = false;
     //xMove = 0;
-    yMove = 0;
+    //yMove = 0;
   }// reset
   
   // Setters and Getters
@@ -292,31 +313,30 @@ class Foosbar_360{
     ballArray = balls;
     generateBars(); // Create foosbars after screen/border dimentions are known
   }// setupBars  
-}// class Foosbar
+}// class Foosbar2
 
 /**
  * ---------------------------------------------
- * Foosman.pde
+ * Foosman2.pde
  *
  * Description: Foosbar object containing foosmen
  *
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1/Eclipse 3.4.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 0.1
+ * Version: 0.2
  * 
  * Version Notes:
  * 3/1/09    - Initial version
  * 3/28/09   - FSM implementation
+ * 4/3/09    - Rotating image implemented
+ * 4/9/09    - Hit box displayed, but not active
  * ---------------------------------------------
  */
 
-
-
-
 class Foosman2{
   
-  // Foosman Images
+  // Foosman2 Images
   String filepath = "data/foosmen_pink/";
   String filename = "top_";
   String extention = ".png";
@@ -326,7 +346,9 @@ class Foosman2{
   float xPos, yPos, playerWidth, playerHeight, orig_Width;
   float hitBuffer = 20;
   boolean active, atTopEdge, atBottomEdge;
-  Foosbar_360 parent;
+  boolean topBufferHit, bottomBufferHit, leftBufferHit, rightBufferHit;
+  boolean topHit, bottomHit, leftHit, rightHit;
+  Foosbar2 parent;
   int ballsRecentlyHit[];
   int nBalls;
     
@@ -335,10 +357,22 @@ class Foosman2{
   double buttonLastPressed = 0;
   double gameTimer;
   
-  int screenWidth, screenHeight, borderWidth, borderHeight;
+  // Hit box information
+  float hit_xPos;
+  float hit_yPos;
+  float hit_width = 31;
+  float hit_height = 68;
+  float hit_horz_shift = 0;
   
-  Foosman2( float x, float y, int newWidth, int newHeight, int numBalls, Foosbar_360 new_parent){
+  int screenWidth, screenHeight, borderWidth, borderHeight;
     
+  Foosman2( float x, float y, int newWidth, int newHeight, int numBalls, Foosbar2 new_parent){
+    if( new_parent.zoneFlag == 0 ){ // Top player - faces right
+      filepath = "data/foosmen_red/red_";
+    }else if( new_parent.zoneFlag == 1 ){ // Bottom player - faces left
+      filepath = "data/foosmen_yellow/yellow_";
+    }
+
     // Loads all rotation images
     for(int i = 0; i < 360; i += rotateInc)
       rotateImages[i] = loadImage(filepath + filename + i + extention);
@@ -352,6 +386,9 @@ class Foosman2{
     ballsRecentlyHit = new int[numBalls];
     nBalls = numBalls;
     
+    hit_xPos = xPos - hit_width/2;
+    hit_yPos = yPos;
+  
     // Sets the screen size and border size - Used for edge collision
     screenWidth = parent.screenWidth;
     screenHeight = parent.screenHeight;
@@ -361,6 +398,55 @@ class Foosman2{
   
   void display(){
     active = true;
+    
+    // Maintains Hitbox shile moving
+    if( parent.zoneFlag == 0 ){
+      if( parent.barRotation >= 0 && parent.barRotation < 15 ) 
+        hit_horz_shift = 0;
+      else if( parent.barRotation >= 15  && parent.barRotation < 30 ) 
+        hit_horz_shift = 25 * 1;
+      else if( parent.barRotation >= 30  && parent.barRotation < 45 ) 
+        hit_horz_shift = 25 * 2;
+      else if( parent.barRotation >= 45 && parent.barRotation < 60 ) 
+        hit_horz_shift = 25 * 3 - 5;
+      else if( parent.barRotation >= 60  && parent.barRotation < 75 ) 
+        hit_horz_shift = 25 * 4 - 15;
+          
+      else if( parent.barRotation >= 345  && parent.barRotation < 360 ) 
+        hit_horz_shift = -25 * 1;
+      else if( parent.barRotation >= 330  && parent.barRotation < 375 ) 
+        hit_horz_shift = -25 * 2;
+      else if( parent.barRotation >= 315 && parent.barRotation < 330 ) 
+        hit_horz_shift = -25 * 3 + 5;
+      else if( parent.barRotation >= 300  && parent.barRotation < 315 ) 
+        hit_horz_shift = -25 * 4 + 15;
+      else
+        hit_horz_shift = 720;
+    }else if( parent.zoneFlag == 1 ){
+      if( parent.barRotation >= 0 && parent.barRotation < 15 ) 
+        hit_horz_shift = 0;
+      else if( parent.barRotation >= 15  && parent.barRotation < 30 ) 
+        hit_horz_shift = -25 * 1;
+      else if( parent.barRotation >= 30  && parent.barRotation < 45 ) 
+        hit_horz_shift = -25 * 2;
+      else if( parent.barRotation >= 45 && parent.barRotation < 60 ) 
+        hit_horz_shift = -25 * 3 + 5;
+      else if( parent.barRotation >= 60  && parent.barRotation < 75 ) 
+        hit_horz_shift = -25 * 4 + 15;
+          
+      else if( parent.barRotation >= 345  && parent.barRotation < 360 ) 
+        hit_horz_shift = 25 * 1;
+      else if( parent.barRotation >= 330  && parent.barRotation < 375 ) 
+        hit_horz_shift = 25 * 2;
+      else if( parent.barRotation >= 315 && parent.barRotation < 330 ) 
+        hit_horz_shift = 25 * 3 - 5;
+      else if( parent.barRotation >= 300  && parent.barRotation < 315 ) 
+        hit_horz_shift = 25 * 4 - 15;
+      else
+        hit_horz_shift = 720;      
+    }
+    hit_xPos = (xPos-hit_width/2) + hit_horz_shift;
+    hit_yPos = yPos - 4;
     
     if( yPos+playerHeight > screenHeight-borderHeight ){
       atBottomEdge = true;
@@ -387,21 +473,29 @@ class Foosman2{
     pushMatrix();
     imageMode(CENTER);
     translate(xPos, yPos + playerHeight/2);
-    rotate(radians(90));
+
+    float barRotation = parent.barRotation;
+    
+    if( parent.zoneFlag == 0 ){ // Top player - faces right
+     rotate(radians(-90));
+    }else if( parent.zoneFlag == 1 ){ // Bottom player - faces left
+      rotate(radians(-90));
+    }
     
     int imageInc = rotateInc/2;
     
-    if( parent.barRotation >= 360 - rotateInc && parent.barRotation < 0 + rotateInc )
+    if( barRotation >= 360 - rotateInc && barRotation < 0 + rotateInc )
       image(rotateImages[0], 0, 0);
     else{
       for( int i = 0;  i < 360; i += rotateInc ){
-        if( parent.barRotation >= i - rotateInc && parent.barRotation < i + rotateInc ){
+        if( barRotation >= i - rotateInc && barRotation < i + rotateInc ){
           image(rotateImages[i], 0, 0);
           break;
         }
       }// for
     }// else
      popMatrix();
+     
     // Team Color
     //fill( parent.teamColor, 100 );
     //rect(xPos-orig_Width/2, yPos, orig_Width, playerHeight);
@@ -418,145 +512,170 @@ class Foosman2{
     if( atBottomEdge )
       text("atBottomEdge", xPos + playerWidth + 16, yPos+playerHeight/2 + 16*2);
     for( int i = 0; i < nBalls; i++)
-    text("RecentlyHit["+i+"]: "+ballsRecentlyHit[i], xPos + playerWidth + 16, yPos+playerHeight/2 + 16*(3+i));
+      text("RecentlyHit["+i+"]: "+ballsRecentlyHit[i], xPos + playerWidth + 16, yPos+playerHeight/2 + 16*(3+i));
     
     //Display Hitbox
-    fill( #FFFFFF );
-    if( abs(playerWidth) <= orig_Width/2 ){ // Foosmen straight down
-      ellipse( xPos - orig_Width/2, yPos , 5, 5 );
-      ellipse( xPos + orig_Width/2, yPos , 5, 5 );
-      ellipse( xPos - orig_Width/2, yPos + playerHeight , 5, 5 );
-      ellipse( xPos + orig_Width/2, yPos + playerHeight , 5, 5 );
+    if( hit_horz_shift != 720 ){
+      fill( 0,0,0 );
+      stroke( 0, 255, 0);
+      ellipse( hit_xPos, hit_yPos, 5, 5 ); // Upper left
+      ellipse( hit_xPos + hit_width , hit_yPos, 5, 5 ); // Upper Right
+      ellipse( hit_xPos , hit_yPos + hit_height, 5, 5 ); // Lower Left
+      ellipse( hit_xPos + hit_width, hit_yPos + hit_height, 5, 5 ); // Lower Right
       
-      //hitBuffer
-      ellipse( xPos - hitBuffer - orig_Width/2, (yPos - hitBuffer), 5, 5 );
-      ellipse( xPos + hitBuffer + orig_Width/2, (yPos - hitBuffer), 5, 5 );
-      ellipse( xPos - hitBuffer - orig_Width/2, (yPos + hitBuffer) + playerHeight, 5, 5 );
-      ellipse( xPos + hitBuffer + orig_Width/2, (yPos + hitBuffer) + playerHeight, 5, 5 );  
-    }else if( -1*playerWidth > orig_Width/2 ){ // Foosmen angled to right
-      ellipse( xPos + playerWidth/2, yPos , 5, 5 );
-      ellipse( xPos + playerWidth, yPos , 5, 5 );
-      ellipse( xPos + playerWidth/2, yPos + playerHeight , 5, 5 );
-      ellipse( xPos + playerWidth, yPos + playerHeight , 5, 5 );
-      
-      //hitBuffer
-      ellipse( xPos + hitBuffer + playerWidth/2, (yPos - hitBuffer) , 5, 5 );
-      ellipse( xPos - hitBuffer + playerWidth, (yPos - hitBuffer) , 5, 5 );
-      ellipse( xPos + hitBuffer + playerWidth/2, (yPos + hitBuffer) + playerHeight , 5, 5 );
-      ellipse( xPos - hitBuffer + playerWidth, (yPos + hitBuffer) + playerHeight , 5, 5 );
-    }else if( playerWidth > orig_Width/2 ){ // Foosmen angled to left
-      ellipse( xPos + playerWidth/2, yPos , 5, 5 );
-      ellipse( xPos + playerWidth, yPos , 5, 5 );
-      ellipse( xPos + playerWidth/2, yPos + playerHeight , 5, 5 );
-      ellipse( xPos + playerWidth, yPos + playerHeight , 5, 5 );
-      
-      //hitBuffer
-      ellipse( xPos - hitBuffer + playerWidth/2, (yPos - hitBuffer) , 5, 5 );
-      ellipse( xPos + hitBuffer + playerWidth, (yPos - hitBuffer) , 5, 5 );
-      ellipse( xPos - hitBuffer + playerWidth/2, (yPos + hitBuffer) + playerHeight , 5, 5 );
-      ellipse( xPos + hitBuffer + playerWidth, (yPos + hitBuffer) + playerHeight , 5, 5 );
+      // Hit buffer
+      ellipse( hit_xPos - hitBuffer, hit_yPos - hitBuffer, 5, 5 ); // Upper left
+      ellipse( hit_xPos + hit_width + hitBuffer, hit_yPos - hitBuffer, 5, 5 ); // Upper Right
+      ellipse( hit_xPos - hitBuffer, hit_yPos + hit_height + hitBuffer, 5, 5 ); // Lower Left
+      ellipse( hit_xPos + hit_width + hitBuffer, hit_yPos + hit_height + hitBuffer, 5, 5 ); // Lower Right
     }
     
+    if( topBufferHit ){
+      fill(255,255,0);
+      stroke(0,0,0);
+      rect( hit_xPos - hitBuffer, hit_yPos - hitBuffer, hit_width + hitBuffer*2, 5 );
+      topBufferHit = false;
+    }if( bottomBufferHit ){
+      fill(255,255,0);
+      stroke(0,0,0);
+      rect( hit_xPos - hitBuffer, hit_yPos + hit_height + hitBuffer, hit_width + hitBuffer*2, 5 );
+      bottomBufferHit = false;   
+    }
+    if( topHit ){
+      fill(255,0,0);
+      stroke(0,0,0);
+      rect( hit_xPos, hit_yPos, hit_width, 5 );
+      topHit = false;
+    }if( bottomHit ){
+      fill(255,0,0);
+      stroke(0,0,0);
+      rect( hit_xPos, hit_yPos + hit_height, hit_width, 5 );
+      bottomHit = false;
+    }
     
+    if( leftBufferHit ){
+      fill(255,255,0);
+      stroke(0,0,0);
+      rect( hit_xPos - hitBuffer, hit_yPos - hitBuffer, 5, hit_height + hitBuffer*2 );
+      leftBufferHit = false;
+    }if( rightBufferHit ){
+      fill(255,255,0);
+      stroke(0,0,0);
+      rect( hit_xPos + hit_width + hitBuffer, hit_yPos - hitBuffer, 5, hit_height + hitBuffer*2 );
+      rightBufferHit = false;
+    }
+    if( leftHit ){
+      fill(255,0,0);
+      stroke(0,0,0);
+      rect( hit_xPos, hit_yPos, 5, hit_height );
+      leftHit = false;
+    }if( rightHit ){
+      fill(255,0,0);
+      stroke(0,0,0);
+      rect( hit_xPos + hit_width, hit_yPos, 5, hit_height );
+      rightHit = false;
+    }
   }// displayDebug
   
   boolean collide(Ball[] balls){
-    if( abs(parent.rotation) > 0.4 ) // Player is rotated high enough for ball to pass
+    if( parent.barRotation > 75 && parent.barRotation < 300 ) // Player is rotated high enough for ball to pass
       return false;
          
-    fill( #FF0000, 100 );
     for( int i = 0; i < nBalls; i++ ){
+   
+      // If ball is inside the hit buffer zone and if has hit recently, iqnore any collisions with current ball. - Prevents internal bouncing
+      if( balls[i].xPos+balls[i].diameter/2 > hit_xPos - hitBuffer && balls[i].xPos+balls[i].diameter/2 < hit_xPos + hit_width + hitBuffer)
+        if( balls[i].yPos+balls[i].diameter/2 > hit_yPos - hitBuffer && balls[i].yPos-balls[i].diameter/2 < hit_yPos + hit_height + hitBuffer)
+          if(ballsRecentlyHit[i] == 1)
+            continue;
       
-      if( playerWidth > orig_Width/2 ){ // Player is rotated to right (feet pointing to right)
-        fill(#FFFF00);
-        rect( xPos + playerWidth/2, yPos, abs(playerWidth)/2, playerHeight);
-      
-        if( balls[i].xPos+balls[i].diameter/2 > xPos + playerWidth/2 + hitBuffer && balls[i].xPos+balls[i].diameter/2 < xPos + playerWidth + orig_Width/2 + hitBuffer)
-          if( balls[i].yPos+balls[i].diameter/2 > yPos - hitBuffer && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight + hitBuffer )
-            if(ballsRecentlyHit[i] == 1)
-              continue;
-     
-        if( balls[i].xPos+balls[i].diameter/2 > xPos + playerWidth/2 && balls[i].xPos+balls[i].diameter/2 < xPos + playerWidth + orig_Width/2)
-          if( balls[i].yPos+balls[i].diameter/2 > yPos && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight ){
-            ballsRecentlyHit[i] = 1;
-            balls[i].setColor(color(#FF0000));
-            if( balls[i].xVel < 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight ){ // Ball is coming from the right && ball is hitting the right side
-              balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              continue;
-            }else if( balls[i].xVel > 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight){ // Ball is coming from the left && hitting left side
-              balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              continue;
-            }else if( balls[i].yVel > 0 && balls[i].xPos < xPos+playerWidth && balls[i].xPos > xPos+playerWidth/2){ // Ball is coming from the top && hitting top side
-              balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              continue;
-            }else if( balls[i].yVel < 0 && balls[i].xPos < xPos+playerWidth && balls[i].xPos > xPos+playerWidth/2){ // Ball is coming from the bottom && hitting bottom side
-              balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              continue;
-            }
-            
-        }// if has been hit 
-          
-      }else if( -1*playerWidth > orig_Width/2 ){ // Player is rotated to left (feet pointing to left)
-        fill(#FFFF00);
-        rect( xPos + playerWidth/2, yPos, playerWidth/2, playerHeight);
-        
-        if( balls[i].xPos+balls[i].diameter/2 > xPos + playerWidth - hitBuffer && balls[i].xPos+balls[i].diameter/2 < xPos + abs(playerWidth)/2 + hitBuffer)
-          if( balls[i].yPos+balls[i].diameter/2 > yPos - hitBuffer && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight + hitBuffer)
-            if(ballsRecentlyHit[i] == 1)
-              continue;
-        
-        if( balls[i].xPos+balls[i].diameter/2 > xPos + playerWidth && balls[i].xPos+balls[i].diameter/2 < xPos + abs(playerWidth)/2 )
-          if( balls[i].yPos+balls[i].diameter/2 > yPos && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight ){
-            ballsRecentlyHit[i] = 1;
-            balls[i].setColor(color(#FF0000));
-            if( balls[i].xVel < 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight ){ // Ball is coming from the right && ball is hitting the right side
-              balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              continue;
-            }else if( balls[i].xVel > 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight){ // Ball is coming from the left && hitting left side
-              balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              continue;
-            }else if( balls[i].yVel > 0 && balls[i].xPos > xPos+playerWidth && balls[i].xPos < xPos+playerWidth/2){ // Ball is coming from the top && hitting top side
-              balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              continue;
-            }else if( balls[i].yVel < 0 && balls[i].xPos > xPos+playerWidth && balls[i].xPos < xPos+playerWidth/2){ // Ball is coming from the bottom && hitting bottom side
-              balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              continue;
-            }
-            
-        }// if has been hit 
-        
-      }else if( abs(playerWidth) <= orig_Width/2 ){ // Player is not rotated (feet straight down)
-      
-        if( balls[i].xPos+balls[i].diameter/2 > xPos - orig_Width  + hitBuffer && balls[i].xPos+balls[i].diameter/2 < xPos + orig_Width + hitBuffer)
-          if( balls[i].yPos+balls[i].diameter/2 > yPos - hitBuffer && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight + hitBuffer)
-            if(ballsRecentlyHit[i] == 1)
-              continue;
+      // Hit buffer zones
+      if(balls[i].xPos > hit_xPos - hitBuffer && balls[i].xPos < hit_xPos + hit_width + hitBuffer){ // Ball is between the left and right edges of the hit buffer
+        if( balls[i].yPos + balls[i].diameter/2 > hit_yPos - hitBuffer && balls[i].yPos - balls[i].diameter/2 < hit_yPos + hit_height/2 ) // Ball center is between top hit buffer and center
+        { 
+          topBufferHit = true;
+        }// if ball enters top buffer zone
+        else if(balls[i].yPos - balls[i].diameter/2 < hit_yPos + hit_height + hitBuffer && balls[i].yPos + balls[i].diameter/2 > hit_yPos + hit_height/2)
+        {
+          bottomBufferHit = true;
+        }// else-if ball entered bottom buffer zone
 
-        if( balls[i].xPos+balls[i].diameter/2 > xPos - orig_Width/2 && balls[i].xPos+balls[i].diameter/2 < xPos + orig_Width )
-          if( balls[i].yPos+balls[i].diameter/2 > yPos && balls[i].yPos-balls[i].diameter/2 < yPos + playerHeight ){
-            ballsRecentlyHit[i] = 1;
-            balls[i].setColor(color(#FF0000));
-            if( balls[i].xVel < 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight ){ // Ball is coming from the right && ball is hitting the right side
-              balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              continue;
-            }else if( balls[i].xVel > 0 && balls[i].yPos > yPos && balls[i].yPos < yPos + playerHeight){ // Ball is coming from the left && hitting left side
-              balls[i].kickBall( 1 , parent.xMove, parent.yMove);
-              continue;
-            }else if( balls[i].yVel > 0 && balls[i].xPos > xPos-orig_Width/2 && balls[i].xPos < xPos+orig_Width/2){ // Ball is coming from the top && hitting top side
-              balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              continue;
-            }else if( balls[i].yVel < 0 && balls[i].xPos > xPos-orig_Width/2 && balls[i].xPos < xPos+orig_Width/2){ // Ball is coming from the bottom && hitting bottom side
-              balls[i].kickBall( 2 , parent.xMove, parent.yMove);
-              continue;
-            }
+        // If hit box collision (Top-bottom collision)
+        if( balls[i].yPos + balls[i].diameter/2 > hit_yPos && balls[i].yPos - balls[i].diameter/2 < hit_yPos + hit_height/2 ) // Ball center is between bottom hit buffer and center
+        { 
+          topHit = true;
+          ballsRecentlyHit[i] = 1;  // Flag collision has occured
+          balls[i].kickBall( 2 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          continue;
+        }// if ball hit top hit zone
+        else if(balls[i].yPos - balls[i].diameter/2 < hit_yPos + hit_height && balls[i].yPos + balls[i].diameter/2 > hit_yPos + hit_height/2)
+        {
+          bottomHit = true;
+          ballsRecentlyHit[i] = 1;  // Flag collision has occured
+          balls[i].kickBall( 2 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          continue;
+        }// else-if ball hits bottom hit
+      }// if ball is between the left and right edges of the hit buffer
+      
+      if( balls[i].yPos > hit_yPos - hitBuffer && balls[i].yPos < hit_yPos + hit_height + hitBuffer ){ // Ball is between top and bottom hit buffer edges
+        if(balls[i].xPos + balls[i].diameter/2  > hit_xPos - hitBuffer && balls[i].xPos - balls[i].diameter/2 < hit_xPos + hit_width/2){ // Ball is between the left hit buffer and center
+          leftBufferHit = true;            
+        }// if Ball is between the left hit buffer and center
+        else if(balls[i].xPos - balls[i].diameter/2 < hit_xPos + hit_width + hitBuffer && balls[i].xPos + balls[i].diameter/2 > hit_xPos + hit_width/2){ // Ball is between the right hit buffer and center
+          rightBufferHit = true;
+        }// if Ball is between the right hit buffer and center
+        
+        // If hit box collision (Left-right collision)
+        if(balls[i].xPos + balls[i].diameter/2  > hit_xPos && balls[i].xPos - balls[i].diameter/2 < hit_xPos + hit_width/2){ // Ball is between the left hit buffer and center
+          leftHit = true;
+          // Stops ball when "wedged" by foosman at a certain angle
+          if( parent.barRotation > 300 && parent.barRotation < 315 )
+            if( balls[i].getSpeed() > 1 )
+              balls[i].stopBall();
             
-          }// if has been hit   
-      }//if-else
+          ballsRecentlyHit[i] = 1;  // Flag collision has occured
+          balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          continue;
+          
+        }// if Ball is between the left hit buffer and center
+        else if(balls[i].xPos - balls[i].diameter/2 < hit_xPos + hit_width && balls[i].xPos + balls[i].diameter/2 > hit_xPos + hit_width/2){ // Ball is between the right hit buffer and center
+          rightHit = true;
+          // Stops ball when "wedged" by foosman at a certain angle
+          if( parent.barRotation > 300 && parent.barRotation < 315 )
+            if( balls[i].getSpeed() > 1 )
+              balls[i].stopBall();
+              
+          ballsRecentlyHit[i] = 1;  // Flag collision has occured
+          balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          continue;
+        }// if Ball is between the right hit buffer and center
+      }// If Ball is between top and bottom hit buffer edges
+      
+      /*
+      // If ball is within hit box... (Left-right collision)
+      if( balls[i].xPos+balls[i].diameter/2 > hit_xPos && balls[i].xPos-balls[i].diameter/2 < hit_xPos + hit_width ) // Ball right within left side && Ball left is within right side
+        if( balls[i].yPos+balls[i].diameter/2 > hit_yPos && balls[i].yPos-balls[i].diameter/2 < hit_yPos + hit_height ) // Ball bottom is within top side && Ball top is within bottom side
+          {
+            if( ballsRecentlyHit[i] == 1 )
+              continue;
+              
+            // Stops ball when "wedged" by foosman at a certain angle
+            if( parent.barRotation > 300 && parent.barRotation < 315 ){
+              if( balls[i].getSpeed() > 1 )
+                balls[i].stopBall();
+            }
+            ballsRecentlyHit[i] = 1;
+            balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert xVel ) + add bar speed
+            continue;            
+          }// if ball hits left side of foosman
+      */
+      
+      // If bar not hit and recently hit, clear flag
       if(ballsRecentlyHit[i] == 1){
           ballsRecentlyHit[i] = 0;
           balls[i].setColor(color(#FFFFFF));
       }
-    }//for
+    }//for all balls
     return false;
   }// collide
   
@@ -575,3 +694,4 @@ class Foosman2{
     return false;
   }// setDelay
 }//class Foosman2
+

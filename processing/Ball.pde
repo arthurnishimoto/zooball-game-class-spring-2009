@@ -16,10 +16,19 @@
  * 3/28/09   - displayDebug now takes in a color and font as parameters.
  * 4/1/09    - Ball image support added. Ball image rotates based on ball vector
  *           - Bouncing ball issue at very low velocities fixed.
+ * 4/9/09    - Ball rolling animations implemented
  * --------------------------------------------- 
  */
 class Ball{
-  PImage ball_img_1 = loadImage("ball_50.gif");
+  // Rotate animation images
+  String filepath = "data/ball/";
+  String filename = "ball_";
+  String extention = ".png";
+  PImage rotateImages[] = new PImage[360];
+  int rotateInc = 15;
+  
+  int rotation = 0;
+  
   int state;
   final static int ACTIVE = 1;
   final static int INACTIVE = 0;
@@ -45,6 +54,10 @@ class Ball{
    * @param screenDim - Screen and border parameters for edge collision
    */
   Ball(float newX, float newY, float newDiameter, int ID, Ball[] otr, int[] screenDim){
+    // Loads all rotation images
+    for(int i = 0; i < 360; i += rotateInc)
+      rotateImages[i] = loadImage(filepath + filename + i + extention);
+      
     // Sets the screen size and border size - Used for edge collision
     screenWidth = screenDim[0];
     screenHeight = screenDim[1];
@@ -70,7 +83,7 @@ class Ball{
   void process(double timer_g){
     if(state == ACTIVE){
       display();
-      //displayDebug();
+      collide(balls);
       setGameTimer(timer_g);
       move();
     }else if(state == INACTIVE){
@@ -125,6 +138,14 @@ class Ball{
     setActive();
   }//launchBall 
   
+  /** 
+   * Stops ball
+   */
+  void stopBall(){
+    xVel = 0;
+    yVel = 0;
+  }//stopBall   
+  
   /**
    * Checks if ball was hit from an input device
    *
@@ -137,6 +158,7 @@ class Ball{
     
     if( getSpeed() > 1 )
       return;
+
     if( x > xPos-diameter/2 && x < xPos+diameter/2 && y > yPos-diameter/2 && y < yPos+diameter/2 ){
       float newVel =  random(-10, 11);
       while( newVel < 4 && newVel > -4 )
@@ -154,9 +176,31 @@ class Ball{
   /**
    * TODO: To be used for ball/ball collision
    */
-  void collide() {
+  void collide(Ball[] others) {
+    float spring = 0.05;
+    
     if(state == INACTIVE)
       return;
+      
+    for (int i = 0; i < nBalls; i++) {
+      if( others[i].state == INACTIVE )
+        continue;
+      float dx = others[i].xPos - xPos;
+      float dy = others[i].yPos - yPos;
+      float distance = sqrt(dx*dx + dy*dy);
+      float minDist = others[i].diameter/2 + diameter/2;
+      if (distance < minDist) { 
+        float angle = atan2(dy, dx);
+        float targetX = xPos + cos(angle) * minDist;
+        float targetY = yPos + sin(angle) * minDist;
+        float ax = (targetX - others[i].xPos) * spring;
+        float ay = (targetY - others[i].yPos) * spring;
+        xVel -= ax;
+        yVel -= ay;
+        others[i].xVel += ax;
+        others[i].yVel += ay;
+      }// if distance < minDist
+    }// for others[i]
   }// collide
   
   /**
@@ -165,16 +209,26 @@ class Ball{
   void move() {
     vel = sqrt(abs(sq(xVel))+abs(sq(yVel)));
     
+    rotation += (int)vel;
+    if(rotation >= 360 )
+      rotation = 0;
+      
     // Prevents bouncing ball when velocity is almost 0
-    if( vel < 0.1 && vel > -0.1){
+    // Also stops ball before "sliding" occurs due to animation frames
+    if( vel < 1 && vel > -1 ){
       xVel = 0;
       yVel = 0;
     }
     
-    if ( xVel > maxVel )
+    // Restricts maximum speed
+    if( xVel > maxVel )
       xVel = maxVel;
-    if ( yVel > maxVel )
+    if( yVel > maxVel )
       yVel = maxVel;
+    if( -1*xVel > maxVel )
+      xVel = -1*maxVel;
+    if( -1*yVel > maxVel )
+      yVel = -1*maxVel;
       
     xPos += xVel;
     yPos += yVel;
@@ -191,20 +245,16 @@ class Ball{
     // Checks if object reaches edge of border/screen, bounce
     if ( xPos+diameter/4 > screenWidth-borderWidth){
       xVel *= -1;
-      xPos += xVel;
       soundManager.playBounce();
     }else if ( xPos-diameter/4 < borderWidth){
       xVel *= -1;
-      xPos += xVel;
       soundManager.playBounce();
     }
     if ( yPos+diameter/4 > screenHeight-borderHeight){
       yVel *= -1;
-      yPos += yVel;
       soundManager.playBounce();
     }else if ( yPos-diameter/4 < borderHeight ){
       yVel *= -1;
-      yPos += yVel;
       soundManager.playBounce();
     }
     
@@ -216,13 +266,26 @@ class Ball{
    * @param p DOCUMENT ME!
    */
   void display(){
-    //fill(ballColor, 255);
-    //ellipse(xPos, yPos, diameter, diameter);
+    fill(ballColor, 255);
+    ellipse(xPos, yPos, diameter, diameter);
     imageMode(CENTER);
+    
     pushMatrix();
+    
     translate(xPos, yPos);
-    rotate(atan2(yVel,xVel));
-    image(ball_img_1, 0, 0);
+    rotate(atan2(yVel,xVel)+radians(270));
+    
+    if( rotation >= 360 - rotateInc && rotation < 0 + rotateInc )
+      image(rotateImages[0], 0, 0);
+    else{
+      for( int i = 0;  i < 360; i += rotateInc ){
+        if( rotation >= i - rotateInc && rotation < i + rotateInc ){
+          image(rotateImages[i], 0, 0);
+          break;
+        }
+      }// for
+    }// else
+    
     popMatrix();
   }// display
   
@@ -236,6 +299,13 @@ class Ball{
      fill(debugColor);
      textFont(font,16);
      text("ID: " + ID_no, xPos+diameter, yPos-diameter/2 );
+     
+     fill(255,255,255);
+     stroke(0,255,0);
+     ellipse(xPos, yPos - diameter/2, 5, 5); // Top hitbox
+     ellipse(xPos - diameter/2, yPos, 5, 5); // Left hitbox
+     ellipse(xPos + diameter/2, yPos, 5, 5); // Right hitbox
+     ellipse(xPos, yPos + diameter/2, 5, 5); // Bottom hitbox
   }// displayDebug
   
   // Getters/Setters
@@ -244,13 +314,17 @@ class Ball{
     return sqrt(sq(xVel)+sq(yVel));
   }// getSpeed
   
+  float getAngle(){
+    return sqrt(sq(xVel)+sq(yVel));
+  }// getAngle  
+  
   void setActive(){
     state = ACTIVE;
   }// setActive
 
   void setInactive(){
     state = INACTIVE;
-  }// setActive
+  }// setInactive
     
   void setMaxVel(float newMax){
     maxVel = newMax;
@@ -264,4 +338,7 @@ class Ball{
     gameTimer = timer_g;
   }// setGameTimer
 
+  void setFriction( float newFriction){
+    friction = newFriction;
+  }// setFriction
 }//class Ball
