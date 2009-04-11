@@ -14,6 +14,7 @@
  * 3/28/09   - Added button text
  * 4/1/09    - Support for rectuangular buttons
  *           - Button text displays up and down
+ * 4/4/09    - Added a lit state
  * ---------------------------------------------
  */
  
@@ -26,10 +27,11 @@ class Button{
   boolean hasImage = false;
   boolean isRound = false;
   boolean isRectangle = false;
-  boolean pressed, xSwipe, ySwipe;
+  boolean pressed, lit;
   float diameter;
   float rHeight, rWidth;
   color idle_cl = color(#000000);
+  color lit_cl = color( 255, 255, 255 );
   color pressed_cl = color(#FF0000);
 
   boolean active;
@@ -81,9 +83,16 @@ class Button{
    
     if(hasImage)
       image( buttonImage, xPos, yPos );
-    else if(!pressed){
+    else if(!pressed && !lit){
       fill(idle_cl);
       stroke(idle_cl);
+      if(isRound)
+        ellipse( xPos, yPos, diameter, diameter );
+      else if(isRectangle)
+        rect( xPos, yPos, rWidth, rHeight );
+    }else if(lit){
+      fill(lit_cl);
+      stroke(lit_cl);
       if(isRound)
         ellipse( xPos, yPos, diameter, diameter );
       else if(isRectangle)
@@ -227,6 +236,14 @@ class Button{
   void setIdleColor(color newColor){
     idle_cl = newColor;
   }// setIdleColor
+
+  void setLitColor(color newColor){
+    lit_cl = newColor;
+  }// setLitColor
+  
+  void setLit(boolean newBool){
+    lit = newBool;
+  }// setLit
   
   void setPressedColor(color newColor){
     pressed_cl = newColor;

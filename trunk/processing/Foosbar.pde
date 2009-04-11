@@ -18,6 +18,7 @@
  
 class Foosbar{
   float xPos, yPos, barWidth, barHeight, yMinTouchArea, yMaxTouchArea;
+  float orig_barWidth;
   color teamColor;
   float buttonPos;
   float buttonValue;
@@ -29,7 +30,7 @@ class Foosbar{
   MTFinger fingerTest;
   Foosman[] foosPlayers;
   Ball[] ballArray;
-  boolean springEnabled = true;
+  boolean springEnabled = false;
   float spring = 0.01;
   float rotateVel;
   
@@ -42,6 +43,7 @@ class Foosbar{
     xPos = new_xPos;
     yPos = new_yPos;
     barWidth = new_barWidth;
+    orig_barWidth = new_barWidth;
     barHeight = new_barHeight;
     buttonPos = yPos;
     nPlayers = players;
@@ -98,7 +100,13 @@ class Foosbar{
       fill( #FF0000, 50);
     else
       fill( #AAAAAA, 50);
-    rect(xPos, yMinTouchArea, barWidth, yMaxTouchArea);
+    rect(xPos, yMinTouchArea, orig_barWidth, yMaxTouchArea);
+    rectMode(CENTER);
+    if(zoneFlag == 0)
+      rect(xPos + orig_barWidth/2, yMinTouchArea + screenHeight/4, barWidth, yMaxTouchArea);
+    if(zoneFlag == 1)
+      rect(xPos + orig_barWidth/2, yMinTouchArea + screenHeight/5, barWidth, yMaxTouchArea);
+    rectMode(CORNER);
   }// displayZones
   
   void displayDebug(color debugColor, PFont font){
@@ -238,7 +246,7 @@ class Foosbar{
  
   void reset(){
     pressed = false;
-    //xMove = 0;
+    xMove = 0;
     yMove = 0;
   }// reset
   
