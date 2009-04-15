@@ -27,8 +27,8 @@ class Foosbar2{
   boolean pressed, active, xSwipe, ySwipe, hasBall, atTopEdge, atBottomEdge;
   float xMove, yMove, rotation;
   float swipeThreshold = 30.0;
-  int sliderMultiplier = 2;
-  int rotateMultiplier = 2;
+  float sliderMultiplier = 2;
+  float rotateMultiplier = 3;
   int nPlayers, zoneFlag;
   MTFinger fingerTest;
   Foosman2[] foosPlayers;
@@ -37,7 +37,7 @@ class Foosbar2{
   float spring = 0.01;
   float barRotation = 0;
   float rotateVel;
-  float barFriction = 0.25;
+  float barFriction = 0.15;
   
   int playerWidth = 50;
   int playerHeight = 60;
@@ -161,6 +161,11 @@ class Foosbar2{
     for( int i = 0; i < nPlayers; i++ )
       foosPlayers[i].displayDebug(debugColor, font);
   }// displayDebug
+  
+  void displayHitbox(){
+    for( int i = 0; i < nPlayers; i++ )
+      foosPlayers[i].displayHitbox(); 
+  }// displayHitbox
   
   boolean isHit( float xCoord, float yCoord ){
     if(!active)
@@ -299,6 +304,22 @@ class Foosbar2{
     springEnabled = enable;
   }// setSpringEnabled
   
+  void setBarSlideMultiplier(float newVal){
+    sliderMultiplier = newVal;
+  }// setBarSlideMultiplier
+
+  void setBarRotateMultiplier(float newVal){
+    rotateMultiplier = newVal;
+  }// setBarRotateMultiplier
+  
+  float getBarSlideMultiplier(){
+    return sliderMultiplier;
+  }// getBarSlideMultiplier
+  
+  float getBarRotateMultiplier(){
+    return rotateMultiplier;
+  }// getBarRotateMultiplier  
+  
   boolean isSpringEnabled(){
     return springEnabled;
   }// isSpringEnabled
@@ -363,20 +384,23 @@ class Foosman2{
   float hit_width = 31;
   float hit_height = 68;
   float hit_horz_shift = 0;
+  int maxStopAngle = 330;
+  int minStopAngle = 300;
   
   int screenWidth, screenHeight, borderWidth, borderHeight;
     
   Foosman2( float x, float y, int newWidth, int newHeight, int numBalls, Foosbar2 new_parent){
+    if( displayArt ){
     if( new_parent.zoneFlag == 0 ){ // Top player - faces right
       filepath = "data/foosmen_red/red_";
     }else if( new_parent.zoneFlag == 1 ){ // Bottom player - faces left
       filepath = "data/foosmen_yellow/yellow_";
     }
-
-    // Loads all rotation images
+  
+      // Loads all rotation images
     for(int i = 0; i < 360; i += rotateInc)
       rotateImages[i] = loadImage(filepath + filename + i + extention);
-
+    }
     xPos = x;
     yPos = y;
     playerWidth = newWidth;
@@ -469,6 +493,12 @@ class Foosman2{
     fill( #000000 );
     rect(xPos, yPos, playerWidth, playerHeight);
 
+    if( !displayArt ){
+    // Team Color
+    fill( parent.teamColor );
+    rect(xPos-orig_Width/2, yPos, orig_Width, playerHeight);
+    }
+    
     // Images
     pushMatrix();
     imageMode(CENTER);
@@ -483,7 +513,7 @@ class Foosman2{
     }
     
     int imageInc = rotateInc/2;
-    
+    if( displayArt ){
     if( barRotation >= 360 - rotateInc && barRotation < 0 + rotateInc )
       image(rotateImages[0], 0, 0);
     else{
@@ -494,11 +524,8 @@ class Foosman2{
         }
       }// for
     }// else
-     popMatrix();
-     
-    // Team Color
-    //fill( parent.teamColor, 100 );
-    //rect(xPos-orig_Width/2, yPos, orig_Width, playerHeight);
+    }
+    popMatrix();
   }// display
   
   void displayDebug(color debugColor, PFont font){
@@ -513,11 +540,16 @@ class Foosman2{
       text("atBottomEdge", xPos + playerWidth + 16, yPos+playerHeight/2 + 16*2);
     for( int i = 0; i < nBalls; i++)
       text("RecentlyHit["+i+"]: "+ballsRecentlyHit[i], xPos + playerWidth + 16, yPos+playerHeight/2 + 16*(3+i));
-    
+  }// displayDebug
+
+  void displayHitbox(){
     //Display Hitbox
     if( hit_horz_shift != 720 ){
+      if( parent.barRotation > minStopAngle && parent.barRotation < maxStopAngle )
+        stroke( 255, 0, 0);
+      else
+        stroke( 0, 255, 0);
       fill( 0,0,0 );
-      stroke( 0, 255, 0);
       ellipse( hit_xPos, hit_yPos, 5, 5 ); // Upper left
       ellipse( hit_xPos + hit_width , hit_yPos, 5, 5 ); // Upper Right
       ellipse( hit_xPos , hit_yPos + hit_height, 5, 5 ); // Lower Left
@@ -575,7 +607,7 @@ class Foosman2{
       rect( hit_xPos + hit_width, hit_yPos, 5, hit_height );
       rightHit = false;
     }
-  }// displayDebug
+  }// displayHitbox
   
   boolean collide(Ball[] balls){
     if( parent.barRotation > 75 && parent.barRotation < 300 ) // Player is rotated high enough for ball to pass
@@ -629,7 +661,7 @@ class Foosman2{
         if(balls[i].xPos + balls[i].diameter/2  > hit_xPos && balls[i].xPos - balls[i].diameter/2 < hit_xPos + hit_width/2){ // Ball is between the left hit buffer and center
           leftHit = true;
           // Stops ball when "wedged" by foosman at a certain angle
-          if( parent.barRotation > 300 && parent.barRotation < 315 )
+          if( parent.barRotation > minStopAngle && parent.barRotation < maxStopAngle )
             if( balls[i].getSpeed() > 1 )
               balls[i].stopBall();
             
@@ -641,7 +673,7 @@ class Foosman2{
         else if(balls[i].xPos - balls[i].diameter/2 < hit_xPos + hit_width && balls[i].xPos + balls[i].diameter/2 > hit_xPos + hit_width/2){ // Ball is between the right hit buffer and center
           rightHit = true;
           // Stops ball when "wedged" by foosman at a certain angle
-          if( parent.barRotation > 300 && parent.barRotation < 315 )
+          if( parent.barRotation > minStopAngle && parent.barRotation < maxStopAngle )
             if( balls[i].getSpeed() > 1 )
               balls[i].stopBall();
               

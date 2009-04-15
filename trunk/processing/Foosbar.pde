@@ -129,6 +129,9 @@ class Foosbar{
       foosPlayers[i].displayDebug(debugColor, font);
   }// displayDebug
   
+  void displayHitbox(){
+  }
+  
   boolean isHit( float xCoord, float yCoord ){
     if(!active)
       return false;

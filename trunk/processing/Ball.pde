@@ -54,10 +54,12 @@ class Ball{
    * @param screenDim - Screen and border parameters for edge collision
    */
   Ball(float newX, float newY, float newDiameter, int ID, Ball[] otr, int[] screenDim){
+    if( displayArt ){
     // Loads all rotation images
     for(int i = 0; i < 360; i += rotateInc)
       rotateImages[i] = loadImage(filepath + filename + i + extention);
-      
+    }
+    
     // Sets the screen size and border size - Used for edge collision
     screenWidth = screenDim[0];
     screenHeight = screenDim[1];
@@ -65,8 +67,8 @@ class Ball{
     borderHeight = screenDim[3];
     
     state = INACTIVE; // Initial state
-    xPos = screenWidth/2; //newX;
-    yPos = screenHeight/2; //newY;
+    xPos = newX;
+    yPos = newY;
     xVel = random(5) + -1*random(5);
     yVel = random(5) + -1*random(5);
     diameter = newDiameter;
@@ -269,7 +271,8 @@ class Ball{
     fill(ballColor, 255);
     ellipse(xPos, yPos, diameter, diameter);
     imageMode(CENTER);
-    
+
+    if( displayArt ){
     pushMatrix();
     
     translate(xPos, yPos);
@@ -287,6 +290,7 @@ class Ball{
     }// else
     
     popMatrix();
+  }
   }// display
   
   /**

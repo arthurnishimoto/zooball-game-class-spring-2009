@@ -170,7 +170,7 @@ class Turret{
       }// if-else-if button pressed
 
     }// if x, y in area
-    else if( armed && !rotatePressed && shootOnRelease){
+    else if( armed && rotatePressed && shootOnRelease){
       shoot();
       armed = false;
     }
