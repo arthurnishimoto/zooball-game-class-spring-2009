@@ -23,8 +23,8 @@ class FoosbarManager{
   Foosbar2[] bars;
   int nBars, fieldLines;
   
-  color team1 = color( 0, 0, 255 );
-  color team2 = color( 255, 0, 0 );
+  color team1 = color( 255, 0, 0 );
+  color team2 = color( 255, 255, 0 );
 
   //Used in Java/Eclipse version only
   int screenWidth, screenHeight, borderWidth, borderHeight;
@@ -43,12 +43,12 @@ class FoosbarManager{
     
     for( int x = 0 ; x < nBars ; x++ ){
       // Syntax: MTFoosbar2(float new_xPos, float new_yPos, float new_barWidth, float new_barHeight, int players, color teamColor, zoneFlag 0 = (top half of screen) 1 = (bottom half of screen))
-      if( nBars == 8 ){ // Full regulation size
+      if( nBars == 8 ){ // Modified regulation size (Reduced center players from 5 to 4)
         bars[0] = new Foosbar2( (0+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 0);
         bars[1] = new Foosbar2( (1+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team1, 0);
         bars[2] = new Foosbar2( (2+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team2, 1);
-        bars[3] = new Foosbar2( (3+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 5, team1, 0);
-        bars[4] = new Foosbar2( (4+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 5, team2, 1);
+        bars[3] = new Foosbar2( (3+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 4, team1, 0);
+        bars[4] = new Foosbar2( (4+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 4, team2, 1);
         bars[5] = new Foosbar2( (5+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team1, 0);
         bars[6] = new Foosbar2( (6+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team2, 1);
         bars[7] = new Foosbar2( (7+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team2, 1);
@@ -118,6 +118,12 @@ class FoosbarManager{
     }// for
   }// display
   
+  void displayHitbox(){
+    for( int x = 0 ; x < nBars ; x++ ){
+      bars[x].displayHitbox();
+    }// for
+  }// displayHitbox
+  
   // Bar touch zone is pressed
   void barsPressed(float x, float y){
      for( int i = 0 ; i < nBars ; i++ )
@@ -133,6 +139,39 @@ class FoosbarManager{
     for( int x = 0 ; x < nBars ; x++ )
       bars[x].barWidth = newWidth;
   }// setBarWidth  
+  
+  void setBarSlideMultiplier(float newVal){
+    for( int x = 0 ; x < nBars ; x++ )
+      bars[x].setBarSlideMultiplier(newVal);
+  }// setBarSlideMultiplier
+  
+  void setBarRotateMultiplier(float newVal){
+    for( int x = 0 ; x < nBars ; x++ )
+      bars[x].setBarRotateMultiplier(newVal);
+  }// setBarRotateMultiplier
+  
+  void setBarFriction(float newVal){
+    for( int x = 0 ; x < nBars ; x++ )
+      bars[x].barFriction = newVal;
+  }// setBarFriction
+  
+  float getBarSlideMultiplier(){
+    for( int x = 0 ; x < nBars ; x++ )
+      return bars[x].getBarSlideMultiplier();
+    return -1.0;
+  }// getBarSlideMultiplier
+  
+  float getBarRotateMultiplier(){
+    for( int x = 0 ; x < nBars ; x++ )
+      return bars[x].getBarRotateMultiplier();
+    return -1.0;
+  }// getBarRotateMultiplier
+  
+  float getBarFriction(){
+    for( int x = 0 ; x < nBars ; x++ )
+      return bars[x].barFriction;
+    return -1.0;
+  }// getBarFriction 
   
   boolean isSpringEnabled(){
     for( int x = 0 ; x < nBars ; x++ )
