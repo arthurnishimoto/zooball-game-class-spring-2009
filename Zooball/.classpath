@@ -4,7 +4,11 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="libraries/core.jar"/>
 	<classpathentry kind="lib" path="libraries/gluegen-rt.jar"/>
-	<classpathentry kind="lib" path="libraries/jogl.jar"/>
+	<classpathentry kind="lib" path="libraries/jogl.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Zooball/libraries"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="libraries/opengl.jar"/>
 	<classpathentry kind="lib" path="libraries/TouchAPI.jar"/>
 	<classpathentry kind="lib" path="libraries/net.jar"/>
