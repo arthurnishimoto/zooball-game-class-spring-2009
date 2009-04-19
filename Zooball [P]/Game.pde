@@ -16,7 +16,7 @@ class Game
   private LeavingState leavingState;
   */
   private PFont debugFont;
-  private boolean debugMode = false;
+  private boolean debugMode = true;
   private final static float DEFAULT_WIDTH = 1920;
   private final static float DEFAULT_HEIGHT = 1080;
   private float screenScale;
@@ -34,10 +34,10 @@ class Game
     menuState.beginLoad( );
     playState.beginLoad( );
     pausedState.beginLoad( );
-    setState( pausedState );
+    setState( playState );
     
-    noStroke( );
     calculateScreenTransformation( );
+    noStroke( );
   }
   
   private void calculateScreenTransformation( ) {
@@ -65,14 +65,16 @@ class Game
   }
   
   public void drawDebugText( String string ) {
-    String[] lines = string.trim( ).split( "\n" );
+    if (debugMode) {
+      String[] lines = string.trim( ).split( "\n" );
 
-    textFont( debugFont ); 
-    fill( 255 );
-    for ( int i = 0; i < lines.length; i++ ) {
-      String line = lines[i].trim( );
-      if ( !line.equals( "" ) )
-        text( line, 15, 20 + i * 15 );
+      textFont( debugFont ); 
+      fill( 255 );
+      for ( int i = 0; i < lines.length; i++ ) {
+        String line = lines[i].trim( );
+        if ( !line.equals( "" ) )
+          text( line, 15, 20 + i * 15 );
+      }
     }
   }
 
