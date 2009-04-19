@@ -1,3 +1,9 @@
+/**
+ * Loading GameState.
+ *
+ * Author:  Andy Bursavich
+ * Version: 0.1
+ */
 class LoadingState extends GameState
 {
   private GameState nextState;
@@ -5,20 +11,16 @@ class LoadingState extends GameState
   
   public LoadingState( Game game ) {
     super( game );
-    logo = loadImage( "infinity.png" );
-    loaded = true;
+    logo = loadImage( "ui\\logos\\infinity.png" );
+    endLoad( );
   }
   
   public void setNextState( GameState state ) { this.nextState = state; }
   
   public void enter( ) {
     super.enter( );
-    if ( nextState != null && !nextState.isLoaded( ) ) {
-      Runnable loader = new Runnable( ) {
-        public void run( ) { nextState.load( ); }
-      };
-      new Thread( loader ).start( );
-    }
+    if ( nextState != null && !nextState.isLoading( ) && !nextState.isLoaded( ) )
+      nextState.beginLoad( );
   }
   
   public void update( ) {
@@ -32,11 +34,10 @@ class LoadingState extends GameState
     drawBackground( );
     drawLogo( );
     drawOverlay( );
+    drawDebugText( );
   }
   
   private void drawBackground( ) {
-    //background( 0x00, 0x33, 0x66 ); // blue
-    //background( 0xFF, 0x66, 0x00 ); // orange
     background( 0 ); // black
   }
   
@@ -56,18 +57,26 @@ class LoadingState extends GameState
   
   private void drawOverlay( ) {
     noStroke( );
-    fill( 0, getAlpha( ) );
+    fill( 0, getOverlayAlpha( ) );
     rect( 0, 0, width, height );
   }
   
-  private float getAlpha( ) {
-    float FULL_CYCLE = 4.0;
-    float HALF_CYCLE = 2.0;
+  private float getOverlayAlpha( ) {
+    float FULL_CYCLE = 3.0;
+    float HALF_CYCLE = 1.5;
     float seconds = timer.getSecondsActive( );
     float position = seconds - floor( seconds / FULL_CYCLE ) * FULL_CYCLE;
     if ( position > HALF_CYCLE)
-      return map( position, HALF_CYCLE, FULL_CYCLE, 200, 0 );
+      return map( position, HALF_CYCLE, FULL_CYCLE, 180, 0 );
     else
-      return map( position, 0, HALF_CYCLE, 0, 200 );
+      return map( position, 0, HALF_CYCLE, 0, 180 );
+  }
+  
+  private void drawDebugText( ) {
+    game.drawDebugText( "Loading: " + nextState + "\nFrame rate: " + frameRate + "\nSeconds: " + timer.getSecondsActive() );
+  }
+  
+  public String toString( ) {
+    return "LoadingState";
   }
 }

@@ -1,18 +1,18 @@
 /**
- * Menu GameState.
+ * The main GameState. Gameplay happens here.
  *
  * Author:  Andy Bursavich
  * Version: 0.1
  */
-class MenuState extends GameState
+class PlayState extends GameState
 {
-  public MenuState( Game game ) {
+  public PlayState( Game game ) {
     super( game );
   }
   
   public void load( ) {
     // spin a while to test the loading screen
-    int max = Integer.MAX_VALUE >> 6;
+    int max = Integer.MAX_VALUE >> 5;
     Random r = new Random( );
     
     for ( int i = 0; i < max; i++ )
@@ -20,21 +20,15 @@ class MenuState extends GameState
     endLoad( );
   }
   
-  public void update( ) {
-    super.update( );
-    if ( timer.getSecondsActive( ) > 3.0 )
-      game.setState( game.getPlayState( ) );
-  }
-  
   public void draw( ) {
     drawBackground( );
   }
   
   private void drawBackground( ) {
-    background( 0x00, 0x33, 0x66 ); // blue
+    background( 20, 200, 20 );
   }
   
   public String toString( ) {
-    return "MenState";
+    return "PlayState";
   }
 }
