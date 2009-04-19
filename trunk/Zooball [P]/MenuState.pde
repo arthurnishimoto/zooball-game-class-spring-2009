@@ -2,7 +2,7 @@
  * Menu GameState.
  *
  * Author:  Andy Bursavich
- * Version: 0.1
+ * Version: 0.2
  */
 class MenuState extends GameState
 {
@@ -31,10 +31,10 @@ class MenuState extends GameState
   }
   
   private void drawBackground( ) {
-    background( 0x00, 0x33, 0x66 ); // blue
+    background( 0 );
+    fill( 0x00, 0x33, 0x66 ); // blue
+    rect( 0, 0, game.getWidth( ), game.getHeight( ) );
   }
   
-  public String toString( ) {
-    return "MenState";
-  }
+  public String toString( ) { return "MenState"; }
 }

@@ -2,7 +2,7 @@
  * Foosball Game.
  *
  * Author:  Andy Bursavich
- * Version: 0.1
+ * Version: 0.2
  */
 class Game
 {
@@ -17,25 +17,51 @@ class Game
   */
   private PFont debugFont;
   private boolean debugMode = false;
+  private final static float DEFAULT_WIDTH = 1920;
+  private final static float DEFAULT_HEIGHT = 1080;
+  private float screenScale;
+  private float screenOffsetX;
+  private float screenOffsetY;
   
   public Game( ) {
     debugFont = loadFont( "ui\\fonts\\Arial Bold-14.vlw" );
-    
+   
     loadingState = new LoadingState( this );
     menuState = new MenuState( this );
     playState = new PlayState( this );
     pausedState = new PausedState( this );
     
     menuState.beginLoad( );
-    //playState.beginLoad( );
+    playState.beginLoad( );
     pausedState.beginLoad( );
     setState( pausedState );
+    
+    noStroke( );
+    calculateScreenTransformation( );
+  }
+  
+  private void calculateScreenTransformation( ) {
+    if ( width / height >= DEFAULT_WIDTH / DEFAULT_HEIGHT ) {
+      screenScale = height / DEFAULT_HEIGHT;
+      screenOffsetX = (width - DEFAULT_WIDTH * screenScale) * 0.5;
+      screenOffsetY = 0;
+    }
+    else {
+      screenScale = width / DEFAULT_WIDTH;
+      screenOffsetX = 0;
+      screenOffsetY = (height - DEFAULT_HEIGHT * screenScale) * 0.5;
+    }
   }
   
   public void loop( ) {
     state.input( );
     state.update( );
+    // Translate and Scale
+    pushMatrix( );
+    translate( screenOffsetX, screenOffsetY );
+    scale( screenScale );
     state.draw( );
+    popMatrix( );
   }
   
   public void drawDebugText( String string ) {
@@ -65,7 +91,6 @@ class Game
     }
   }
   
-  //public LoadingState getLoadingState( ) { return loadingState; }
   public MenuState getMenuState( ) { return menuState; }
   public PlayState getPlayState( ) { return playState; }
   public PausedState getPausedState( ) { return pausedState; }
@@ -73,6 +98,9 @@ class Game
   public OverState getOverState( ) { return overState; }
   public LeavingState getLeavingState( ) { return leavingState; }
   */
+  
+  public float getWidth( ) { return DEFAULT_WIDTH; }
+  public float getHeight( ) { return DEFAULT_HEIGHT; }
   
   public boolean isDebugMode( ) { return debugMode; }
   public void toggleDebugMode( ) { debugMode = !debugMode; }

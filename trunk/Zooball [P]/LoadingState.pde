@@ -2,7 +2,7 @@
  * Loading GameState.
  *
  * Author:  Andy Bursavich
- * Version: 0.1
+ * Version: 0.2
  */
 class LoadingState extends GameState
 {
@@ -43,7 +43,7 @@ class LoadingState extends GameState
   
   private void drawLogo( ) {
     pushMatrix( );
-    translate( ( width - logo.width ) * 0.5, ( height - logo.height ) * 0.5 );
+    translate( ( game.getWidth( ) - logo.width ) * 0.5, ( game.getHeight( ) - logo.height ) * 0.5 );
     beginShape( );
     texture( logo );
     textureMode( NORMALIZED );
@@ -56,9 +56,8 @@ class LoadingState extends GameState
   }
   
   private void drawOverlay( ) {
-    noStroke( );
     fill( 0, getOverlayAlpha( ) );
-    rect( 0, 0, width, height );
+    rect( 0, 0, game.getWidth( ), game.getHeight( ) );
   }
   
   private float getOverlayAlpha( ) {
@@ -76,7 +75,5 @@ class LoadingState extends GameState
     game.drawDebugText( "Loading: " + nextState + "\nFrame rate: " + frameRate + "\nSeconds: " + timer.getSecondsActive() );
   }
   
-  public String toString( ) {
-    return "LoadingState";
-  }
+  public String toString( ) { return "LoadingState"; }
 }
