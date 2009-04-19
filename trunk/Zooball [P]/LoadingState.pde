@@ -2,16 +2,18 @@
  * Loading GameState.
  *
  * Author:  Andy Bursavich
- * Version: 0.2
+ * Version: 0.3
  */
 class LoadingState extends GameState
 {
   private GameState nextState;
-  private PImage logo;
+  private Image logo;
   
   public LoadingState( Game game ) {
     super( game );
-    logo = loadImage( "ui\\logos\\infinity.png" );
+    logo = Image.getImage( "ui\\logos\\infinity.png" );
+    logo.setX( ( game.getWidth( ) - logo.getWidth( ) ) * 0.5 );
+    logo.setY( ( game.getHeight( ) - logo.getHeight( ) ) * 0.5 );
     endLoad( );
   }
   
@@ -42,17 +44,7 @@ class LoadingState extends GameState
   }
   
   private void drawLogo( ) {
-    pushMatrix( );
-    translate( ( game.getWidth( ) - logo.width ) * 0.5, ( game.getHeight( ) - logo.height ) * 0.5 );
-    beginShape( );
-    texture( logo );
-    textureMode( NORMALIZED );
-    vertex( 0, 0, 0, 0 );
-    vertex( logo.width, 0, 1, 0 );
-    vertex( logo.width, logo.height, 1, 1 );
-    vertex( 0, logo.height, 0, 1 );
-    endShape( );
-    popMatrix( );
+    logo.draw( );
   }
   
   private void drawOverlay( ) {
