@@ -2,7 +2,7 @@
  * The main GameState. Gameplay happens here.
  *
  * Author:  Andy Bursavich
- * Version: 0.1
+ * Version: 0.2
  */
 class PlayState extends GameState
 {
@@ -25,10 +25,10 @@ class PlayState extends GameState
   }
   
   private void drawBackground( ) {
-    background( 20, 200, 20 );
+    background( 0 );
+    fill( 20, 200, 20 ); // green
+    rect( 0, 0, game.getWidth( ), game.getHeight( ) );
   }
   
-  public String toString( ) {
-    return "PlayState";
-  }
+  public String toString( ) { return "PlayState"; }
 }
