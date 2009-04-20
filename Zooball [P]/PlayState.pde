@@ -2,12 +2,12 @@
  * The main GameState. Gameplay happens here.
  *
  * Author:  Andy Bursavich
- * Version: 0.4
+ * Version: 0.5
  */
 class PlayState extends GameState
 {
-  Image imgPitch, imgStadiumTop, imgStadiumBottom, imgStadiumLeft, imgStadiumRight;
-  CircularButton btnPauseTop, btnPauseBottom;
+  private Image imgPitch, imgStadiumTop, imgStadiumBottom, imgStadiumLeft, imgStadiumRight;
+  private CircularButton btnPauseTop, btnPauseBottom;
   
   public PlayState( Game game ) {
     super( game );
@@ -26,8 +26,10 @@ class PlayState extends GameState
     imgStadiumRight.setPosition( 1845, 25 );
     btnPauseBottom = new CircularButton( "ui\\buttons\\pause\\enabled.png" );
     btnPauseBottom.setPosition( 1882.5, 1027.5 );
+    btnPauseBottom.setRadius( 27.5 );
     btnPauseTop = new CircularButton( "ui\\buttons\\pause\\enabled.png" );
     btnPauseTop.setPosition( 37.5, 52.5 );
+    btnPauseTop.setRadius( 27.5 );
     btnPauseTop.setRotation( PI );
     endLoad( );
   }
@@ -42,8 +44,8 @@ class PlayState extends GameState
   
   private void drawBackground( ) {
     background( 0 );
-    fill( 20, 200, 20 ); // green
-    rect( 0, 0, game.getWidth( ), game.getHeight( ) );
+    //fill( 20, 200, 20 ); // green
+    //rect( 0, 0, game.getWidth( ), game.getHeight( ) );
   }
   
   private void drawPitch( ) {
@@ -80,7 +82,7 @@ class PlayState extends GameState
   }
   
   private void drawDebugText( ) {
-    game.drawDebugText( "Frame rate: " + frameRate + "\nSeconds: " + timer.getSecondsActive() );
+    game.drawDebugText( "State: " + this + "\nFrame rate: " + new DecimalFormat("0.0").format(frameRate) + "\nSeconds: " + timer.getSecondsActive() );
   }
   
   public String toString( ) { return "PlayState"; }

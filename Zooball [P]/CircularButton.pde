@@ -2,7 +2,7 @@
  * Intended for circular buttons. Position (x, y) is the center of the button.
  * 
  * Author: Andy Bursavich
- * Version: 0.1
+ * Version: 0.2
  */
 public class CircularButton
 {
@@ -45,7 +45,6 @@ public class CircularButton
     image.setHeight( radius * 2 );
     image.setX( -radius );
     image.setY( -radius );
-    println( radius * 2 );
   }
   
 }
