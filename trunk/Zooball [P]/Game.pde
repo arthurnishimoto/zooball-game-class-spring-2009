@@ -2,7 +2,7 @@
  * Foosball Game.
  *
  * Author:  Andy Bursavich
- * Version: 0.2
+ * Version: 0.3
  */
 class Game
 {
@@ -16,7 +16,8 @@ class Game
   private LeavingState leavingState;
   */
   private PFont debugFont;
-  private boolean debugMode = true;
+  private boolean debugMode = false;
+  private boolean strokeMode = false;
   private final static float DEFAULT_WIDTH = 1920;
   private final static float DEFAULT_HEIGHT = 1080;
   private float screenScale;
@@ -106,4 +107,12 @@ class Game
   
   public boolean isDebugMode( ) { return debugMode; }
   public void toggleDebugMode( ) { debugMode = !debugMode; }
+  public boolean isStrokeMode( ) { return strokeMode; }
+  public void toggleStrokeMode( ) {
+    strokeMode = !strokeMode;
+    if ( strokeMode )
+      stroke( 0x33, 0xff, 0x00 );
+    else
+      noStroke( );
+  }
 }
