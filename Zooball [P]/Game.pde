@@ -34,7 +34,7 @@ class Game
     menuState.beginLoad( );
     playState.beginLoad( );
     pausedState.beginLoad( );
-    setState( playState );
+    setState( menuState );
     
     calculateScreenTransformation( );
     noStroke( );
