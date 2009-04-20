@@ -2,7 +2,7 @@
  * Loading GameState.
  *
  * Author:  Andy Bursavich
- * Version: 0.4
+ * Version: 0.5
  */
 class LoadingState extends GameState
 {
@@ -53,8 +53,8 @@ class LoadingState extends GameState
   }
   
   private float getOverlayAlpha( ) {
-    float FULL_CYCLE = 3.0;
-    float HALF_CYCLE = 1.5;
+    float FULL_CYCLE = 2.0;
+    float HALF_CYCLE = 1.0;
     float seconds = timer.getSecondsActive( );
     float position = seconds - floor( seconds / FULL_CYCLE ) * FULL_CYCLE;
     if ( position > HALF_CYCLE)
@@ -64,7 +64,7 @@ class LoadingState extends GameState
   }
   
   private void drawDebugText( ) {
-    game.drawDebugText( "Loading: " + nextState + "\nFrame rate: " + frameRate + "\nSeconds: " + timer.getSecondsActive() );
+    game.drawDebugText( "State: " + this + "\nLoading: " + nextState + "\nFrame rate: " + new DecimalFormat("0.0").format(frameRate) + "\nSeconds: " + timer.getSecondsActive() );
   }
   
   public String toString( ) { return "LoadingState"; }
