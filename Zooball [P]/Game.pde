@@ -2,7 +2,7 @@
  * Foosball Game.
  *
  * Author:  Andy Bursavich
- * Version: 0.4
+ * Version: 0.3
  */
 class Game
 {
@@ -10,6 +10,7 @@ class Game
   private LoadingState loadingState;
   private MenuState menuState;
   private PlayState playState;
+  private PlayTestState playTestState; // TEMP
   private PausedState pausedState;
   /*
   private OverState overState;
@@ -30,13 +31,15 @@ class Game
     loadingState = new LoadingState( this );
     menuState = new MenuState( this );
     playState = new PlayState( this );
+    playTestState = new PlayTestState( this ) ; // TEMP
     pausedState = new PausedState( this );
     
     menuState.beginLoad( );
     playState.beginLoad( );
+    playTestState.beginLoad(); // TEMP
     pausedState.beginLoad( );
     
-    setState( pausedState );
+    setState( playTestState );
     
     calculateScreenTransformation( );
     noStroke( );
@@ -71,14 +74,11 @@ class Game
       String[] lines = string.trim( ).split( "\n" );
 
       textFont( debugFont ); 
+      fill( 255 );
       for ( int i = 0; i < lines.length; i++ ) {
         String line = lines[i].trim( );
-        if ( !line.equals( "" ) ) {
-          fill( 0, 128 );
-          rect( 10, 5 + i * 20, textWidth( line ) + 10, 20);
-          fill( 255 );
-          text( line, 15, 20 + i * 20 );
-        }
+        if ( !line.equals( "" ) )
+          text( line, 15, 20 + i * 15 );
       }
     }
   }
