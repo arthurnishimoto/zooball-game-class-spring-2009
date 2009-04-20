@@ -4,12 +4,12 @@
  * Author: Andy Bursavich
  * Version: 0.1
  */
-public class Button
+public class CircularButton
 {
   private Image image;
   private float x, y, rotation, radius;
   
-  public Button( String fileName ) {
+  public CircularButton( String fileName ) {
     image = new Image( fileName );
     setRadius( ( image.getWidth( ) + image.getHeight( ) ) * 0.25 ); // diameter = average of width and height
   }

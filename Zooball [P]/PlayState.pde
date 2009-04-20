@@ -6,27 +6,27 @@
  */
 class PlayState extends GameState
 {
-  Image pitch, stadiumTop, stadiumBottom, stadiumLeft, stadiumRight;
-  Button btnPauseTop, btnPauseBottom;
+  Image imgPitch, imgStadiumTop, imgStadiumBottom, imgStadiumLeft, imgStadiumRight;
+  CircularButton btnPauseTop, btnPauseBottom;
   
   public PlayState( Game game ) {
     super( game );
   }
   
   public void load( ) {
-    pitch = new Image( "objects\\stadium\\pitch.png" );
-    pitch.setPosition( 75, 25 );
-    stadiumTop = new Image( "objects\\stadium\\top.png" );
-    stadiumTop.setPosition( 0, 0 );
-    stadiumBottom = new Image( "objects\\stadium\\bottom.png" );
-    stadiumBottom.setPosition( 0, 1055 );
-    stadiumLeft = new Image( "objects\\stadium\\left.png" );
-    stadiumLeft.setPosition( 0, 25 );
-    stadiumRight = new Image( "objects\\stadium\\right.png" );
-    stadiumRight.setPosition( 1845, 25 );
-    btnPauseBottom = new Button( "ui\\buttons\\pause\\enabled.png" );
+    imgPitch = new Image( "objects\\stadium\\pitch.png" );
+    imgPitch.setPosition( 75, 25 );
+    imgStadiumTop = new Image( "objects\\stadium\\top.png" );
+    imgStadiumTop.setPosition( 0, 0 );
+    imgStadiumBottom = new Image( "objects\\stadium\\bottom.png" );
+    imgStadiumBottom.setPosition( 0, 1055 );
+    imgStadiumLeft = new Image( "objects\\stadium\\left.png" );
+    imgStadiumLeft.setPosition( 0, 25 );
+    imgStadiumRight = new Image( "objects\\stadium\\right.png" );
+    imgStadiumRight.setPosition( 1845, 25 );
+    btnPauseBottom = new CircularButton( "ui\\buttons\\pause\\enabled.png" );
     btnPauseBottom.setPosition( 1882.5, 1027.5 );
-    btnPauseTop = new Button( "ui\\buttons\\pause\\enabled.png" );
+    btnPauseTop = new CircularButton( "ui\\buttons\\pause\\enabled.png" );
     btnPauseTop.setPosition( 37.5, 52.5 );
     btnPauseTop.setRotation( PI );
     endLoad( );
@@ -47,14 +47,14 @@ class PlayState extends GameState
   }
   
   private void drawPitch( ) {
-    pitch.draw( );
+    imgPitch.draw( );
   }
   
   private void drawStadium( ) {
-    stadiumTop.draw( );
-    stadiumBottom.draw( );
-    stadiumLeft.draw( );
-    stadiumRight.draw( );
+    imgStadiumTop.draw( );
+    imgStadiumBottom.draw( );
+    imgStadiumLeft.draw( );
+    imgStadiumRight.draw( );
     // If we only have one team configuration, these rectangles could just be incorporated into the above textures...
     /*
     // UIC Goal
