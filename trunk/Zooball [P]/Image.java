@@ -4,16 +4,15 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 /**
- * Wrapper of sorts for PImage.  Create a new Image by calling Image.getImage( fileName ).
- * Image will only create a single instance of the underlying PImage object which is shared
- * among all Images that use it.
+ * Wrapper of sorts for PImage.  Image will only create a single instance of the underlying
+ * PImage object which is shared among all Images that use it.
  * 
  * For example, multiple buttons can be created using the same texture.  Each button will
  * have its own Image object with its own position, size, rotation, etc.  But each will use
  * the same underlying PImage object when drawing.
  * 
  * Author: Andy Bursavich
- * Version: 0.1
+ * Version: 0.2
  */
 public class Image
 {
@@ -22,8 +21,8 @@ public class Image
   private PImage pimage;
   private float x, y, rotation, width, height;
   
-  private Image( PImage pimage ) {
-    this.pimage = pimage;
+  public Image( String fileName ) {
+    pimage = getPImage( fileName );
     x = y = rotation = 0;
     width = pimage.width;
     height = pimage.height;
@@ -31,7 +30,7 @@ public class Image
   
   public static void setPApplet( PApplet p ) { Image.p = p; }
   
-  public static Image getImage( String fileName ) {
+  private static PImage getPImage( String fileName ) {
     PImage pimage = null;
     
     if ( pimages.containsKey( fileName ) )
@@ -47,7 +46,7 @@ public class Image
       }
     }
     
-    return new Image( pimage );
+    return pimage;
   }
   
   public void draw( ) {
@@ -65,6 +64,10 @@ public class Image
     p.popMatrix( );
   }
   
+  public void setPosition( float x, float y ) {
+    this.x = x;
+    this.y = y;
+  }
   public float getX( ) { return x; }
   public void setX( float x ) { this.x = x; }
   public float getY( ) { return y; }

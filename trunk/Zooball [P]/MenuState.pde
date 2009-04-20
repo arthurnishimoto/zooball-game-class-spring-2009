@@ -12,13 +12,12 @@ class MenuState extends GameState
   
   public void load( ) {
     // spin a while to test the loading screen
-    /*
     int max = Integer.MAX_VALUE >> 6;
     Random r = new Random( );
     
     for ( int i = 0; i < max; i++ )
       r.nextDouble( );   
-    */
+
     endLoad( );
   }
   
@@ -38,5 +37,5 @@ class MenuState extends GameState
     rect( 0, 0, game.getWidth( ), game.getHeight( ) );
   }
   
-  public String toString( ) { return "MenState"; }
+  public String toString( ) { return "MenuState"; }
 }
