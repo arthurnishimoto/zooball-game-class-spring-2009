@@ -12,3 +12,13 @@ void setup( ) {
 void draw( ) {
   game.loop( );
 }
+
+void keyPressed( KeyEvent e ) {
+  if ( game != null ) {
+    if ( e.getKeyChar( ) == 'd' || e.getKeyChar( ) == 'D' )
+      game.toggleDebugMode(  );
+    else if ( e.getKeyChar( ) == 's' || e.getKeyChar( ) == 'S' )
+      game.toggleStrokeMode( );
+  }
+  super.keyPressed( e ); // Pass event up the chain so ESC still works
+}
