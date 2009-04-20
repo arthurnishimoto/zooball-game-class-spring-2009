@@ -2,7 +2,7 @@
  * Foosball Game.
  *
  * Author:  Andy Bursavich
- * Version: 0.3
+ * Version: 0.4
  */
 class Game
 {
@@ -74,11 +74,15 @@ class Game
       String[] lines = string.trim( ).split( "\n" );
 
       textFont( debugFont ); 
-      fill( 255 );
+
       for ( int i = 0; i < lines.length; i++ ) {
         String line = lines[i].trim( );
-        if ( !line.equals( "" ) )
-          text( line, 15, 20 + i * 15 );
+        if ( !line.equals( "" ) ){
+          fill( 0, 128 );
+          rect( 10, 5 + i * 20, textWidth( line ) + 10, 20);
+          fill( 255 );
+          text( line, 15, 20 + i * 20 );
+        }
       }
     }
   }
