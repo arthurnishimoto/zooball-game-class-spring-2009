@@ -17,17 +17,17 @@ class PausedState extends GameState
   public void load( ) {
     if ( !game.getPlayState( ).isLoading( ) && !game.getPlayState( ).isLoaded( ) )
       game.getPlayState( ).beginLoad( );
-    btnResumeBottom = new CircularButton( "ui\\buttons\\play\\enabled.png" );
+    btnResumeBottom = new CircularButton( "data/ui/buttons/play/enabled.png" );
     btnResumeBottom.setPosition( 897.5, 980 );
     btnResumeBottom.setRadius( 50 );
-    btnQuitBottom = new CircularButton( "ui\\buttons\\stop\\enabled.png" );
+    btnQuitBottom = new CircularButton( "data/ui/buttons/stop/enabled.png" );
     btnQuitBottom.setPosition( 1022.5, 980 );
     btnQuitBottom.setRadius( 50 );
-    btnResumeTop = new CircularButton( "ui\\buttons\\play\\enabled.png" );
+    btnResumeTop = new CircularButton( "data/ui/buttons/play/enabled.png" );
     btnResumeTop.setPosition( 1022.5, 100 );
     btnResumeTop.setRadius( 50 );
     btnResumeTop.setRotation( PI );
-    btnQuitTop = new CircularButton( "ui\\buttons\\stop\\enabled.png" );
+    btnQuitTop = new CircularButton( "data/ui/buttons/stop/enabled.png" );
     btnQuitTop.setPosition( 897.5, 100 );
     btnQuitTop.setRadius( 50 );
     btnQuitTop.setRotation( PI );

@@ -17,17 +17,17 @@ class OverState extends GameState
   public void load( ) {
     if ( !game.getPlayState( ).isLoading( ) && !game.getPlayState( ).isLoaded( ) )
       game.getPlayState( ).beginLoad( );
-    btnReplayBottom = new CircularButton( "ui\\buttons\\replay\\enabled.png" );
+    btnReplayBottom = new CircularButton( "data/ui/buttons/replay/enabled.png" );
     btnReplayBottom.setPosition( 897.5, 980 );
     btnReplayBottom.setRadius( 50 );
-    btnQuitBottom = new CircularButton( "ui\\buttons\\stop\\enabled.png" );
+    btnQuitBottom = new CircularButton( "data/ui/buttons/stop/enabled.png" );
     btnQuitBottom.setPosition( 1022.5, 980 );
     btnQuitBottom.setRadius( 50 );
-    btnReplayTop = new CircularButton( "ui\\buttons\\replay\\enabled.png" );
+    btnReplayTop = new CircularButton( "data/ui/buttons/replay/enabled.png" );
     btnReplayTop.setPosition( 1022.5, 100 );
     btnReplayTop.setRadius( 50 );
     btnReplayTop.setRotation( PI );
-    btnQuitTop = new CircularButton( "ui\\buttons\\stop\\enabled.png" );
+    btnQuitTop = new CircularButton( "data/ui/buttons/stop/enabled.png" );
     btnQuitTop.setPosition( 897.5, 100 );
     btnQuitTop.setRadius( 50 );
     btnQuitTop.setRotation( PI );

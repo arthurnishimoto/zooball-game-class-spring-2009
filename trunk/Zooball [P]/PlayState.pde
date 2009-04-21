@@ -88,7 +88,7 @@
 // Gameplay Flags
 Boolean displayArt = true;
 
-Boolean yellowTeamTop = true;
+Boolean redTeamTop = false;
 
 Boolean yellowTeamWins = false;
 Boolean redTeamWins = false;
@@ -99,7 +99,7 @@ color debugColor = color(255,255,255); // TEMP
 
 // Gameplay Initial Variables
 int nBalls = 5;
-int maxScore = 2;
+int maxScore = 3;
 float tableFriction = 0.01; // Default = 0.01
 int rotateInc = 15; // Global rotation increment for artwork
 
@@ -140,7 +140,7 @@ class PlayState extends GameState
   private CircularButton btnPauseTop, btnPauseBottom;
   int ballsInPlay = 0;
   int ballQueue = 0;
-
+    
   public PlayState( Game game ) {
     super( game );
   }// CTOR
@@ -161,7 +161,7 @@ class PlayState extends GameState
     screenDimensions[2] = borderWidth;
     screenDimensions[3] = borderHeight;
 
-    font = loadFont("ui\\fonts\\Arial Bold-14.vlw"); // TEMP
+    font = loadFont("data/ui/fonts/Arial Bold-14.vlw"); // TEMP
     balls = new Ball[nBalls];
     
     // Loads Ball artwork
@@ -190,7 +190,7 @@ class PlayState extends GameState
     barManager = new FoosbarManager( fieldLines, barWidth, screenDimensions, balls, red_foosmanImages, yellow_foosmanImages);
 
     // Sets team colors
-    if( !yellowTeamTop ){
+    if( !redTeamTop ){
       topColor = color(255,0,0);
       bottomColor = color(255,255,0);
     }else{
@@ -207,10 +207,10 @@ class PlayState extends GameState
     bottomGoal.setParentClass(this);
     
     // Pause Buttons
-    btnPauseBottom = new CircularButton( "ui\\buttons\\pause\\enabled.png" );
+    btnPauseBottom = new CircularButton( "data/ui/buttons/pause/enabled.png" );
     btnPauseBottom.setPosition( 1882.5, 1027.5 );
     btnPauseBottom.setRadius( 27.5 );
-    btnPauseTop = new CircularButton( "ui\\buttons\\pause\\enabled.png" );
+    btnPauseTop = new CircularButton( "data/ui/buttons/pause/enabled.png" );
     btnPauseTop.setPosition( 37.5, 52.5 );
     btnPauseTop.setRadius( 27.5 );
     btnPauseTop.setRotation( PI );
@@ -233,6 +233,8 @@ class PlayState extends GameState
   }// enter()  
   
   public void draw( ) {
+    frameRate(30); // Framerate must be below 60 to allow bar spin gesture.
+    
     drawBackground( );
     
     particleManager.display();
@@ -250,6 +252,10 @@ class PlayState extends GameState
     
     drawBorders();
     drawButtons();
+    
+    ballLauncher_bottom.process(timer.getSecondsActive()); 
+    ballLauncher_top.process(timer.getSecondsActive()); 
+    
     drawDebugText();
     
     if( timer.isActive() )
@@ -278,7 +284,7 @@ class PlayState extends GameState
     for( int i = 0; i < nBalls; i++ ){
       if( !timer.isActive() )
         break;
-
+      
       if( balls[i].isActive() ){
         particleManager.trailParticles( 1, balls[i].diameter, balls[i].xPos, balls[i].yPos, 0, 0, 0 );
         balls[i].process( timer.getSecondsActive() );
@@ -305,17 +311,17 @@ class PlayState extends GameState
     
     
     // Team border
-    fill( topColor );
+    fill( bottomColor );
     noStroke();
     rect( borderWidth + goalWidth, borderHeight - 30, game.getWidth( )-(borderWidth + goalWidth)*2, 20 ); // Top border
-    fill( bottomColor );
+    fill( topColor );
     noStroke();
     rect( borderWidth + goalWidth, game.getHeight( )-borderHeight + 10, game.getWidth( )-(borderWidth + goalWidth)*2, 20 ); // Bottom border    
   }// drawBorders()
   
   private void checkWinningConditions(){
     if( topGoal.getScore() >= maxScore ){
-      if( !yellowTeamTop ){
+      if( !redTeamTop ){
         redTeamWins = true;
         game.setState( game.getOverState() );
       }else{
@@ -323,7 +329,7 @@ class PlayState extends GameState
         game.setState( game.getOverState() );
       }
     }else if( bottomGoal.getScore() >= maxScore  ){
-      if( yellowTeamTop ){
+      if( redTeamTop ){
         redTeamWins = true;
         game.getOverState().timer.reset();
         game.setState( game.getOverState() );
@@ -339,6 +345,8 @@ class PlayState extends GameState
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
        game.setState( game.getPausedState() );
     barManager.barsPressed(x,y);
+    ballLauncher_bottom.isHit(x,y);
+    ballLauncher_top.isHit(x,y);
   }// checkButtonHit
 }// class PlayState
 

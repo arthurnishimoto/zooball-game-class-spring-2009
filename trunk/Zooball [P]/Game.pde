@@ -25,7 +25,7 @@ class Game
   private float screenOffsetY;
   
   public Game( ) {
-    debugFont = loadFont( "ui\\fonts\\Arial Bold-14.vlw" );
+    debugFont = loadFont( "data/ui/fonts/Arial Bold-14.vlw" );
    
     loadingState = new LoadingState( this );
     menuState = new MenuState( this );

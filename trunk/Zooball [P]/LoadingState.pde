@@ -11,7 +11,7 @@ class LoadingState extends GameState
   
   public LoadingState( Game game ) {
     super( game );
-    logo = new Image( "ui\\logos\\infinity.png" );
+    logo = new Image( "data/ui/logos/infinity.png" );
     logo.setX( ( game.getWidth( ) - logo.getWidth( ) ) * 0.5 );
     logo.setY( ( game.getHeight( ) - logo.getHeight( ) ) * 0.5 );
     endLoad( );
