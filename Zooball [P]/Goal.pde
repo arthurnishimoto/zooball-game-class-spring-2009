@@ -27,7 +27,7 @@ class Goal{
   color teamColor;
   Ball[] balls;
   
-  PlayTestState parent;
+  PlayState parent;
   
   int ballsRecentlyHit[];
  
@@ -62,19 +62,24 @@ class Goal{
       noStroke();      
       rect( xPos + goalWidth/2, yPos, goalWidth/2, goalHeight );
     }
+
+    // Temp visual score
+    for(int x = 1; x < points+1; x++){
+      fill(0,0,0);
+      rectMode(CENTER);
+      rect( xPos + goalWidth/2, yPos + 50*x, 40, 40 );
+    }
+    rectMode(CORNER);
   }// display
   
   void displayDebug(color debugColor, PFont font){
     textFont(font,16);
     fill(debugColor);
     for( int i = 0; i < nBalls; i++)
-    text("RecentlyHit["+i+"]: "+ballsRecentlyHit[i], xPos, yPos + 16*(3+i));
+      text("RecentlyHit["+i+"]: "+ballsRecentlyHit[i], xPos, yPos + 16*(3+i));
+    text("Points: "+points, xPos, yPos + 16*(3+nBalls));
   }// displayDebug
-  
-  int scored(){
-    return points;
-  }// scored
-  
+    
   // Check for balls colliding with the goal bars
   boolean collide(Ball[] balls){
     
@@ -148,8 +153,15 @@ class Goal{
     return false;
   }// hasBall
   
-  void setParentClass(PlayTestState newParent){
+  // Setters/Getters
+  
+  void setParentClass(PlayState newParent){
     parent = newParent;
   }// setParentClass
+  
+  int getScore(){
+    return points;
+  }// getScore
+  
 }// class Goal
 

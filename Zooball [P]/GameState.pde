@@ -36,11 +36,63 @@ abstract class GameState
   protected void load( ) { endLoad( ); }
   protected final void endLoad( ) { loading = AFTER; }
   
-  public void reset( ) { timer.reset( ); }
+  public void reset( ) { timer.reset( ); loading = BEFORE; }
   public void enter( ) { timer.setActive( true ); }
   public void exit( ) { timer.setActive( false ); }
   
-  public void input( ) { }
+  public void input( ) {
+    // Process mouse if clicked
+    if(mousePressed && usingMouse){
+      float xCoord = mouseX;    
+      float yCoord = mouseY;
+  		
+      //Draw mouse
+      fill( #FF0000 );
+      noStroke();
+      ellipse( xCoord, yCoord, 20, 20 );
+  
+      // ANY CHANGES HERE MUST BE COPIED TO TOUCH ELSE-IF BELOW
+      checkButtonHit(xCoord,yCoord, 1);
+    }// if mousePressed
+    else if( usingMouse && !connectToTacTile ){
+      checkButtonHit(-100, -100, -1); // Allows for a "mouse release" trigger
+    }// else if usingMouse
+    
+    //Process touches off the managedList if there are any touches.
+    if ( ! tacTile.managedListIsEmpty()  ){
+      // Grab the managedList
+  	touchList = tacTile.getManagedList();
+      // Cycle though the touches 
+  	for ( int index = 0; index < touchList.size(); index ++ ){
+  		//Grab a touch
+  		Touches curTouch = (Touches) touchList.get(index);
+  
+  		//Grab data
+  		float xCoord = curTouch.getXPos() * width;    
+  		float yCoord = height - curTouch.getYPos() * height;
+  
+    		//Get finger ID
+  		int finger = curTouch.getFinger();
+  		
+  		//Draw finger 
+  		fill( #FF0000 );
+  		noStroke();
+  		ellipse( xCoord, yCoord, 20, 20 );
+
+                // ANY CHANGES HERE MUST BE COPIED TO MOUSE IF ABOVE
+                checkButtonHit(xCoord, yCoord, finger);
+  	}// for touchList
+    }// if touch
+    else if(connectToTacTile){ 
+      checkButtonHit(-100, -100, -1); // Allows for a "touch release" trigger
+    }// if tacTileList empty else
+    // Events that occur during every loop
+
+  }// input()
+  
+  public void checkButtonHit(float x, float y, int finger){   
+  }// checkButtonHit
+
   public void update( ) { timer.update( ); }
   public void draw( ) { }
 }

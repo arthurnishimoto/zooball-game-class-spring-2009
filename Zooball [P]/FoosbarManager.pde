@@ -46,7 +46,7 @@ class FoosbarManager{
     for( int x = 0 ; x < nBars ; x++ ){
       // Syntax: MTFoosbar2(float new_xPos, float new_yPos, float new_barWidth, float new_barHeight, int players, color teamColor, zoneFlag 0 = (top half of screen) 1 = (bottom half of screen))
       if( nBars == 8 ){ // Modified regulation size (Reduced center players from 5 to 4)
-        if ( redTeamTop ){
+        if ( yellowTeamTop ){
           bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 0, team1_Images);
           bars[1] = new Foosbar( (1+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team1, 0, team1_Images);
           bars[2] = new Foosbar( (2+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team2, 1, team2_Images);

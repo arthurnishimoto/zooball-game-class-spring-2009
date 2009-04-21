@@ -65,4 +65,12 @@ class PausedState extends GameState
   }
   
   public String toString( ) { return "PausedState"; }
+  
+  public void checkButtonHit(float x, float y, int finger){
+    if( btnResumeBottom.contains(x,y) || btnResumeTop.contains(x,y) )
+      game.setState( game.getPlayState() );
+    else if( btnQuitBottom.contains(x,y) || btnQuitTop.contains(x,y) )
+      game.setState( game.getMenuState() );
+  }// checkButtonHit
+  
 }
