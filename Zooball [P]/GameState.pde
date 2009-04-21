@@ -53,6 +53,7 @@ abstract class GameState
   
       // ANY CHANGES HERE MUST BE COPIED TO TOUCH ELSE-IF BELOW
       checkButtonHit(xCoord,yCoord, 1);
+      debugConsole.input(xCoord,yCoord, 1);
     }// if mousePressed
     else if( usingMouse && !connectToTacTile ){
       checkButtonHit(-100, -100, -1); // Allows for a "mouse release" trigger
@@ -81,6 +82,7 @@ abstract class GameState
 
                 // ANY CHANGES HERE MUST BE COPIED TO MOUSE IF ABOVE
                 checkButtonHit(xCoord, yCoord, finger);
+                debugConsole.input(xCoord, yCoord, finger);
   	}// for touchList
     }// if touch
     else if(connectToTacTile){ 
@@ -90,7 +92,7 @@ abstract class GameState
 
   }// input()
   
-  public void checkButtonHit(float x, float y, int finger){   
+  public void checkButtonHit(float x, float y, int finger){
   }// checkButtonHit
 
   public void update( ) { timer.update( ); }

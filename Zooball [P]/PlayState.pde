@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 0.6
+ * Version: 0.7
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -93,6 +93,10 @@ Boolean yellowTeamTop = true;
 Boolean yellowTeamWins = false;
 Boolean redTeamWins = false;
 
+Boolean debugText = false; // TEMP
+Boolean debug2Text = false; // TEMP
+color debugColor = color(255,255,255); // TEMP
+
 // Gameplay Initial Variables
 int nBalls = 5;
 int maxScore = 2;
@@ -119,6 +123,8 @@ PImage yellow_foosmanImages[] = new PImage[360];
 Goal topGoal, bottomGoal;
 color topColor;
 color bottomColor;
+Turret ballLauncher_bottom;
+Turret ballLauncher_top;
 
 // Rotate animation images
 String filepath;
@@ -132,7 +138,9 @@ FoosbarManager barManager;
 class PlayState extends GameState
 {
   private CircularButton btnPauseTop, btnPauseBottom;
-  
+  int ballsInPlay = 0;
+  int ballQueue = 0;
+
   public PlayState( Game game ) {
     super( game );
   }// CTOR
@@ -191,11 +199,11 @@ class PlayState extends GameState
     }
     
     // Left Goal
-    topGoal = new Goal( borderWidth, game.getHeight( )/2, goalWidth, 300 , 0, topColor, balls);
+    topGoal = new Goal( borderWidth, game.getHeight()/2, goalWidth, 300 , 0, topColor, balls);
     topGoal.setParentClass(this);
     
     // Right Goal
-    bottomGoal = new Goal( game.getWidth( )-borderWidth-100, game.getHeight( )/2, goalWidth, 300 , 1, bottomColor, balls);
+    bottomGoal = new Goal( game.getWidth()-borderWidth-100, game.getHeight()/2, goalWidth, 300 , 1, bottomColor, balls);
     bottomGoal.setParentClass(this);
     
     // Pause Buttons
@@ -206,9 +214,23 @@ class PlayState extends GameState
     btnPauseTop.setPosition( 37.5, 52.5 );
     btnPauseTop.setRadius( 27.5 );
     btnPauseTop.setRotation( PI );
+       
+    ballLauncher_bottom = new Turret( 75 , game.getWidth()/2 , game.getHeight() - 100, 150, 50);
+    ballLauncher_bottom.setParentClass(this);
+    ballLauncher_bottom.faceUp();
+    
+    ballLauncher_top = new Turret( 75 , game.getWidth()/2 , 0 + 100, 150, 50);
+    ballLauncher_top.setParentClass(this);
+    ballLauncher_top.faceDown();
     
     endLoad( );
   }// load()
+  
+  public void enter(){
+    timer.setActive( true );
+    soundManager.stopSounds();
+    soundManager.playGameplay();
+  }// enter()  
   
   public void draw( ) {
     drawBackground( );
@@ -230,7 +252,8 @@ class PlayState extends GameState
     drawButtons();
     drawDebugText();
     
-    checkWinningConditions();
+    if( timer.isActive() )
+      checkWinningConditions();
   }// draw()
   
   private void drawBackground( ) {
@@ -239,7 +262,7 @@ class PlayState extends GameState
     rect( 0, 0, game.getWidth( ), game.getHeight( ) );
   }// drawBackGround()
   
-  public String toString( ) { return "PlayTestState"; }
+  public String toString( ) { return "PlayState"; }
   
   private void drawButtons( ) {
     btnPauseBottom.draw( );
@@ -247,7 +270,7 @@ class PlayState extends GameState
   }  
   
   private void drawDebugText( ) {
-    game.drawDebugText( "Frame rate: " + frameRate + "\nSeconds: " + timer.getSecondsActive() );
+    game.drawDebugText( "State: " + this + "\nFrame Rate: " + new DecimalFormat("0.0").format(frameRate) + "\nSeconds: " + timer.getSecondsActive() );
   }
   
   private void drawBalls(){
@@ -302,12 +325,14 @@ class PlayState extends GameState
     }else if( bottomGoal.getScore() >= maxScore  ){
       if( yellowTeamTop ){
         redTeamWins = true;
+        game.getOverState().timer.reset();
         game.setState( game.getOverState() );
       }else{
         yellowTeamWins = true;
+        game.getOverState().timer.reset();
         game.setState( game.getOverState() );
-      }  
-    }    
+      }
+    }
   }// checkWinningConditions()
   
   void checkButtonHit(float x, float y, int finger){

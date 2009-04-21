@@ -6,7 +6,7 @@ Game game;
 
 Boolean connectToTacTile = false;
 Boolean usingMouse = true;
-Boolean scaleScreen = false; // All input is off-centered when scaled
+Boolean scaleScreen = true; // All input is off-centered when scaled
 
 //Touch API
 TouchAPI tacTile;
@@ -22,6 +22,9 @@ String tacTileMachine = "tactile.evl.uic.edu";
 int dataPort = 7000;
 int msgPort = 7340;
   
+SoundManager soundManager;  
+DebugConsole debugConsole;
+  
 void setup( ) {
   Image.setPApplet( this ); // Image stores a static instance of this PApplet to call Processing methods. This must be set before creating any Image objects.
   
@@ -35,6 +38,9 @@ void setup( ) {
     //Create connection to Touch Server
     tacTile = new TouchAPI( this, dataPort, msgPort, localMachine);
   }// if-else tacTile
+  
+  soundManager = new SoundManager(this);
+  debugConsole = new DebugConsole();
   
   game = new Game( );
 }
