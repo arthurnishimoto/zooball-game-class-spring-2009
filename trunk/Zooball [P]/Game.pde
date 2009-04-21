@@ -70,7 +70,7 @@ class Game
     }
     state.draw( );
     popMatrix( );
-    
+    debugConsole.draw();
     state.input( ); // Placed after draw so input touches appear on top
   }
   

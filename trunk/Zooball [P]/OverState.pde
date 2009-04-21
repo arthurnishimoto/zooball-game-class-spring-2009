@@ -34,6 +34,12 @@ class OverState extends GameState
     endLoad( );
   }
   
+  public void enter(){
+    timer.setActive( true );
+    soundManager.stopSounds();
+    soundManager.playPostgame();
+  }// enter()
+  
   public void draw( ) {
     drawBackground( );
     drawOverlay( );
@@ -93,7 +99,7 @@ class OverState extends GameState
     }
     
     popMatrix();
-    textAlign(CORNER);    
+    textAlign(LEFT);    
   }// drawGameOverText()
   
   private void drawDebugText( ) {
