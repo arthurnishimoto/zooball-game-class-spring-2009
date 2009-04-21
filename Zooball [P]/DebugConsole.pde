@@ -20,7 +20,7 @@ class DebugConsole{
   float timerIncrementer = 0.015; //Default = 0.048; 0.015 for 60 FPS; 0.030 for 30 FPS
   
   DebugConsole(){
-    font = loadFont("ui\\fonts\\Arial Bold-14.vlw"); // TEMP
+    font = loadFont("data/ui/fonts/Arial Bold-14.vlw"); // TEMP
     
     // Debugging Console
     debugButton = new Button( 50 , screenHeight - borderHeight/2 - 75*0, 50 );

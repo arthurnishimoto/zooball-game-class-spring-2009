@@ -154,15 +154,15 @@ class Foosmen{
 
     float barRotation = parent.barRotation;
     
-    if( parent.zoneFlag == 0 && yellowTeamTop ){ // Top player - faces right
+    if( parent.zoneFlag == 0 && redTeamTop ){ // Top player - faces right
      rotate(radians(-90));
-    }else if( parent.zoneFlag == 1 && yellowTeamTop ){ // Bottom player - faces left
+    }else if( parent.zoneFlag == 1 && redTeamTop ){ // Bottom player - faces left
       rotate(radians(-90));
     }
     
-    if( parent.zoneFlag == 0 && !yellowTeamTop ){ // Top player - faces right
+    if( parent.zoneFlag == 0 && !redTeamTop ){ // Top player - faces right
      rotate(radians(90));
-    }else if( parent.zoneFlag == 1 && !yellowTeamTop ){ // Bottom player - faces left
+    }else if( parent.zoneFlag == 1 && !redTeamTop ){ // Bottom player - faces left
       rotate(radians(90));
     }    
     
