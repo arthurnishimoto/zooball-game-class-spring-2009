@@ -10,12 +10,11 @@ class Game
   private LoadingState loadingState;
   private MenuState menuState;
   private PlayState playState;
-  private PlayTestState playTestState; // TEMP
   private PausedState pausedState;
-  /*
+  
   private OverState overState;
-  private LeavingState leavingState;
-  */
+  //private LeavingState leavingState;
+  
   private PFont debugFont;
   private boolean debugMode = false;
   private boolean strokeMode = false;
@@ -31,15 +30,17 @@ class Game
     loadingState = new LoadingState( this );
     menuState = new MenuState( this );
     playState = new PlayState( this );
-    playTestState = new PlayTestState( this ) ; // TEMP
     pausedState = new PausedState( this );
+    
+    overState = new OverState( this );  // TEMP
     
     menuState.beginLoad( );
     playState.beginLoad( );
-    playTestState.beginLoad(); // TEMP
     pausedState.beginLoad( );
     
-    setState( playTestState );
+    overState.beginLoad( ); // TEMP
+    
+    setState( playState );
     
     calculateScreenTransformation( );
     noStroke( );
@@ -59,14 +60,18 @@ class Game
   }
   
   public void loop( ) {
-    state.input( );
     state.update( );
+    
     // Translate and Scale
     pushMatrix( );
-    translate( screenOffsetX, screenOffsetY );
-    scale( screenScale );
+    if(scaleScreen){
+      translate( screenOffsetX, screenOffsetY );
+      scale( screenScale );
+    }
     state.draw( );
     popMatrix( );
+    
+    state.input( ); // Placed after draw so input touches appear on top
   }
   
   public void drawDebugText( String string ) {
@@ -102,13 +107,26 @@ class Game
     }
   }
   
+  /**
+   * Reloads the input state
+   *
+   * @param state - state to be reloaded
+   */
+  public void reloadState( GameState state ) {
+    if ( this.state != null )
+      this.state.exit( );
+    state.reset();
+    state.beginLoad();
+    setState(state);
+  }// reloadState
+  
   public MenuState getMenuState( ) { return menuState; }
   public PlayState getPlayState( ) { return playState; }
   public PausedState getPausedState( ) { return pausedState; }
-  /*
+  
   public OverState getOverState( ) { return overState; }
-  public LeavingState getLeavingState( ) { return leavingState; }
-  */
+  //public LeavingState getLeavingState( ) { return leavingState; }
+  
   
   public float getWidth( ) { return DEFAULT_WIDTH; }
   public float getHeight( ) { return DEFAULT_HEIGHT; }

@@ -25,7 +25,7 @@ public class CircularButton
   public boolean contains( float x, float y ) {
     float dx = this.x - x;
     float dy = this.y - y;
-    return (radius * radius) <= ( (dx * dx) + (dy * dy) );
+    return (radius * radius) >= ( (dx * dx) + (dy * dy) );
   }
   
   public void setPosition( float x, float y ) {
