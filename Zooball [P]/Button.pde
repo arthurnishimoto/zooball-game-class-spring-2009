@@ -21,7 +21,7 @@
 class Button{
   PImage buttonImage;
   int xPos, yPos;
-  double buttonDownTime = 1;
+  double buttonDownTime = 0.2;
   double buttonLastPressed = -1;
   double gameTimer;
   boolean hasImage = false;

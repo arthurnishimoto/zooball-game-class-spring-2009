@@ -31,7 +31,7 @@ class Game
     menuState = new MenuState( this );
     playState = new PlayState( this );
     pausedState = new PausedState( this );
-    
+
     overState = new OverState( this );  // TEMP
     
     menuState.beginLoad( );

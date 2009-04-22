@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 0.7
+ * Version: 0.8
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -67,10 +67,13 @@
  *              - [Added] Toggle to change team screen positions. Goal zone colors and team color bar.
  *              - [Fixed] Responds to game timer for pausing
  *              - [Modified] All ball/foosmen image loading done by parent state. Only loads one instance of each image.
- * 4/20/09      - [Added] TouchAPI support
- * 4/21/09      - Version 0.7
+ * 4/20/09      - Version 0.7
+ *              - [Added] TouchAPI support
  *              - Moved from PlayTestState to PlayState
  *              - [Added] Pause, Over State support
+ * 4/21/09      - Version 0.8
+ *              - Ball launcher reintegrated (Thus all Prototype features in)
+ *              - Foosbar "Spring-loaded" mode reintegrated and better implemented.
  * Notes:
  *      - [TODO] Add visual score counter above goals
  *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?
@@ -98,9 +101,10 @@ Boolean debug2Text = false; // TEMP
 color debugColor = color(255,255,255); // TEMP
 
 // Gameplay Initial Variables
-int nBalls = 5;
+int nBalls = 1;
 int maxScore = 3;
 float tableFriction = 0.01; // Default = 0.01
+int maxBallSpeed = 20;
 int rotateInc = 15; // Global rotation increment for artwork
 
 int borderWidth = 0;
@@ -140,6 +144,7 @@ class PlayState extends GameState
   private CircularButton btnPauseTop, btnPauseBottom;
   int ballsInPlay = 0;
   int ballQueue = 0;
+  int lastScored = -1;
     
   public PlayState( Game game ) {
     super( game );
@@ -171,8 +176,7 @@ class PlayState extends GameState
       ballImages[i] = loadImage(filepath + filename + i + extention);
     
     for( int i = 0; i < nBalls; i++ ){
-      balls[i] = new Ball( game.getWidth( )/2, game.getHeight( )/2, 50, i, balls, screenDimensions, ballImages);
-      balls[i].setActive();
+      balls[i] = new Ball( -100, -100, 50, i, balls, screenDimensions, ballImages);
     }
 
     // Loads Red Foosman artwork
@@ -223,6 +227,8 @@ class PlayState extends GameState
     ballLauncher_top.setParentClass(this);
     ballLauncher_top.faceDown();
     
+    coinToss();
+
     endLoad( );
   }// load()
   
@@ -235,6 +241,11 @@ class PlayState extends GameState
   public void draw( ) {
     frameRate(30); // Framerate must be below 60 to allow bar spin gesture.
     
+    if( ballsInPlay != 0 && ballsInPlay <= nBalls )
+      coinToss();
+    if( ballsInPlay == 0)
+      reloadBall();
+      
     drawBackground( );
     
     particleManager.display();
@@ -257,6 +268,7 @@ class PlayState extends GameState
     ballLauncher_top.process(timer.getSecondsActive()); 
     
     drawDebugText();
+    barManager.displayDebug(debugColor, font);
     
     if( timer.isActive() )
       checkWinningConditions();
@@ -284,7 +296,7 @@ class PlayState extends GameState
     for( int i = 0; i < nBalls; i++ ){
       if( !timer.isActive() )
         break;
-      
+      balls[i].setMaxVel(maxBallSpeed);
       if( balls[i].isActive() ){
         particleManager.trailParticles( 1, balls[i].diameter, balls[i].xPos, balls[i].yPos, 0, 0, 0 );
         balls[i].process( timer.getSecondsActive() );
@@ -345,8 +357,33 @@ class PlayState extends GameState
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
        game.setState( game.getPausedState() );
     barManager.barsPressed(x,y);
-    ballLauncher_bottom.isHit(x,y);
+    
     ballLauncher_top.isHit(x,y);
+    ballLauncher_top.rotateIsHit(x,y);
+    ballLauncher_bottom.isHit(x,y);
+    ballLauncher_bottom.rotateIsHit(x,y);
   }// checkButtonHit
+  
+  void reloadBall(){
+    if( lastScored == 0 ){
+      ballLauncher_bottom.enable();
+    }else if( lastScored == 1 ){
+      ballLauncher_top.enable();
+    }
+  }// reloadBall
+  
+  void coinToss(){
+    float coinToss = random(2);
+    if( coinToss >= 1 )
+      ballLauncher_bottom.enable();
+    else if( coinToss < 1 )
+      ballLauncher_top.enable();
+      
+    if( ballsInPlay == nBalls ){
+      ballLauncher_top.disable();
+      ballLauncher_bottom.disable();
+    }
+  }// coinToss
+
 }// class PlayState
 
