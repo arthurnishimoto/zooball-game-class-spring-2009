@@ -154,6 +154,12 @@ class Foosmen{
 
     float barRotation = parent.barRotation;
     
+    // Added check to make sure rotation within legal range (0-359)
+    if( barRotation >= 360 )
+      barRotation = 0;
+    else if( barRotation < 0 )
+      barRotation = 359;
+    
     if( parent.zoneFlag == 0 && redTeamTop ){ // Top player - faces right
      rotate(radians(-90));
     }else if( parent.zoneFlag == 1 && redTeamTop ){ // Bottom player - faces left

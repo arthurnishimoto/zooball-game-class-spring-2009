@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1/Eclipse 3.4.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 0.2
+ * Version: 0.3
  * 
  * Version Notes:
  * 3/1/09    - Initial version
@@ -17,9 +17,12 @@
  * 4/10/09   - Basic hit zones added. Bar rotation multipler.
  *           - Ball/bar basic top,left,bottom,right zone collision implemented. Bar at certain angle stops ball
  * 4/16/09   - Fixed "shaky" bar during very low rotation velocities
+ * 4/21/09   - Version 0.3 - Revised "Spring-loaded" option for bar rotation. Applies velocity on press release.
  * ---------------------------------------------
  */
  
+boolean springEnabled = true; // TEMP
+
 class Foosbar{
   float xPos, yPos, barWidth, barHeight, yMinTouchArea, yMaxTouchArea;
   color teamColor;
@@ -34,7 +37,7 @@ class Foosbar{
   MTFinger fingerTest;
   Foosmen[] foosPlayers;
   Ball[] ballArray;
-  boolean springEnabled = false;
+  //boolean springEnabled = true;
   float spring = 0.01;
   float barRotation = 0;
   float rotateVel;
@@ -128,7 +131,49 @@ class Foosbar{
     }else{
       ySwipe = false;
     }// if xSwipe
-
+       
+    // If spring == true, bar will "spring" back to down position
+    if( springEnabled ){
+      
+      if( rotation < 0 ){
+        if( zoneFlag == 1 ){
+          rotation += spring * 10;
+          //if(!pressed) // Applies velocity on press release
+            rotateVel = barRotation/4;
+          barRotation = abs(rotation*100);
+        }else if( zoneFlag == 0 ){
+          rotation += spring * 10;
+          //if(!pressed) // Applies velocity on press release
+            rotateVel = (360 - barRotation)/4;
+          barRotation = 360 + rotation*100;
+        }
+        
+      }else if( rotation > 0 ){
+        if( zoneFlag == 1 ){
+          rotation -= spring * 10;
+          //if(!pressed) // Applies velocity on press release
+            rotateVel = (360 - barRotation)/4;
+          barRotation = 360 - rotation*100;
+        }else if( zoneFlag == 0 ){
+          rotation -= spring * 10;
+          //if(!pressed) // Applies velocity on press release
+            rotateVel = barRotation/4;
+          barRotation = rotation*100;          
+        }
+        
+      }else if( rotation == 0 )
+        barRotation = 0;
+        
+      xMove = rotateVel*100;
+      
+      // Stops spring
+      if( rotation < 0.1 && rotation > -0.1 ){
+        rotateVel = 0;
+        rotation = 0;
+      }
+      return;
+    }// if spring enabled
+    
     // Bar rotation
     if( zoneFlag == 0 ){
       if( xMove > 1 ){
@@ -187,7 +232,7 @@ class Foosbar{
     text("Active: "+pressed, xPos, yPos+barHeight-16*7);
     text("Y Position: "+buttonValue, xPos, yPos+barHeight-16*6);
     text("Movement: "+xMove+" , "+yMove, xPos, yPos+barHeight-16*5);
-    text("Rotation: "+rotation, xPos, yPos+barHeight-16*4);
+    text("Rotation: "+rotation*100, xPos, yPos+barHeight-16*4);
     text("Players: "+nPlayers, xPos, yPos+barHeight-16*3);
     if(atTopEdge)
       text("atTopEdge", xPos, yPos+barHeight-16*2);

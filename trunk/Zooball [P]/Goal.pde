@@ -88,7 +88,7 @@ class Goal{
       float ballY = balls[i].yPos;
       float ballDia = balls[i].diameter;
       
-      if( !balls[i].isActive() )
+      if( balls[i].isInactive() )
         continue;
 
       if( teamNumber == 0 ){ // Blue team, left goal
@@ -110,8 +110,8 @@ class Goal{
           points++;
           //soundManager.playGoal();
           //parent.bottomScore++;
-          //parent.lastScored = 1;
-          //parent.ballsInPlay--;
+          parent.lastScored = 1;
+          parent.ballsInPlay--;
           continue;
         }
         
@@ -136,8 +136,8 @@ class Goal{
           points++;
           //soundManager.playGoal();
           //parent.topScore++;
-          //parent.lastScored = 0;
-          //parent.ballsInPlay--;
+          parent.lastScored = 0;
+          parent.ballsInPlay--;
           continue;
         }
         

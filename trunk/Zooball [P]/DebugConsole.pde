@@ -100,8 +100,6 @@ class DebugConsole{
     barWidthUp.setIdleColor(color(250,250,250));
     barWidthUp.setButtonText("+");
     barWidthUp.setDoubleSidedText(false);
-    barWidthUp.setDelay(0.1);
-
   }// CTOR
   
   public void draw(){
@@ -172,7 +170,7 @@ class DebugConsole{
         fill(color(255,255,255));
         textFont(font,18);
         if(debugConsole)
-          text("Bar Width\n("+barWidth+")", 175, screenHeight - borderHeight/2 - 65*1);
+          text("Maximum Ball\nSpeed ("+maxBallSpeed+")", 175, screenHeight - borderHeight/2 - 65*1);
         else if(debugConsole2)
           text("Min Stop\nAngle ("+barManager.getMinStopAngle()+")", 175, screenHeight - borderHeight/2 - 65*1);
         barWidthUp.process(font, timer_g);
@@ -184,7 +182,13 @@ class DebugConsole{
       }// if debugConsole
 
       debugButton.process(font, timer_g += timerIncrementer);
-      debugButton.setLit( debugConsole || debugConsole2 );    
+      debugButton.setLit( debugConsole || debugConsole2 );
+      debugTextButton.setLit( debugText );
+      
+      if(debugConsole2)
+        debug2TextButton.setLit( springEnabled );
+      springButton.setLit( debugConsole2 );
+      //turretButton.setLit( ballLauncher_bottom.isShootOnRelease() );
       textAlign(LEFT);
   }// draw()
   
@@ -252,13 +256,11 @@ class DebugConsole{
       }// if addFriction 
       
       if( barWidthDown.isHit(x,y) ){
-        barWidth--;
-        barManager.setBarWidth(barWidth);
+        maxBallSpeed--;
       }// if barWidthDown
       
       if( barWidthUp.isHit(x,y) ){
-        barWidth++;
-        barManager.setBarWidth(barWidth);
+        maxBallSpeed++;
       }// if barWidthUp    
       
       if( applyChanges.isHit(x,y) ){
@@ -290,7 +292,8 @@ class DebugConsole{
       //    barManager.setSpringEnabled(true);
       //  }
       //}// if springButton
-        
+      springButton.setButtonText("More");
+      springButton.setDoubleSidedText(false);
       if( springButton.isHit(x,y) ){
         if( debugConsole ){
           debugConsole = false;
@@ -350,11 +353,14 @@ class DebugConsole{
         }
       }// if debugTextButton
       
+      debug2TextButton.setButtonText("Bar\nSpring");
+      debug2TextButton.setDoubleSidedText(false);
+      
       if( debug2TextButton.isHit(x,y) ){
-        if(debug2Text){
-          debug2Text = false;
+        if( springEnabled ){
+          springEnabled = false;
         }else{
-          debug2Text = true;
+          springEnabled = true;
         }
       }// if debug2TextButton
       
