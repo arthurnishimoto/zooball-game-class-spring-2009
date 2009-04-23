@@ -157,6 +157,11 @@ class FoosbarManager{
       bars[x].setSpringEnabled(enable);
   }// setSpringEnabled
   
+  void setRotationEnabled(boolean enable){
+    for( int x = 0 ; x < nBars ; x++ )
+      bars[x].setRotationEnabled(enable);
+  }// setRotationEnabled
+  
   void setBarWidth(float newWidth){
     for( int x = 0 ; x < nBars ; x++ )
       bars[x].barWidth = newWidth;
@@ -222,6 +227,12 @@ class FoosbarManager{
       return bars[x].isSpringEnabled();
     return false;
   }// isSpringEnabled
+  
+  boolean isRotationEnabled(){
+    for( int x = 0 ; x < nBars ; x++ )
+      return bars[x].isRotationEnabled();
+    return false;
+  }// isRotationEnabled
   
   // Reset bars - used to fix edge collision sticking
   void reset(){

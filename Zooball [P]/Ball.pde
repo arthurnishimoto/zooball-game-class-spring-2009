@@ -221,7 +221,7 @@ class Ball{
       while( newVel < 4 && newVel > -4 )
         newVel =  random(-10, 11);
       yVel = newVel;
-      //soundManager.playKick();
+      soundManager.playKick();
     }// if
   }// is Hit
   
@@ -300,20 +300,20 @@ class Ball{
     if ( xPos+diameter/2 > screenWidth-borderWidth){ // Right side
       xVel *= -1;
       xPos --; // Push out of wall
-      ///soundManager.playBounce();
+      soundManager.playBounce();
     }else if ( xPos-diameter/2 < borderWidth){ // Left Side
       xVel *= -1;
       xPos ++; // Push out of wall
-      //soundManager.playBounce();
+      soundManager.playBounce();
     }
     if ( yPos+diameter/2 > screenHeight-borderHeight){ // Bottom side
       yVel *= -1;
       yPos --; // Push out of wall
-      //soundManager.playBounce();
+      soundManager.playBounce();
     }else if ( yPos-diameter/2 < borderHeight ){ // Top side
       yVel *= -1;
       yPos ++; // Push out of wall
-      //soundManager.playBounce();
+      soundManager.playBounce();
     }
     
   }// move
