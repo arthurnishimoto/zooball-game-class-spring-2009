@@ -1,20 +1,32 @@
 /**
- * @TODO Quickly added for user test. - CLEAN UP LATER
+ * DebugConsole.pde
+ *
+ * By Arthur Nishimoto
+ *
+ * Version 2.0 (4/23/09)
+ *
+ * A debugging console that sits within the game class above all classes.
+ * Divided into panels.
+ * Panel 1 - Volume, # of balls/bars, Friction, Max ball speed, Turret fire mode, dubug text
+ * panel 2 - (Foosbar Controls) Slide, rotation, friction, stoping angles, Bar control modes (fixed, spring, 360)
+ *
  */
 class DebugConsole{
   Button debugButton;
   
-  Button debugTextButton, debug2TextButton;
-  Button springButton, turretButton;
-  Button addBall, subtBall;
-  Button addBar, subtBar;
-  Button volumeUp, volumeDown;
   Button muteButton;
   Button applyChanges;
-  Button addFriction, subtFriction;
-  Button barWidthUp, barWidthDown;
+  
+  Button plus1, minus1;
+  Button plus2, minus2;
+  Button plus3, minus3;
+  Button plus4, minus4;
+  Button plus5, minus5;
+  
+  Button round1, round2, round3, round4;
+  
   Boolean debugConsole = false;
-  Boolean debugConsole2 = false;
+  Boolean debugPanel2 = false;
   int screenHeight = screen.height;
   int new_nBalls, newFieldLines;
   float timerIncrementer = 0.015; //Default = 0.048; 0.015 for 60 FPS; 0.030 for 30 FPS
@@ -22,384 +34,385 @@ class DebugConsole{
   DebugConsole(){
     font = loadFont("data/ui/fonts/Arial Bold-14.vlw"); // TEMP
     
-    // Debugging Console
+    // Button which opens the console
     debugButton = new Button( 50 , screenHeight - borderHeight/2 - 75*0, 50 );
     debugButton.setIdleColor(color(0,10,0));    
     debugButton.setLitColor(color(0,250,50)); 
-
-    debugTextButton = new Button( 375 , screenHeight - borderHeight/2 - 75*0, 50 );
-    debugTextButton.setIdleColor(color(0,50,50));
-    debugTextButton.setLitColor(color(0,250,250));
     
-    debug2TextButton = new Button( 375 , screenHeight - borderHeight/2 - 75*1, 50 );
-    debug2TextButton.setIdleColor(color(0,50,50));
-    debug2TextButton.setLitColor(color(0,250,250));
+    setupPanel();
+  }// CTOR
+  
+  public void draw(){
+    if(debugConsole)
+      displayPanel_1();
+    if(debugPanel2)
+      displayPanel_2();
+      
+    debugButton.process(font, timer_g);
+    debugButton.setLit( debugConsole || debugPanel2 );
     
-    springButton = new Button( 375 , screenHeight - borderHeight/2 - 75*2, 50 );
-    springButton.setIdleColor(color(0,50,50));
-    springButton.setLitColor(color(250,250,0));
+    timer_g += timerIncrementer; //Used for debug since console is indepentent of state
+  }// draw()
+  
+  public void input(float x, float y, int finger){
+    if( debugButton.isHit(x,y) ){
+      if(debugConsole || debugPanel2 ){
+        debugConsole = false;
+        debugPanel2 = false;
+      }else{
+        new_nBalls = nBalls;
+        newFieldLines = fieldLines;
+        debugConsole = true;
+      }
+    }// if debugButton
     
-    turretButton = new Button( 375 , screenHeight - borderHeight/2 - 75*3, 50 );
-    turretButton.setIdleColor(color(0,50,50));
-    turretButton.setLitColor(color(0,250,0));
-    
-    volumeDown = new Button( 50, screenHeight - borderHeight/2 - 65*5 - 25, 50, 50 );
-    volumeDown.setIdleColor(color(250,250,250));
-    volumeDown.setButtonText("-");
-    volumeDown.setDoubleSidedText(false);    
-    
-    volumeUp = new Button( 250, screenHeight - borderHeight/2 - 65*5 - 25, 50, 50 );
-    volumeUp.setIdleColor(color(250,250,250));
-    volumeUp.setButtonText("+");
-    volumeUp.setDoubleSidedText(false); 
-         
+    if(debugConsole)
+      panel_1_input(x,y,finger);
+    else if(debugPanel2)
+      panel_2_input(x,y,finger);
+  }// input()
+  
+  private void setupPanel(){
     muteButton = new Button( 250 + 75, screenHeight - borderHeight/2 - 65*5 - 25, 100, 50 );
     muteButton.setIdleColor(color(60,10,10));
     muteButton.setLitColor(color(255, 0, 0));
     muteButton.setButtonText("MUTE");
-    muteButton.setDoubleSidedText(false);  
+    muteButton.setDoubleSidedText(false);
+    
+    minus1 = new Button( 50, screenHeight - borderHeight/2 - 65*5 - 25, 50, 50 );
+    minus1.setIdleColor(color(250,250,250));
+    minus1.setDoubleSidedText(false);
+    minus1.setButtonText("-");
+    minus2 = new Button( 50, screenHeight - borderHeight/2 - 65*4 - 25, 50, 50 );
+    minus2.setIdleColor(color(250,250,250));
+    minus2.setDoubleSidedText(false);
+    minus2.setButtonText("-");
+    minus3 = new Button( 50, screenHeight - borderHeight/2 - 65*3 - 25, 50, 50 );
+    minus3.setIdleColor(color(250,250,250));
+    minus3.setDoubleSidedText(false);
+    minus3.setButtonText("-");
+    minus4 = new Button( 50, screenHeight - borderHeight/2 - 65*2 - 25, 50, 50 );
+    minus4.setIdleColor(color(250,250,250));
+    minus4.setDoubleSidedText(false);
+    minus4.setButtonText("-");
+    minus5 = new Button( 50, screenHeight - borderHeight/2 - 65*1 - 25, 50, 50 );
+    minus5.setIdleColor(color(250,250,250));
+    minus5.setDoubleSidedText(false);
+    minus5.setButtonText("-");
+    
+    plus1 = new Button( 250, screenHeight - borderHeight/2 - 65*5 - 25, 50, 50 );
+    plus1.setIdleColor(color(250,250,250));
+    plus1.setDoubleSidedText(false);
+    plus1.setButtonText("+");
+    plus2 = new Button( 250, screenHeight - borderHeight/2 - 65*4 - 25, 50, 50 );
+    plus2.setIdleColor(color(250,250,250));
+    plus2.setDoubleSidedText(false);
+    plus2.setButtonText("+");
+    plus3 = new Button( 250, screenHeight - borderHeight/2 - 65*3 - 25, 50, 50 );
+    plus3.setIdleColor(color(250,250,250));
+    plus3.setDoubleSidedText(false);
+    plus3.setButtonText("+");
+    plus4 = new Button( 250, screenHeight - borderHeight/2 - 65*2 - 25, 50, 50 );
+    plus4.setIdleColor(color(250,250,250));
+    plus4.setDoubleSidedText(false);
+    plus4.setButtonText("+");
+    plus5 = new Button( 250, screenHeight - borderHeight/2 - 65*1 - 25, 50, 50 );
+    plus5.setIdleColor(color(250,250,250));
+    plus5.setDoubleSidedText(false);
+    plus5.setButtonText("+");
+    
+    round1 = new Button( 375 , screenHeight - borderHeight/2 - 75*3, 50 );
+    round1.setDoubleSidedText(false);
+    round1.setIdleColor(color(0,50,50));
+    round2 = new Button( 375 , screenHeight - borderHeight/2 - 75*2, 50 );
+    round2.setDoubleSidedText(false);
+    round2.setIdleColor(color(0,50,50));
+    round3 = new Button( 375 , screenHeight - borderHeight/2 - 75*1, 50 );
+    round3.setDoubleSidedText(false);
+    round3.setIdleColor(color(0,50,50));
+    round4 = new Button( 375 , screenHeight - borderHeight/2 - 75*0, 50 );
+    round4.setDoubleSidedText(false);
+    round4.setIdleColor(color(0,50,50));
     
     applyChanges = new Button( 125, screenHeight - borderHeight/2 - 65*0 - 25, 200, 50 );
     applyChanges.setIdleColor(color(60,10,10, 1));
     applyChanges.setLitColor(color(255, 0, 0));
     applyChanges.setDoubleSidedText(false);  
     
-    subtBall = new Button( 50, screenHeight - borderHeight/2 - 65*4 - 25, 50, 50 );
-    subtBall.setIdleColor(color(250,250,250));
-    subtBall.setButtonText("-");
-    subtBall.setDoubleSidedText(false);
-    addBall = new Button( 250, screenHeight - borderHeight/2 - 65*4 - 25, 50, 50 );
-    addBall.setIdleColor(color(250,250,250));
-    addBall.setButtonText("+");
-    addBall.setDoubleSidedText(false);
-    
-    subtBar = new Button( 50, screenHeight - borderHeight/2 - 65*3 - 25, 50, 50 );
-    subtBar.setIdleColor(color(250,250,250));
-    subtBar.setButtonText("-");
-    subtBar.setDoubleSidedText(false);
-    addBar = new Button( 250, screenHeight - borderHeight/2 - 65*3 - 25, 50, 50 );
-    addBar.setIdleColor(color(250,250,250));
-    addBar.setButtonText("+");
-    addBar.setDoubleSidedText(false);
-    
-    subtFriction = new Button( 50, screenHeight - borderHeight/2 - 65*2 - 25, 50, 50 );
-    subtFriction.setIdleColor(color(250,250,250));
-    subtFriction.setButtonText("-");
-    subtFriction.setDoubleSidedText(false);
-    addFriction = new Button( 250, screenHeight - borderHeight/2 - 65*2 - 25, 50, 50 );
-    addFriction.setIdleColor(color(250,250,250));
-    addFriction.setButtonText("+");
-    addFriction.setDoubleSidedText(false);
-    
-    barWidthDown = new Button( 50, screenHeight - borderHeight/2 - 65*1 - 25, 50, 50 );
-    barWidthDown.setIdleColor(color(250,250,250));
-    barWidthDown.setButtonText("-");
-    barWidthDown.setDoubleSidedText(false);
-    barWidthDown.setDelay(0.1);
-    barWidthUp = new Button( 250, screenHeight - borderHeight/2 - 65*1 - 25, 50, 50 );
-    barWidthUp.setIdleColor(color(250,250,250));
-    barWidthUp.setButtonText("+");
-    barWidthUp.setDoubleSidedText(false);
-  }// CTOR
+  }// setupPanel
   
-  public void draw(){
-
-      if( debugConsole || debugConsole2 ){ 
-        // Debug Console
-        rectMode(CORNER);
-        
-        // background
-        fill(color(0,0,0, 150));
-        stroke(color(0,0,0));
-        rect(0, screenHeight - borderHeight/2 - 75*5, 450 , 500 );
-        
-        // Controls
-        volumeDown.process(font, timer_g);
-        textAlign(CENTER);
-        fill(color(255,255,255));
-        textFont(font,18);
-        if( debugConsole ){
-          text("Volume\n("+soundManager.getGain()+")", 175, screenHeight - borderHeight/2 - 65*5);
-          muteButton.process(font, timer_g);
-          muteButton.setLit( soundManager.isMuted() );      
-        }else if( debugConsole2 )
-          text("Bar Slide\n("+barManager.getBarSlideMultiplier()+")", 175, screenHeight - borderHeight/2 - 65*5);
-        volumeUp.process(font, timer_g);
+  private void displayPanel_1(){
+    // background
+    fill(color(0,0,0, 150));
+    stroke(color(0,0,0));
+    rect(0, screenHeight - borderHeight/2 - 75*5, 450 , 500 );    
     
-        
-        applyChanges.process(font, timer_g);
-        if( new_nBalls != nBalls || fieldLines != newFieldLines ){
-          applyChanges.setButtonText("APPLY CHANGES\n (Requires Restart)");
-          applyChanges.setLit( true );
-        }else{
-          applyChanges.setButtonText("");
-          applyChanges.setLit( false );      
-        }
-        subtBall.process(font, timer_g);
-        textAlign(CENTER);
-        fill(color(255,255,255));
-        textFont(font,18);
-        if( debugConsole ){
-          text("Balls\n("+new_nBalls+")", 175, screenHeight - borderHeight/2 - 65*4);
-        }else if( debugConsole2 )
-          text("Bar Rotation\n("+barManager.getBarRotateMultiplier()+")", 175, screenHeight - borderHeight/2 - 65*4);     
-        addBall.process(font, timer_g);
+    // Buttons
+    muteButton.process(font, timer_g);
+    muteButton.setLit( soundManager.isMuted() );
     
-        subtBar.process(font, timer_g);
-        textAlign(CENTER);
-        fill(color(255,255,255));
-        textFont(font,18);
-        if( debugConsole )
-          text("Bars\n("+(newFieldLines - 1)+")", 175, screenHeight - borderHeight/2 - 65*3);
-        else if( debugConsole2 )
-          text("Bar Friction\n("+barManager.getBarFriction()+")", 175, screenHeight - borderHeight/2 - 65*3);
-        addBar.process(font, timer_g);
+    applyChanges.process(font, timer_g);
+    if( new_nBalls != nBalls || fieldLines != newFieldLines ){
+      applyChanges.setButtonText("APPLY CHANGES\n (Requres Restart)");
+      applyChanges.setLit( true );
+    }else{
+      applyChanges.setButtonText("");
+      applyChanges.setLit( false );      
+    }
         
-        subtFriction.process(font, timer_g);
-        textAlign(CENTER);
-        fill(color(255,255,255));
-        textFont(font,18);
-        if( debugConsole )
-          text("Friction\n("+tableFriction+")", 175, screenHeight - borderHeight/2 - 65*2);
-        else if( debugConsole2 )
-          text("Max Stop\nAngle ("+barManager.getMaxStopAngle()+")", 175, screenHeight - borderHeight/2 - 65*2);
-        addFriction.process(font, timer_g);
-        
-        barWidthDown.process(font, timer_g);
-        textAlign(CENTER);
-        fill(color(255,255,255));
-        textFont(font,18);
-        if(debugConsole)
-          text("Maximum Ball\nSpeed ("+maxBallSpeed+")", 175, screenHeight - borderHeight/2 - 65*1);
-        else if(debugConsole2)
-          text("Min Stop\nAngle ("+barManager.getMinStopAngle()+")", 175, screenHeight - borderHeight/2 - 65*1);
-        barWidthUp.process(font, timer_g);
-        
-        debugTextButton.process(font, timer_g);
-        debug2TextButton.process(font, timer_g);
-        springButton.process(font, timer_g);
-        turretButton.process(font, timer_g);
-      }// if debugConsole
+    minus1.process(font, timer_g);
+    fill(255,255,255);
+    text("Volume\n("+soundManager.getGain()+")", 175, screenHeight - borderHeight/2 - 65*5);
+    plus1.process(font, timer_g);
+    
+    minus2.process(font, timer_g);
+    fill(255,255,255);
+    text("Balls\n("+new_nBalls+")", 175, screenHeight - borderHeight/2 - 65*4);
+    plus2.process(font, timer_g);
+ 
+    minus3.process(font, timer_g);
+    fill(255,255,255);
+    text("Bars\n("+(newFieldLines - 1)+")", 175, screenHeight - borderHeight/2 - 65*3);    
+    plus3.process(font, timer_g);
 
-      debugButton.process(font, timer_g += timerIncrementer);
-      debugButton.setLit( debugConsole || debugConsole2 );
-      debugTextButton.setLit( debugText );
+    minus4.process(font, timer_g);
+    fill(255,255,255);
+    text("Friction\n("+tableFriction+")", 175, screenHeight - borderHeight/2 - 65*2);   
+    plus4.process(font, timer_g);
+
+    minus5.process(font, timer_g);
+    fill(255,255,255);
+    text("Maximum Ball\nSpeed ("+maxBallSpeed+")", 175, screenHeight - borderHeight/2 - 65*1);
+    plus5.process(font, timer_g);
+
+    round1.process(font, timer_g);
+    round1.setButtonText("Turret\nMode");
+    round1.setLitColor( color(0, 255, 0) );
+    round1.setLit( ballLauncher_bottom.isShootOnRelease() );
       
-      if(debugConsole2)
-        debug2TextButton.setLit( springEnabled );
-      springButton.setLit( debugConsole2 );
-      //turretButton.setLit( ballLauncher_bottom.isShootOnRelease() );
-      textAlign(LEFT);
-  }// draw()
+    round2.process(font, timer_g);
+    round2.setButtonText("Debug\nText");
+    round2.setLitColor( color(255, 0, 0) );
+    round2.setLit( debugText );
+    
+    round3.process(font, timer_g);
+    round3.setButtonText("Panel\n2");
+    round3.setLitColor( color(0,250,250) );
+    round3.setLit( debugPanel2 );
+    
+    round4.process(font, timer_g);
+    round4.setButtonText("");
+    round4.setLitColor( color(0,250,250) );
+    round4.setLit( false );
+    
+    textAlign(LEFT);
+  }// displayPanel_1
   
+  private void panel_1_input(float x, float y, int finger){
   
-  public void input(float x, float y, int finger){
-    fill(0,255,0);
-    ellipse(x,y,10,10);
-    if( debugButton.isHit(x,y) ){
-      fill(0,0,255);
-      ellipse(x,y,10,10);
-      if(debugConsole || debugConsole2){
-        debugConsole = false;
-        debugConsole2 = false;
+    if( muteButton.isHit(x,y) ){
+      if( soundManager.isMuted() )
+        soundManager.unmute();
+      else
+        soundManager.mute();
+    }// if muteButton
+      
+    if( minus1.isHit(x,y) ){
+      soundManager.subtractGain();
+    }// if minus 1
+    if( plus1.isHit(x,y) ){
+      soundManager.addGain();
+    }// if plus 1
+
+    if( minus2.isHit(x,y) ){
+      if( new_nBalls > 0 )
+        new_nBalls --;
+    }// if minus 2
+    if( plus2.isHit(x,y) ){
+      if( new_nBalls >= 0 )
+        new_nBalls ++;
+    }// if plus 2
+    
+    if( minus3.isHit(x,y) ){
+      if( newFieldLines > 1 )
+        newFieldLines--;
+    }// if minus 3
+    if( plus3.isHit(x,y) ){
+      if( newFieldLines >= 1 )
+        newFieldLines++;
+    }// if plus 3
+    
+    if( minus4.isHit(x,y) ){
+      tableFriction -= 0.01;
+    }// if minus 4
+    if( plus4.isHit(x,y) ){
+      tableFriction += 0.01;
+    }// if plus 4
+    
+    if( minus5.isHit(x,y) ){
+      maxBallSpeed--;
+    }// if minus 5
+    if( plus5.isHit(x,y) ){
+      maxBallSpeed++;
+    }// if plus5
+    
+    if( round1.isHit(x,y) ){
+      if(ballLauncher_bottom.isShootOnRelease()){
+        ballLauncher_bottom.setShootOnRelease(false);
+        ballLauncher_top.setShootOnRelease(false);
       }else{
-        new_nBalls = nBalls;
-        newFieldLines = fieldLines;
-        debugConsole = true;
+        ballLauncher_bottom.setShootOnRelease(true);
+        ballLauncher_top.setShootOnRelease(true);
       }
-    }// debugButton
+    }// if round1
     
-
-    if(debugConsole){
+    if( round2.isHit(x,y) ){
+      if( debugText ){
+        debugText = false;
+      }else{
+        debugText = true;
+      }
+    }// if round2
+    
+    if( round3.isHit(x,y) ){
+      debugPanel2 = true;
+      debugConsole = false;
+    }// if round3
+    
+    if( round4.isHit(x,y) ){
+    }// if round4
+    
+    if( applyChanges.isHit(x,y) ){
+      nBalls = new_nBalls;
+      fieldLines = newFieldLines;
+      game.reloadState( game.getPlayState() );
+    }// if applyChanges
       
-      if( volumeUp.isHit(x,y) ){
-        soundManager.addGain();
-      }// if volumeUp
-      
-      if( volumeDown.isHit(x,y) ){
-        soundManager.subtractGain();
-      }// if volumeDown
-      
-      if( muteButton.isHit(x,y) ){
-        if( soundManager.isMuted() )
-          soundManager.unmute();
-        else
-          soundManager.mute();
-      }// if muteButton
-      
-      if( subtBall.isHit(x,y) ){
-        if( new_nBalls > 0 )
-          new_nBalls --;
-      }// if subtBall
-      
-      if( addBall.isHit(x,y) ){
-        if( new_nBalls >= 0 )
-          new_nBalls ++;
-      }// if addBall
-      
-      if( subtBar.isHit(x,y) ){
-        if( newFieldLines > 1 )
-          newFieldLines--;
-      }// if subtBar
-      
-      if( addBar.isHit(x,y) ){
-        if( newFieldLines >= 1 )
-          newFieldLines++;
-      }// if addBar 
-      
-      if( subtFriction.isHit(x,y) ){
-        tableFriction -= 0.01;
-      }// if subtFriction
-      
-      if( addFriction.isHit(x,y) ){
-        tableFriction += 0.01;
-      }// if addFriction 
-      
-      if( barWidthDown.isHit(x,y) ){
-        maxBallSpeed--;
-      }// if barWidthDown
-      
-      if( barWidthUp.isHit(x,y) ){
-        maxBallSpeed++;
-      }// if barWidthUp    
-      
-      if( applyChanges.isHit(x,y) ){
-        nBalls = new_nBalls;
-        fieldLines = newFieldLines;
-        game.reloadState( game.getPlayState() );
-      }// if applyChanges
-      
-      if( debugTextButton.isHit(x,y) ){
-        if(debugText){
-          debugText = false;
-        }else{
-          debugText = true;
-        }
-      }// if debugTextButton
-      
-      if( debug2TextButton.isHit(x,y) ){
-        if(debug2Text){
-          debug2Text = false;
-        }else{
-          debug2Text = true;
-        }
-      }// if debug2TextButton
-      
-      //if( springButton.isHit(x,y) ){
-      //  if(barManager.isSpringEnabled()){
-      //    barManager.setSpringEnabled(false);
-      //  }else{
-      //    barManager.setSpringEnabled(true);
-      //  }
-      //}// if springButton
-      springButton.setButtonText("More");
-      springButton.setDoubleSidedText(false);
-      if( springButton.isHit(x,y) ){
-        if( debugConsole ){
-          debugConsole = false;
-          debugConsole2 = true;
-        }else{
-          debugConsole = true;
-          debugConsole2 = false;
-        }
-      }// if springButton
-      
-      if( turretButton.isHit(x,y) ){
-        if(ballLauncher_bottom.isShootOnRelease()){
-          ballLauncher_bottom.setShootOnRelease(false);
-          ballLauncher_top.setShootOnRelease(false);
-        }else{
-          ballLauncher_bottom.setShootOnRelease(true);
-          ballLauncher_top.setShootOnRelease(true);
-        }
-      }// if turretButton     
-    }// if debugConsole is active
-    else if( debugConsole2 ){
-      if( subtFriction.isHit(x,y) ){
-        if( barManager.getMaxStopAngle() > 0 )
-          barManager.setMaxStopAngle(barManager.getMaxStopAngle() - 15);
-      }// if subtFriction
-      
-      if( addFriction.isHit(x,y) ){
-        if( barManager.getMaxStopAngle() < 360 )
-          barManager.setMaxStopAngle(barManager.getMaxStopAngle() + 15);
-      }// if addFriction 
-      
-      if( barWidthDown.isHit(x,y) ){
-        if( barManager.getMinStopAngle() > 0 )
-          barManager.setMinStopAngle(barManager.getMinStopAngle() - 15);
-      }// if barWidthDown
-      
-      if( barWidthUp.isHit(x,y) ){
-        if( barManager.getMinStopAngle() < 360 )
-          barManager.setMinStopAngle(barManager.getMinStopAngle() + 15);
-      }// if barWidthUp  
-      
-      if( turretButton.isHit(x,y) ){
-        if(ballLauncher_bottom.isShootOnRelease()){
-          ballLauncher_bottom.setShootOnRelease(false);
-          ballLauncher_top.setShootOnRelease(false);
-        }else{
-          ballLauncher_bottom.setShootOnRelease(true);
-          ballLauncher_top.setShootOnRelease(true);
-        }
-      }// if turretButton  
-      
-      if( debugTextButton.isHit(x,y) ){
-        if(debugText){
-          debugText = false;
-        }else{
-          debugText = true;
-        }
-      }// if debugTextButton
-      
-      debug2TextButton.setButtonText("Bar\nSpring");
-      debug2TextButton.setDoubleSidedText(false);
-      
-      if( debug2TextButton.isHit(x,y) ){
-        if( springEnabled ){
-          springEnabled = false;
-        }else{
-          springEnabled = true;
-        }
-      }// if debug2TextButton
-      
-      if( springButton.isHit(x,y) ){
-        if( debugConsole ){
-          debugConsole = false;
-          debugConsole2 = true;
-        }else{
-          debugConsole = true;
-          debugConsole2 = false;
-        }
-      }// if springButton
+  }// panel_1_input()
   
-      if( volumeUp.isHit(x,y) ){
-        barManager.setBarSlideMultiplier(barManager.getBarSlideMultiplier() + 0.5 );
-      }// if volumeUp
-      
-      if( volumeDown.isHit(x,y) ){
-        barManager.setBarSlideMultiplier(barManager.getBarSlideMultiplier() - 0.5 );
-      }// if volumeDown
-      
-      if( subtBall.isHit(x,y) ){
-        barManager.setBarRotateMultiplier(barManager.getBarRotateMultiplier() - 0.5 );
-      }// if subtBall
-      
-      if( addBall.isHit(x,y) ){
-        barManager.setBarRotateMultiplier(barManager.getBarRotateMultiplier() + 0.5 );
-      }// if addBall
-      
-      if( subtBar.isHit(x,y) ){
-        barManager.setBarFriction(barManager.getBarFriction() - 0.05 );
-      }// if subtBar
-      
-      if( addBar.isHit(x,y) ){
-        barManager.setBarFriction(barManager.getBarFriction() + 0.05 );
-      }// if addBar
-      
-    }// if debugConsole2 is active    
+  private void displayPanel_2(){
+    // background
+    fill(color(0,0,0, 150));
+    stroke(color(0,0,0));
+    rect(0, screenHeight - borderHeight/2 - 75*5, 450 , 500 );    
+    
+    // Buttons
+    minus1.process(font, timer_g);
+    fill(255,255,255);
+    text("Bar Slide\n("+barManager.getBarSlideMultiplier()+")", 175, screenHeight - borderHeight/2 - 65*5);
+    plus1.process(font, timer_g);
+    
+    minus2.process(font, timer_g);
+    fill(255,255,255);
+    text("Bar Rotation\n("+barManager.getBarRotateMultiplier()+")", 175, screenHeight - borderHeight/2 - 65*4);
+    plus2.process(font, timer_g);
+ 
+    minus3.process(font, timer_g);
+    fill(255,255,255);
+    text("Bar Friction\n("+barManager.getBarFriction()+")", 175, screenHeight - borderHeight/2 - 65*3); 
+    plus3.process(font, timer_g);
 
-  }// input()
+    minus4.process(font, timer_g);
+    fill(255,255,255);
+    text("Max Stop\nAngle ("+barManager.getMaxStopAngle()+")", 175, screenHeight - borderHeight/2 - 65*2); 
+    plus4.process(font, timer_g);
+
+    minus5.process(font, timer_g);
+    fill(255,255,255);
+    text("Min Stop\nAngle ("+barManager.getMinStopAngle()+")", 175, screenHeight - borderHeight/2 - 65*1);
+    plus5.process(font, timer_g);
+
+    round1.process(font, timer_g);
+    round1.setButtonText("Spring\nMode");
+    round1.setLitColor( color(255, 255, 0) );
+    round1.setLit( barManager.isSpringEnabled() );
+      
+    round2.process(font, timer_g);
+    round2.setButtonText("Rotate\nMode");
+    round2.setLitColor( color(255, 255, 0) );
+    round2.setLit( barManager.isRotationEnabled() );
+    
+    round3.process(font, timer_g);
+    round3.setButtonText("Panel\n2");
+    round3.setLitColor( color(0,250,250) );
+    round3.setLit( debugPanel2 );
+    
+    round4.process(font, timer_g);
+    round4.setButtonText("");
+    round4.setLitColor( color(0,250,250) );
+    round4.setLit( false );
+    
+    textAlign(LEFT);
+  }// displayPanel_2
+  
+  private void panel_2_input(float x, float y, int finger){
+    if( minus1.isHit(x,y) ){
+      barManager.setBarSlideMultiplier(barManager.getBarSlideMultiplier() - 0.5 );
+    }// if minus 1
+    if( plus1.isHit(x,y) ){
+      barManager.setBarSlideMultiplier(barManager.getBarSlideMultiplier() + 0.5 );
+    }// if plus 1
+
+    if( minus2.isHit(x,y) ){
+      barManager.setBarRotateMultiplier(barManager.getBarRotateMultiplier() - 0.5 );
+    }// if minus 2
+    if( plus2.isHit(x,y) ){
+      barManager.setBarRotateMultiplier(barManager.getBarRotateMultiplier() + 0.5 );
+    }// if plus 2
+    
+    if( minus3.isHit(x,y) ){
+      barManager.setBarFriction(barManager.getBarFriction() - 0.05 );
+    }// if minus 3
+    if( plus3.isHit(x,y) ){
+      barManager.setBarFriction(barManager.getBarFriction() + 0.05 );
+    }// if plus 3
+    
+    if( minus4.isHit(x,y) ){
+      if( barManager.getMaxStopAngle() > 0 )
+        barManager.setMaxStopAngle(barManager.getMaxStopAngle() - 15);
+    }// if minus 4
+    if( plus4.isHit(x,y) ){
+      if( barManager.getMaxStopAngle() < 360 )
+        barManager.setMaxStopAngle(barManager.getMaxStopAngle() + 15);
+    }// if plus 4
+    
+    if( minus5.isHit(x,y) ){
+      if( barManager.getMinStopAngle() > 0 )
+        barManager.setMinStopAngle(barManager.getMinStopAngle() - 15);
+    }// if minus 5
+    if( plus5.isHit(x,y) ){
+      if( barManager.getMinStopAngle() < 360 )
+        barManager.setMinStopAngle(barManager.getMinStopAngle() + 15);
+    }// if plus5
+    
+    if( round1.isHit(x,y) ){
+      if( barManager.isSpringEnabled() ){
+        barManager.setSpringEnabled(false);
+        barManager.setRotationEnabled(false);
+      }else{
+        barManager.setSpringEnabled(true);
+        barManager.setRotationEnabled(false);
+      }
+    }// if round1
+    
+    if( round2.isHit(x,y) ){
+      if( barManager.isRotationEnabled() ){
+        barManager.setRotationEnabled(false);
+        barManager.setSpringEnabled(false);
+      }else{
+        barManager.setSpringEnabled(false);
+        barManager.setRotationEnabled(true);
+      }
+    }// if round2
+    
+    if( round3.isHit(x,y) ){
+      debugPanel2 = false;
+      debugConsole = true;
+    }// if round3
+    
+    if( round4.isHit(x,y) ){
+    }// if round4
+      
+  }// panal_2_input()
 }// class
 

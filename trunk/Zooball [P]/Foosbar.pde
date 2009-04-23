@@ -21,7 +21,7 @@
  * ---------------------------------------------
  */
  
-boolean springEnabled = true; // TEMP
+
 
 class Foosbar{
   float xPos, yPos, barWidth, barHeight, yMinTouchArea, yMaxTouchArea;
@@ -37,12 +37,14 @@ class Foosbar{
   MTFinger fingerTest;
   Foosmen[] foosPlayers;
   Ball[] ballArray;
-  //boolean springEnabled = true;
   float spring = 0.01;
   float barRotation = 0;
   float rotateVel;
   float barFriction = 0.15;
   
+  boolean springEnabled = false;
+  boolean rotationEnabled = false;
+
   PImage[] foosmenImages;
   
   int playerWidth = 50;
@@ -175,50 +177,53 @@ class Foosbar{
     }// if spring enabled
     
     // Bar rotation
-    if( zoneFlag == 0 ){
-      if( xMove > 1 ){
-        barRotation += xMove * rotateMultiplier;
-        xMove -= barFriction;
-        rotateVel = xMove * rotateMultiplier;
-      }else if( xMove < -1 ){
-        barRotation += xMove * rotateMultiplier;
-        xMove += barFriction;
-        rotateVel = xMove * rotateMultiplier;
-      }else{
-        xMove = 0;
-        rotateVel = 0;
+    if(rotationEnabled){
+      if( zoneFlag == 0 ){
+        if( xMove > 1 ){
+          barRotation += xMove * rotateMultiplier;
+          xMove -= barFriction;
+          rotateVel = xMove * rotateMultiplier;
+        }else if( xMove < -1 ){
+          barRotation += xMove * rotateMultiplier;
+          xMove += barFriction;
+          rotateVel = xMove * rotateMultiplier;
+        }else{
+          xMove = 0;
+          rotateVel = 0;
+        }
+      }else if( zoneFlag == 1 ){
+        if( xMove > 1 ){
+          barRotation -= xMove * rotateMultiplier;
+          xMove -= barFriction;
+          rotateVel = xMove * rotateMultiplier;
+        }else if( xMove < -1 ){
+          barRotation -= xMove * rotateMultiplier;
+          xMove += barFriction;
+          rotateVel = xMove * rotateMultiplier;
+        }else{
+          xMove = 0;
+          rotateVel = 0;
+        }
       }
-    }else if( zoneFlag == 1 ){
-      if( xMove > 1 ){
-        barRotation -= xMove * rotateMultiplier;
-        xMove -= barFriction;
-        rotateVel = xMove * rotateMultiplier;
-      }else if( xMove < -1 ){
-        barRotation -= xMove * rotateMultiplier;
-        xMove += barFriction;
-        rotateVel = xMove * rotateMultiplier;
-      }else{
-        xMove = 0;
-        rotateVel = 0;
-      }
-    }
-
-    if( barRotation >= 360 )
-      barRotation = 0;
-    else if( barRotation < 0 )
-      barRotation = 359;
+  
+      if( barRotation >= 360 )
+        barRotation = 0;
+      else if( barRotation < 0 )
+        barRotation = 359;
+        
+    }// if rotationEnabled
   }// display
   
   void displayZones(){
     noStroke();
     
     // Zone Bar
-    //if(pressed)
-    //  fill( #00FF00, 50);
+    if(pressed)
+      fill( #00FF00, 50);
     //else if(hasBall)
     //  fill( #FF0000, 50);
-    //else
-    fill( #AAAAAA, 50);
+    else
+      fill( #AAAAAA, 50);
     noStroke();
     rect(xPos, yMinTouchArea, barWidth, yMaxTouchArea);
   }// displayZones
@@ -372,6 +377,10 @@ class Foosbar{
     springEnabled = enable;
   }// setSpringEnabled
   
+  void setRotationEnabled(boolean enable){
+    rotationEnabled = enable;
+  }// setRotationEnabled 
+  
   void setBarSlideMultiplier(float newVal){
     sliderMultiplier = newVal;
   }// setBarSlideMultiplier
@@ -401,6 +410,10 @@ class Foosbar{
   boolean isSpringEnabled(){
     return springEnabled;
   }// isSpringEnabled
+  
+  boolean isRotationEnabled(){
+    return rotationEnabled;
+  }// isRotationEnabled
   
   int getMinStopAngle(){
     for( int i = 0; i < nPlayers; i++ )

@@ -74,6 +74,8 @@
  * 4/21/09      - Version 0.8
  *              - Ball launcher reintegrated (Thus all Prototype features in)
  *              - Foosbar "Spring-loaded" mode reintegrated and better implemented.
+ * 4/23/09      - Version 0.8.5
+ *              - DebugConsole completely rewritten. All sounds back in. Some artwork in. Multiple foosbar control modes in.
  * Notes:
  *      - [TODO] Add visual score counter above goals
  *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?
@@ -102,9 +104,9 @@ color debugColor = color(255,255,255); // TEMP
 
 // Gameplay Initial Variables
 int nBalls = 1;
-int maxScore = 3;
+int maxScore = 5;
 float tableFriction = 0.01; // Default = 0.01
-int maxBallSpeed = 20;
+int maxBallSpeed = 15;
 int rotateInc = 15; // Global rotation increment for artwork
 
 int borderWidth = 0;
@@ -142,6 +144,7 @@ FoosbarManager barManager;
 class PlayState extends GameState
 {
   private CircularButton btnPauseTop, btnPauseBottom;
+  private Image imgPitch, border;
   int ballsInPlay = 0;
   int ballQueue = 0;
   int lastScored = -1;
@@ -151,6 +154,11 @@ class PlayState extends GameState
   }// CTOR
   
   public void load( ) {
+    imgPitch = new Image( "data/objects/stadium/pitch2.png" );
+    imgPitch.setPosition( 75, 25 );
+    border = new Image( "data/objects/stadium/border.png" );
+    border.setPosition( 0, 0 );
+    
     // spin a while to test the loading screen
     int max = Integer.MAX_VALUE >> 5;
     Random r = new Random( );
@@ -268,7 +276,32 @@ class PlayState extends GameState
     ballLauncher_top.process(timer.getSecondsActive()); 
     
     drawDebugText();
-    barManager.displayDebug(debugColor, font);
+    
+    if(debugText){
+      fill(0,0,0,150);
+      stroke(0,0,0);
+      rect(0,0, 400, 16*12 );
+      textAlign(LEFT);
+      fill(debugColor);
+      textFont(font,16);
+      text("Resolution: "+width+" , "+height, 16, 16*1);  
+      text("MousePos: "+mouseX+" , "+mouseY, 16, 16*2);
+      text("Timer: "+timer_g, 16, 16*3);
+      text("FPS: "+frameRate, 16, 16*4);
+      text("Table Friction: "+tableFriction, 16, 16*5);
+      text("Last Scored (Top = 0, Bottom = 1): "+lastScored, 16, 16*12);
+      if(  nBalls > 0 ){
+        text("Ball 0 Speed: "+balls[0].getSpeed(), 16, 16*6);
+        text("Ball 0 xVel: "+balls[0].xVel, 16, 16*7);
+        text("Ball 0 yVel: "+balls[0].yVel, 16, 16*8);
+        text("Ball 0 Angle: "+degrees(atan2(balls[0].yVel,balls[0].xVel)), 16, 16*9);
+      }
+      particleManager.displayDebug(debugColor, font);
+      barManager.displayDebug(debugColor, font);
+      barManager.displayHitbox();
+      for( int i = 0; i < nBalls; i++ )
+        balls[i].displayDebug(debugColor, font);
+    }
     
     if( timer.isActive() )
       checkWinningConditions();
@@ -276,8 +309,9 @@ class PlayState extends GameState
   
   private void drawBackground( ) {
     background( 0 );
-    fill( 20, 200, 20 ); // green
+    fill( 121, 174, 39 ); // green
     rect( 0, 0, game.getWidth( ), game.getHeight( ) );
+    imgPitch.draw( );
   }// drawBackGround()
   
   public String toString( ) { return "PlayState"; }
@@ -296,7 +330,9 @@ class PlayState extends GameState
     for( int i = 0; i < nBalls; i++ ){
       if( !timer.isActive() )
         break;
+        
       balls[i].setMaxVel(maxBallSpeed);
+      
       if( balls[i].isActive() ){
         particleManager.trailParticles( 1, balls[i].diameter, balls[i].xPos, balls[i].yPos, 0, 0, 0 );
         balls[i].process( timer.getSecondsActive() );
@@ -320,7 +356,7 @@ class PlayState extends GameState
     rect( game.getWidth( )-borderWidth, borderHeight, borderWidth, game.getHeight( )-borderHeight*2 ); // Right border
     
     // Border Image
-    
+    border.draw();
     
     // Team border
     fill( bottomColor );
@@ -354,6 +390,17 @@ class PlayState extends GameState
   }// checkWinningConditions()
   
   void checkButtonHit(float x, float y, int finger){
+    
+  // Keyboard input
+  if(keyPressed && usingMouse){
+    if( key == 'b' || key == 'B' )
+       balls[0].launchBall(mouseX, mouseY, 5, 0);
+    else if( key == 'v' || key == 'V' )
+       balls[0].launchBall(mouseX, mouseY, 0, 5);
+    else if( key == 'n' || key == 'N' )
+       balls[0].launchBall(mouseX, mouseY, 5, 5);
+  }// if keypressed
+  
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
        game.setState( game.getPausedState() );
     barManager.barsPressed(x,y);
@@ -362,6 +409,11 @@ class PlayState extends GameState
     ballLauncher_top.rotateIsHit(x,y);
     ballLauncher_bottom.isHit(x,y);
     ballLauncher_bottom.rotateIsHit(x,y);
+    
+    // Player can touch the ball if get stuck (must be moving very slow or stopped)
+    for( int i = 0; i < nBalls; i++ ){
+      balls[i].isHit(x,y);
+    }// for nBalls     
   }// checkButtonHit
   
   void reloadBall(){

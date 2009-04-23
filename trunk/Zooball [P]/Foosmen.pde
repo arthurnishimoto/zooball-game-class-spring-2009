@@ -43,7 +43,7 @@ class Foosmen{
   float hit_width = 31;
   float hit_height = 68;
   float hit_horz_shift = 0;
-  int maxStopAngle = 330;
+  int maxStopAngle = 345;
   int minStopAngle = 300;
   
   int screenWidth, screenHeight, borderWidth, borderHeight;
@@ -207,6 +207,8 @@ class Foosmen{
     if( hit_horz_shift != 720 ){
       if( parent.barRotation > minStopAngle && parent.barRotation < maxStopAngle )
         stroke( 255, 0, 0);
+      else if( parent.barRotation < 375-minStopAngle && parent.barRotation > 375-maxStopAngle )
+        stroke( 255, 255, 0);
       else
         stroke( 0, 255, 0);
       fill( 0,0,0 );
@@ -324,7 +326,10 @@ class Foosmen{
           if( parent.barRotation > minStopAngle && parent.barRotation < maxStopAngle )
             if( balls[i].getSpeed() > 1 )
               balls[i].stopBall();
-            
+          if( parent.barRotation < 375-minStopAngle && parent.barRotation > 375-maxStopAngle )
+            if( balls[i].getSpeed() > 1 )
+              balls[i].stopBall();
+              
           ballsRecentlyHit[i] = 1;  // Flag collision has occured
           balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
           continue;
@@ -334,6 +339,9 @@ class Foosmen{
           rightHit = true;
           // Stops ball when "wedged" by Foosmen at a certain angle
           if( parent.barRotation > minStopAngle && parent.barRotation < maxStopAngle )
+            if( balls[i].getSpeed() > 1 )
+              balls[i].stopBall();
+          if( parent.barRotation < 375-minStopAngle && parent.barRotation > 375-maxStopAngle )
             if( balls[i].getSpeed() > 1 )
               balls[i].stopBall();
               

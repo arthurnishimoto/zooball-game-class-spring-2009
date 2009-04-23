@@ -98,7 +98,7 @@ class Goal{
           
           if( ballY <= yPos || ballY >= yPos + goalHeight ){
             balls[i].kickBall( 1, 0, 0 );
-            //soundManager.playBounce();
+            soundManager.playBounce();
             ballsRecentlyHit[i] = 1;
             continue;
           }
@@ -108,7 +108,7 @@ class Goal{
         if( ballX < xPos + goalWidth/2 ){ // GOOOOOOOAL!
           balls[i].setInactive();
           points++;
-          //soundManager.playGoal();
+          soundManager.playGoal();
           //parent.bottomScore++;
           parent.lastScored = 1;
           parent.ballsInPlay--;
@@ -124,7 +124,7 @@ class Goal{
           
           if( ballY <= yPos || ballY >= yPos + goalHeight ){
             balls[i].kickBall( 1, 0, 0 );
-            //soundManager.playBounce();
+            soundManager.playBounce();
             ballsRecentlyHit[i] = 1;
             continue;
           }
@@ -134,7 +134,7 @@ class Goal{
         if( ballX > xPos + goalWidth/2 ){ // GOOOOOOOAL!
           balls[i].setInactive();
           points++;
-          //soundManager.playGoal();
+          soundManager.playGoal();
           //parent.topScore++;
           parent.lastScored = 0;
           parent.ballsInPlay--;
