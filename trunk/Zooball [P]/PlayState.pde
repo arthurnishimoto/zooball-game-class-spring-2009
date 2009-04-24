@@ -98,7 +98,7 @@ Boolean redTeamTop = false;
 Boolean yellowTeamWins = false;
 Boolean redTeamWins = false;
 
-Boolean debugText = false; // TEMP
+Boolean debugText = true; // TEMP
 Boolean debug2Text = false; // TEMP
 color debugColor = color(255,255,255); // TEMP
 
@@ -138,13 +138,14 @@ String filename;
 String extention = ".png";
     
 // Managers
-ParticleManager particleManager = new ParticleManager( 2000, 5 );
+ParticleManager particleManager = new ParticleManager( 2000, 5 ); // Ball trail effects
+ParticleManager particleManager2 = new ParticleManager( 2000, 3 ); // Fire effects
 FoosbarManager barManager;
 
 class PlayState extends GameState
 {
   private CircularButton btnPauseTop, btnPauseBottom;
-  private Image imgPitch, border;
+  private Image imgPitch, border, imgLines, imgNets, logo;
   int ballsInPlay = 0;
   int ballQueue = 0;
   int lastScored = -1;
@@ -154,10 +155,20 @@ class PlayState extends GameState
   }// CTOR
   
   public void load( ) {
-    imgPitch = new Image( "data/objects/stadium/pitch2.png" );
-    imgPitch.setPosition( 75, 25 );
-    border = new Image( "data/objects/stadium/border.png" );
+    ballsInPlay = 0;
+    ballQueue = 0;
+    lastScored = -1;
+  
+    imgPitch = new Image( "data/objects/stadium/gamefield_grass.gif" );
+    imgPitch.setPosition( 0, 0 );
+    border = new Image( "data/objects/stadium/gamefield_woodtrim.png" );
     border.setPosition( 0, 0 );
+    imgLines = new Image( "data/objects/stadium/gamefield_centerline_goalzones.png" );
+    imgLines.setPosition( 0, 0 );
+    imgNets = new Image( "data/objects/stadium/gamefield_nets.png" );
+    imgNets.setPosition( 0, 0 );
+    logo = new Image( "data/objects/stadium/gamefield_logo.png" );
+    logo.setPosition( 0, 0 );    
     
     // spin a while to test the loading screen
     int max = Integer.MAX_VALUE >> 5;
@@ -188,14 +199,18 @@ class PlayState extends GameState
     }
 
     // Loads Red Foosman artwork
-    filepath = "data/objects/foosmen_red/";
-    filename = "red_top_";
+    //filepath = "data/objects/foosmen_red/";
+    //filename = "red_top_";
+    filepath = "data/objects/dragon_360/";
+    filename = "dragon_";
     for(int i = 0; i < 360; i += rotateInc)
       red_foosmanImages[i] = loadImage(filepath + filename + i + extention);
       
     // Loads Yellow Foosman artwork
-    filepath = "data/objects/foosmen_yellow/";
-    filename = "yellow_top_";
+    //filepath = "data/objects/foosmen_yellow/";
+    //filename = "yellow_top_";
+    filepath = "data/objects/tiger_360/";
+    filename = "tiger_";
     for(int i = 0; i < 360; i += rotateInc)
       yellow_foosmanImages[i] = loadImage(filepath + filename + i + extention);      
       
@@ -261,6 +276,7 @@ class PlayState extends GameState
     
     drawBalls();
     
+    imgNets.draw();
     topGoal.collide(balls);
     bottomGoal.collide(balls);
             
@@ -312,6 +328,8 @@ class PlayState extends GameState
     fill( 121, 174, 39 ); // green
     rect( 0, 0, game.getWidth( ), game.getHeight( ) );
     imgPitch.draw( );
+    imgLines.draw();
+    logo.draw();
   }// drawBackGround()
   
   public String toString( ) { return "PlayState"; }
@@ -327,7 +345,7 @@ class PlayState extends GameState
   
   private void drawBalls(){
     // Draw Balls
-    for( int i = 0; i < nBalls; i++ ){
+    for( int i = 0; i < balls.length; i++ ){
       if( !timer.isActive() )
         break;
         
@@ -357,7 +375,7 @@ class PlayState extends GameState
     
     // Border Image
     border.draw();
-    
+        
     // Team border
     fill( bottomColor );
     noStroke();
@@ -399,6 +417,8 @@ class PlayState extends GameState
        balls[0].launchBall(mouseX, mouseY, 0, 5);
     else if( key == 'n' || key == 'N' )
        balls[0].launchBall(mouseX, mouseY, 5, 5);
+    else if( key == 'f' || key == 'F' )
+      balls[0].launchFireball(mouseX, mouseY, 5, 5);
   }// if keypressed
   
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
@@ -412,7 +432,7 @@ class PlayState extends GameState
     
     // Player can touch the ball if get stuck (must be moving very slow or stopped)
     for( int i = 0; i < nBalls; i++ ){
-      balls[i].isHit(x,y);
+        balls[i].isHit(x,y);
     }// for nBalls     
   }// checkButtonHit
   

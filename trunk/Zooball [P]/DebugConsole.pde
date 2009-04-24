@@ -50,7 +50,8 @@ class DebugConsole{
       
     debugButton.process(font, timer_g);
     debugButton.setLit( debugConsole || debugPanel2 );
-    
+          
+    textAlign(LEFT); // Default
     timer_g += timerIncrementer; //Used for debug since console is indepentent of state
   }// draw()
   

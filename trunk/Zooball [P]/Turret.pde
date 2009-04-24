@@ -106,11 +106,11 @@ class Turret{
     // Center Button
     if(pressed){
       fill(pressed_cl);
-      stroke(pressed_cl);
+      noStroke();
       ellipse( xPos, yPos, diameter, diameter );
     }else{
       fill(idle_cl);
-      stroke(idle_cl);
+      noStroke();
       ellipse( xPos, yPos, diameter, diameter );
     }
     

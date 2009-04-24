@@ -28,8 +28,10 @@ class Foosmen{
   boolean topBufferHit, bottomBufferHit, leftBufferHit, rightBufferHit;
   boolean topHit, bottomHit, leftHit, rightHit;
   boolean hasImage = false;
+  boolean hasBall = false;
   Foosbar parent;
   int ballsRecentlyHit[];
+  int ballCaught[];
   int nBalls;
     
   //GLOBAL button time
@@ -56,6 +58,7 @@ class Foosmen{
     playerHeight = newHeight;
     parent = new_parent;
     ballsRecentlyHit = new int[numBalls];
+    ballCaught = new int[numBalls];
     nBalls = numBalls;
     
     hit_xPos = xPos - hit_width/2;
@@ -147,6 +150,16 @@ class Foosmen{
     rect(xPos-orig_Width/2, yPos, orig_Width, playerHeight);
     }
     
+    if( hasBall ){
+      for( int i = 0; i < ballCaught.length; i++ )
+        if( ballCaught[i] == 1 ){
+          if(parent.zoneFlag == 1)
+            balls[i].launchBall( xPos - 50, yPos + playerHeight/2, 0, 0 );
+          else if(parent.zoneFlag == 0)
+            balls[i].launchBall( xPos + 50, yPos + playerHeight/2, 0, 0 );
+        }
+    }
+    
     // Images
     pushMatrix();
     imageMode(CENTER);
@@ -161,15 +174,19 @@ class Foosmen{
       barRotation = 359;
     
     if( parent.zoneFlag == 0 && redTeamTop ){ // Top player - faces right
-     rotate(radians(-90));
+      //rotate(radians(-90)); //Red/Yellow foosmen
+      rotate(radians(-90)); //Dragon/Tiger foosmen
     }else if( parent.zoneFlag == 1 && redTeamTop ){ // Bottom player - faces left
-      rotate(radians(-90));
+      //rotate(radians(-90)); //Red/Yellow foosmen
+      rotate(radians(-90)); //Dragon/Tiger foosmen
     }
     
     if( parent.zoneFlag == 0 && !redTeamTop ){ // Top player - faces right
-     rotate(radians(90));
+      //rotate(radians(90)); //Red/Yellow foosmen
+      rotate(radians(-90)); //Red/Yellow foosmen
     }else if( parent.zoneFlag == 1 && !redTeamTop ){ // Bottom player - faces left
-      rotate(radians(90));
+      //rotate(radians(90)); //Red/Yellow foosmen
+      rotate(radians(-90)); //Dragon/Tiger foosmen
     }    
     
     int imageInc = rotateInc/2;
@@ -186,6 +203,13 @@ class Foosmen{
     }// else
     }
     popMatrix();
+    
+    if( parent.debuffed ){
+      particleManager2.fireParticles( 5, 30, xPos, yPos + playerHeight/2, 0, 0, 0, 5);
+      particleManager2.fireParticles( 5, 30, xPos+playerWidth, yPos + playerHeight/2, 0, 0, 0, 5);
+      //particleManager2.smokeParticles( 5, 10, xPos+playerWidth/2, yPos+playerHeight/2, 0, 0, 3, -1); // Fast Smoke
+      particleManager2.display();
+    }
   }// display
   
   void displayDebug(color debugColor, PFont font){
@@ -199,7 +223,7 @@ class Foosmen{
     if( atBottomEdge )
       text("atBottomEdge", xPos + playerWidth + 16, yPos+playerHeight/2 + 16*2);
     for( int i = 0; i < nBalls; i++)
-      text("RecentlyHit["+i+"]: "+ballsRecentlyHit[i], xPos + playerWidth + 16, yPos+playerHeight/2 + 16*(3+i));
+      text("RecentlyHit["+i+"]: "+ballsRecentlyHit[i], xPos + playerWidth + 16, yPos+playerHeight/2 + 16*(4+i));
   }// displayDebug
 
   void displayHitbox(){
@@ -300,6 +324,7 @@ class Foosmen{
           topHit = true;
           ballsRecentlyHit[i] = 1;  // Flag collision has occured
           balls[i].kickBall( 2 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          specialCollision(i);
           continue;
         }// if ball hit top hit zone
         else if(balls[i].yPos - balls[i].diameter/2 < hit_yPos + hit_height && balls[i].yPos + balls[i].diameter/2 > hit_yPos + hit_height/2)
@@ -307,6 +332,7 @@ class Foosmen{
           bottomHit = true;
           ballsRecentlyHit[i] = 1;  // Flag collision has occured
           balls[i].kickBall( 2 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          specialCollision(i);
           continue;
         }// else-if ball hits bottom hit
       }// if ball is between the left and right edges of the hit buffer
@@ -325,13 +351,14 @@ class Foosmen{
           // Stops ball when "wedged" by Foosmen at a certain angle
           if( parent.barRotation > minStopAngle && parent.barRotation < maxStopAngle )
             if( balls[i].getSpeed() > 1 )
-              balls[i].stopBall();
+              catchBall(i);
           if( parent.barRotation < 375-minStopAngle && parent.barRotation > 375-maxStopAngle )
             if( balls[i].getSpeed() > 1 )
-              balls[i].stopBall();
+              catchBall(i);
               
           ballsRecentlyHit[i] = 1;  // Flag collision has occured
           balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          specialCollision(i);
           continue;
           
         }// if Ball is between the left hit buffer and center
@@ -340,13 +367,14 @@ class Foosmen{
           // Stops ball when "wedged" by Foosmen at a certain angle
           if( parent.barRotation > minStopAngle && parent.barRotation < maxStopAngle )
             if( balls[i].getSpeed() > 1 )
-              balls[i].stopBall();
+              catchBall(i);
           if( parent.barRotation < 375-minStopAngle && parent.barRotation > 375-maxStopAngle )
             if( balls[i].getSpeed() > 1 )
-              balls[i].stopBall();
+              catchBall(i);
               
           ballsRecentlyHit[i] = 1;  // Flag collision has occured
           balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          specialCollision(i);
           continue;
         }// if Ball is between the right hit buffer and center
       }// If Ball is between top and bottom hit buffer edges
@@ -378,6 +406,54 @@ class Foosmen{
     }//for all balls
     return false;
   }// collide
+  
+  void catchBall(int ballID){
+    specialCollision(ballID);
+    if( parent.debuffed )
+      return;
+      
+    // If ball hits player from back, stop ball instead of catch
+    if( parent.zoneFlag == 1 && rightHit ){
+      balls[ballID].stopBall();
+      return;
+    }else if( parent.zoneFlag == 0 && leftHit ){
+      balls[ballID].stopBall();
+      return;
+    }
+    
+    balls[ballID].setInactive();
+    hasBall = true;
+    parent.hasBall = true;
+    ballCaught[ballID] = 1;
+    ballsRecentlyHit[ballID] = 0;
+  }// catchBall
+  
+  void releaseBall(){
+    for( int i = 0; i < ballCaught.length; i++ ){
+      if( ballCaught[i] == 1 ){
+          if( parent.hasSpecial && parent.dragons ){// Throws Fireball
+            if(parent.zoneFlag == 1)
+              balls[i].launchFireball( xPos - 50, yPos + playerHeight/2, parent.rotateVel, parent.yMove );
+            else if(parent.zoneFlag == 0)
+              balls[i].launchFireball( xPos + 50, yPos + playerHeight/2, parent.rotateVel, parent.yMove );
+          }
+          else{ // Throws normal ball
+            if(parent.zoneFlag == 1)
+              balls[i].launchBall( xPos - 50, yPos + playerHeight/2, parent.rotateVel, parent.yMove );
+            else if(parent.zoneFlag == 0)
+              balls[i].launchBall( xPos + 50, yPos + playerHeight/2, parent.rotateVel, parent.yMove );
+          }
+        ballCaught[i] = 0;
+        hasBall = false;
+        parent.hasBall = false;
+      }// if has caught ball
+    }// if caught array
+  }// releaseBall
+  
+  private void specialCollision(int ballID){
+    if( balls[ballID].isFireball() && parent.tigers )
+      parent.setDebuff();
+  }//specialCollision()
   
   void setGameTimer( double timer_g ){
     gameTimer = timer_g;
