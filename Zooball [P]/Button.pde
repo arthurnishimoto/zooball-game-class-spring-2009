@@ -180,6 +180,7 @@ class Button{
       rect( xPos, yPos, rWidth, rHeight );
     if(isRound)
       ellipse( xPos, yPos, diameter, diameter );
+
   }// display
     
   void displayEdges(color debugColor){

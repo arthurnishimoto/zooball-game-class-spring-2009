@@ -89,13 +89,14 @@ class ParticleManager{
      particlesInUse += effectDensity;
   }//explodeparticles
   
-  void fireParticles(int effectDensity, float newDia, float xPos, float yPos, float xVel, float yVel, int colorFlag){
+  void fireParticles(int effectDensity, float newDia, float xPos, float yPos, float xVel, float yVel, int colorFlag, float dispRate){
     int particlesAdded = 0;
     if( particlesInUse >= particleDensity-particleBuffer )
        particlesInUse = 0;
     for (int i = particlesInUse; i < particlesInUse+effectDensity; i++) {
       if( particlesInUse >= particleDensity || particlesInUse < 0)
         break;
+      particles[i].dispersionRate = dispRate;
       particles[i].active = true;
       particles[i].gravity = false;
       particles[i].colorFlag = colorFlag;
@@ -110,6 +111,28 @@ class ParticleManager{
      particlesInUse += effectDensity;
   }//fireparticles
 
+  void smokeParticles(int effectDensity, float newDia, float xPos, float yPos, float xVel, float yVel, int colorFlag, float dispRate){
+    int particlesAdded = 0;
+    if( particlesInUse >= particleDensity-particleBuffer )
+       particlesInUse = 0;
+    for (int i = particlesInUse; i < particlesInUse+effectDensity; i++) {
+      if( particlesInUse >= particleDensity || particlesInUse < 0)
+        break;
+      particles[i].dispersionRate = dispRate;
+      particles[i].active = true;
+      particles[i].gravity = false;
+      particles[i].colorFlag = colorFlag;
+      particles[i].diameter = particles[i].originalDiameter;
+      if( newDia >= 0 )
+        particles[i].diameter = newDia;
+      particles[i].xPos = xPos;
+      particles[i].yPos = yPos;
+      particles[i].xVel = xVel + random(5)-random(5);
+      particles[i].yVel = yVel - random(10);
+     }// for
+     particlesInUse += effectDensity;
+  }//fireparticles
+  
   void waterCannonParticles(int effectDensity, float newDia, float xPos, float yPos, float xVel, float yVel, int colorFlag){
     int particlesAdded = 0;
     if( particlesInUse >= particleDensity-particleBuffer )

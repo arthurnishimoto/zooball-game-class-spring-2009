@@ -20,8 +20,6 @@
  * 4/21/09   - Version 0.3 - Revised "Spring-loaded" option for bar rotation. Applies velocity on press release.
  * ---------------------------------------------
  */
- 
-
 
 class Foosbar{
   float xPos, yPos, barWidth, barHeight, yMinTouchArea, yMaxTouchArea;
@@ -29,10 +27,12 @@ class Foosbar{
   float buttonPos;
   float buttonValue;
   boolean pressed, active, xSwipe, ySwipe, hasBall, atTopEdge, atBottomEdge;
+  boolean centerZonePressed;
+  float centerZoneWidth = 50;
   float xMove, yMove, rotation;
   float swipeThreshold = 30.0;
-  float sliderMultiplier = 2;
-  float rotateMultiplier = 3;
+  float sliderMultiplier = 3;
+  float rotateMultiplier = 1;
   int nPlayers, zoneFlag;
   MTFinger fingerTest;
   Foosmen[] foosPlayers;
@@ -42,8 +42,20 @@ class Foosbar{
   float rotateVel;
   float barFriction = 0.15;
   
+  float orig_sliderMultiplier = sliderMultiplier;
+  float orig_rotateMultiplier = rotateMultiplier;
+  float debuffDuration = 7;
+  float debuffTimer = 0;
+  double gameTimer;
+  boolean debuffed = false;
+  
   boolean springEnabled = false;
-  boolean rotationEnabled = false;
+  boolean rotationEnabled = true;
+
+  boolean hasSpecial = true; // If foosbar has special ability ready
+
+  boolean dragons = false;
+  boolean tigers = false;
 
   PImage[] foosmenImages;
   
@@ -96,9 +108,17 @@ class Foosbar{
    */
   void generateBars(){
     if(zoneFlag == 0){
+      if( redTeamTop )
+        dragons = true;
+      else
+        tigers = true;
       yMinTouchArea = borderHeight;
       yMaxTouchArea = game.getHeight()/2 - borderHeight;
     }else if(zoneFlag == 1){
+      if( !redTeamTop )
+        dragons = true;
+      else
+        tigers = true;
       yMinTouchArea = game.getHeight()/2;
       yMaxTouchArea = game.getHeight()/2 - borderHeight;
     }else{
@@ -118,7 +138,19 @@ class Foosbar{
       foosPlayers[i].display();
     }
     active = true;
-  
+    
+    if(debuffed){
+      sliderMultiplier = 0.5;
+      rotateMultiplier = 0.5;   
+      if( debuffTimer < gameTimer ){
+        debuffTimer = 0;
+        debuffed = false;
+      }
+    }else{
+      sliderMultiplier = orig_sliderMultiplier;
+      rotateMultiplier = orig_rotateMultiplier;
+    }
+    
     // Swipe
     if( abs(xMove) <= swipeThreshold ){
       xSwipe = true;
@@ -134,18 +166,29 @@ class Foosbar{
       ySwipe = false;
     }// if xSwipe
        
+    // Gets xMove directly from finer to also stop spinning
+    if( centerZonePressed && fingerTest.xMove == 0 && !pressed ){ // Resets to neutral position if center zone tapped
+      barRotation = 0;
+      rotateVel = 0;
+      xMove = 0; // Stops spinning on release
+    }
+    
+    if( hasBall && !pressed)
+      for(int i = 0; i < foosPlayers.length; i++)
+        foosPlayers[i].releaseBall();
+
     // If spring == true, bar will "spring" back to down position
     if( springEnabled ){
       
       if( rotation < 0 ){
         if( zoneFlag == 1 ){
           rotation += spring * 10;
-          //if(!pressed) // Applies velocity on press release
+          if(!pressed) // Applies velocity on press release
             rotateVel = barRotation/4;
           barRotation = abs(rotation*100);
         }else if( zoneFlag == 0 ){
           rotation += spring * 10;
-          //if(!pressed) // Applies velocity on press release
+          if(!pressed) // Applies velocity on press release
             rotateVel = (360 - barRotation)/4;
           barRotation = 360 + rotation*100;
         }
@@ -153,12 +196,12 @@ class Foosbar{
       }else if( rotation > 0 ){
         if( zoneFlag == 1 ){
           rotation -= spring * 10;
-          //if(!pressed) // Applies velocity on press release
+          if(!pressed) // Applies velocity on press release
             rotateVel = (360 - barRotation)/4;
           barRotation = 360 - rotation*100;
         }else if( zoneFlag == 0 ){
           rotation -= spring * 10;
-          //if(!pressed) // Applies velocity on press release
+          if(!pressed) // Applies velocity on press release
             rotateVel = barRotation/4;
           barRotation = rotation*100;          
         }
@@ -180,11 +223,13 @@ class Foosbar{
     if(rotationEnabled){
       if( zoneFlag == 0 ){
         if( xMove > 1 ){
-          barRotation += xMove * rotateMultiplier;
+          if( !hasBall )
+            barRotation += xMove * rotateMultiplier;
           xMove -= barFriction;
           rotateVel = xMove * rotateMultiplier;
         }else if( xMove < -1 ){
-          barRotation += xMove * rotateMultiplier;
+          if( !hasBall )
+            barRotation += xMove * rotateMultiplier;
           xMove += barFriction;
           rotateVel = xMove * rotateMultiplier;
         }else{
@@ -193,11 +238,13 @@ class Foosbar{
         }
       }else if( zoneFlag == 1 ){
         if( xMove > 1 ){
-          barRotation -= xMove * rotateMultiplier;
+          if( !hasBall )
+            barRotation -= xMove * rotateMultiplier;
           xMove -= barFriction;
           rotateVel = xMove * rotateMultiplier;
         }else if( xMove < -1 ){
-          barRotation -= xMove * rotateMultiplier;
+          if( !hasBall )
+            barRotation -= xMove * rotateMultiplier;
           xMove += barFriction;
           rotateVel = xMove * rotateMultiplier;
         }else{
@@ -210,8 +257,9 @@ class Foosbar{
         barRotation = 0;
       else if( barRotation < 0 )
         barRotation = 359;
-        
     }// if rotationEnabled
+    if( hasBall )
+      barRotation = 0; // Locks bar rotation if hasBall
   }// display
   
   void displayZones(){
@@ -223,15 +271,23 @@ class Foosbar{
     //else if(hasBall)
     //  fill( #FF0000, 50);
     else
-      fill( #AAAAAA, 50);
+      fill( #AAFFAA, 50);
     noStroke();
     rect(xPos, yMinTouchArea, barWidth, yMaxTouchArea);
+    
+    // Center Zone Bar
+    if(centerZonePressed)
+      fill( #00FFFF, 50);
+    else
+      fill( #00AAAA, 50);
+    rect(xPos+barWidth/2 - centerZoneWidth/2, yMinTouchArea, centerZoneWidth, yMaxTouchArea);
   }// displayZones
   
   void displayDebug(color debugColor, PFont font){
     fill(debugColor);
     textFont(font,12);
-    
+    if( debuffTimer - gameTimer > 0)
+      text("Debuff Time Remaining "+(debuffTimer - gameTimer), xPos, yPos+barHeight-16*10);
     text("Bar Rotation: "+barRotation, xPos, yPos+barHeight-16*9);
     text("Rotate Velocity: "+rotateVel, xPos, yPos+barHeight-16*8);
     text("Active: "+pressed, xPos, yPos+barHeight-16*7);
@@ -243,7 +299,10 @@ class Foosbar{
       text("atTopEdge", xPos, yPos+barHeight-16*2);
     else if(atBottomEdge)
       text("atBottomEdge", xPos, yPos+barHeight-16*2);
-    
+    else if(dragons)
+      text("DRAGONS/RED", xPos, yPos+barHeight-16*2);
+    else if(tigers)
+      text("TIGERS/YELLOW", xPos, yPos+barHeight-16*2);      
     for( int i = 0; i < nPlayers; i++ )
       foosPlayers[i].displayDebug(debugColor, font);
   }// displayDebug
@@ -274,8 +333,14 @@ class Foosbar{
         buttonValue = (yPos-buttonPos)/(yPos-barWidth-barHeight);
         pressed = true;
         
+        if( xCoord > xPos + barWidth/2 - centerZoneWidth/2 && xCoord < xPos + barWidth/2 + centerZoneWidth/2 && yCoord > yMinTouchArea && yCoord < yMinTouchArea+yMaxTouchArea)
+          centerZonePressed = true;
+        else
+          centerZonePressed = false;
+          
         rotation = (xCoord-(xPos+barWidth/2))/barWidth; // Rotation: value from -0.5 (fully up to the left) to 0.5 (fully up to the right)
     
+        if( fingerTest.xMove*sliderMultiplier != 0)
         xMove = fingerTest.xMove*sliderMultiplier;
         xMove = constrain(xMove, -10, 10);
         if( abs(fingerTest.yMove-yMove) < 100) // Prevents sudden sliding of bar
@@ -309,7 +374,6 @@ class Foosbar{
         buttonPos = yCoord;
         return true;
     }// if x, y in area
-
     pressed = false;
     return false;
   }// isHit
@@ -321,12 +385,13 @@ class Foosbar{
    * @param balls - Array of ball objects
    */  
   boolean ballInArea(Ball[] balls){
+    /*
     for( int i = 0; i < balls.length; i++ ){
       if( !balls[i].isActive() )
         return false;
       if( balls[i].xPos > xPos && balls[i].xPos < xPos + barWidth ){
         hasBall = true;
-        /*
+
         if(pressed){ // If ball is in area and user flicks in area
           if( xMove > 0 && balls[i].xVel > 0){
             balls[i].xVel += xMove; // Add speed to same direction right (+x)
@@ -341,11 +406,12 @@ class Foosbar{
             //balls[i].xVel /= 2; 
           }// if-else
         }// if pressed
-        */
+        
         return true;
       }// if
     }// for
     hasBall = false;
+    */
     return false;
   }// ballInArea
   
@@ -369,6 +435,7 @@ class Foosbar{
   }// setButtonPos
   
   void setGameTimer( double timer_g ){
+    gameTimer = timer_g;
     for( int i = 0; i < nPlayers; i++ )
         foosPlayers[i].setGameTimer(timer_g);
   }// setGameTimer
@@ -383,10 +450,12 @@ class Foosbar{
   
   void setBarSlideMultiplier(float newVal){
     sliderMultiplier = newVal;
+    orig_sliderMultiplier = newVal;
   }// setBarSlideMultiplier
 
   void setBarRotateMultiplier(float newVal){
     rotateMultiplier = newVal;
+    orig_rotateMultiplier = newVal;
   }// setBarRotateMultiplier
   
   void setMinStopAngle(int newVal){
@@ -399,6 +468,11 @@ class Foosbar{
       foosPlayers[i].setMaxStopAngle(newVal);
   }// setMaxStopAngle
   
+  void setDebuff(){
+    debuffTimer = debuffDuration + (float)gameTimer;
+    debuffed = true;
+  }// setDebuff 
+    
   float getBarSlideMultiplier(){
     return sliderMultiplier;
   }// getBarSlideMultiplier

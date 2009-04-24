@@ -190,6 +190,23 @@ class Ball{
     setActive();
   }//launchBall 
   
+   /** 
+   * Ball was launched with a specific location using a specific velocity.
+   * Fireball varient
+   *
+   * @param x - initial x position
+   * @param y - initial y position
+   * @param xVeloc - initial x velocity
+   * @param yVeloc - initial y velocity
+   */
+  void launchFireball(float x, float y, float xVeloc, float yVeloc){
+    xPos = x;
+    yPos = y;
+    xVel = xVeloc;
+    yVel = yVeloc;
+    setFireball();
+  }//launchFireball 
+  
   /** 
    * Stops ball
    */
@@ -295,7 +312,7 @@ class Ball{
       yVel -= friction;
     else if( yVel < 0 )
       yVel += friction;
-        
+      
     // Checks if object reaches edge of border/screen, bounce
     if ( xPos+diameter/2 > screenWidth-borderWidth){ // Right side
       xVel *= -1;
