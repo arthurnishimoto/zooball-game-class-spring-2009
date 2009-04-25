@@ -27,6 +27,11 @@ class Goal{
   color teamColor;
   Ball[] balls;
   
+  boolean onFire = false;
+  float fireDuration = 10;
+  float fireTimer = 0;
+  float fireX, fireY;
+  
   PlayState parent;
   
   int ballsRecentlyHit[];
@@ -70,6 +75,13 @@ class Goal{
       rect( xPos + goalWidth/2, yPos + 50*x, 40, 40 );
     }
     rectMode(CORNER);
+    
+    if( fireTimer > parent.timer.getSecondsActive() ){
+      particleManager2.fireParticles( 5, 30, fireX, fireY, 0, 0, 0, 5);
+      particleManager2.fireParticles( 5, 30, fireX, fireY, 0, 0, 0, 5);
+      particleManager2.smokeParticles( 5, 10, fireX, fireY, 0, 0, 3, -1); // Fast Smoke
+    }else
+      onFire = false;
   }// display
   
   void displayDebug(color debugColor, PFont font){
@@ -106,10 +118,13 @@ class Goal{
         }// if
         
         if( ballX < xPos + goalWidth/2 ){ // GOOOOOOOAL!
+          if( balls[i].isFireball() )
+            setOnFire(balls[i].xPos,balls[i].yPos);
+          if( balls[i].isDecoyball() )
+            continue;
           balls[i].setInactive();
           points++;
           soundManager.playGoal();
-          //parent.bottomScore++;
           parent.lastScored = 1;
           parent.ballsInPlay--;
           continue;
@@ -132,10 +147,13 @@ class Goal{
         }// if
         
         if( ballX > xPos + goalWidth/2 ){ // GOOOOOOOAL!
+          if( balls[i].isFireball() )
+            setOnFire(balls[i].xPos,balls[i].yPos);
+          if( balls[i].isDecoyball() )
+            continue;
           balls[i].setInactive();
           points++;
           soundManager.playGoal();
-          //parent.topScore++;
           parent.lastScored = 0;
           parent.ballsInPlay--;
           continue;
@@ -158,6 +176,13 @@ class Goal{
   void setParentClass(PlayState newParent){
     parent = newParent;
   }// setParentClass
+  
+  void setOnFire(float x, float y){
+    onFire = true;
+    fireX = x;
+    fireY = y;
+    fireTimer = fireDuration + parent.timer.getSecondsActive();
+  }// setOnFire
   
   int getScore(){
     return points;

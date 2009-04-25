@@ -44,6 +44,8 @@ class Ball{
   
   int screenWidth, screenHeight, borderWidth, borderHeight;
   double gameTimer;
+  float fireballDuration = 5;
+  float fireballTimer = 0;
   
   /**
    * Creates a new Ball object.
@@ -120,6 +122,11 @@ class Ball{
       collide(balls);
       setGameTimer(timer_g);
       move();
+    }else if(state == DECOYBALL){
+      display();
+      collide(balls);
+      setGameTimer(timer_g);
+      move();
     }
   }// process
   
@@ -148,6 +155,16 @@ class Ball{
    */
   boolean isFireball(){
     if(state == FIREBALL)
+      return true;
+    else
+      return false;  
+  }// isFireball
+
+  /**
+   * Checks if ball is in fireball state.
+   */
+  boolean isDecoyball(){
+    if(state == DECOYBALL)
       return true;
     else
       return false;  
@@ -192,7 +209,7 @@ class Ball{
   
    /** 
    * Ball was launched with a specific location using a specific velocity.
-   * Fireball varient
+   * Fireball variant
    *
    * @param x - initial x position
    * @param y - initial y position
@@ -205,8 +222,25 @@ class Ball{
     xVel = xVeloc;
     yVel = yVeloc;
     setFireball();
-  }//launchFireball 
+    fireballTimer = (float)gameTimer + fireballDuration;
+  }//launchFireball
   
+  /** 
+   * Ball was launched with a specific location using a specific velocity.
+   * Decoyball varient
+   *
+   * @param x - initial x position
+   * @param y - initial y position
+   * @param xVeloc - initial x velocity
+   * @param yVeloc - initial y velocity
+   */
+  void launchDecoyball(float x, float y, float xVeloc, float yVeloc){
+    xPos = x;
+    yPos = y;
+    xVel = xVeloc;
+    yVel = yVeloc;
+    setDecoyball();
+  }//launchBall   
   /** 
    * Stops ball
    */
@@ -290,6 +324,12 @@ class Ball{
       xVel = 0;
       yVel = 0;
     }
+    
+    if( isFireball() ){
+      if( fireballTimer < gameTimer )
+        setActive();
+    }else
+      fireballTimer = 0;
     
     // Restricts maximum speed
     if( xVel > maxVel )
@@ -416,6 +456,10 @@ class Ball{
   void setFireball(){
     state = FIREBALL;
   }// setFireball
+
+  void setDecoyball(){
+    state = DECOYBALL;
+  }// setDecoyball
   
   void setMaxVel(float newMax){
     maxVel = newMax;
