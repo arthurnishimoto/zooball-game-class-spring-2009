@@ -33,7 +33,11 @@ class Foosmen{
   int ballsRecentlyHit[];
   int ballCaught[];
   int nBalls;
-    
+  
+  boolean confused = false;
+  float confusedDuration = 3;
+  float confusedTimer = 0;
+  
   //GLOBAL button time
   double buttonDownTime = 0.3;
   double buttonLastPressed = 0;
@@ -73,6 +77,13 @@ class Foosmen{
   
   void display(){
     active = true;
+    
+    if(confusedTimer > gameTimer){
+      fill(255,255,255);
+      textFont(font,64);
+      text("?", xPos - playerWidth/2, yPos - 20);    
+    }else
+      confused = false;
     
     // Maintains Hitbox shile moving
     if( parent.zoneFlag == 0 ){
@@ -175,10 +186,10 @@ class Foosmen{
     
     if( parent.zoneFlag == 0 && redTeamTop ){ // Top player - faces right
       //rotate(radians(-90)); //Red/Yellow foosmen
-      rotate(radians(-90)); //Dragon/Tiger foosmen
+      rotate(radians(90)); //Dragon/Tiger foosmen
     }else if( parent.zoneFlag == 1 && redTeamTop ){ // Bottom player - faces left
       //rotate(radians(-90)); //Red/Yellow foosmen
-      rotate(radians(-90)); //Dragon/Tiger foosmen
+      rotate(radians(90)); //Dragon/Tiger foosmen
     }
     
     if( parent.zoneFlag == 0 && !redTeamTop ){ // Top player - faces right
@@ -208,7 +219,6 @@ class Foosmen{
       particleManager2.fireParticles( 5, 30, xPos, yPos + playerHeight/2, 0, 0, 0, 5);
       particleManager2.fireParticles( 5, 30, xPos+playerWidth, yPos + playerHeight/2, 0, 0, 0, 5);
       //particleManager2.smokeParticles( 5, 10, xPos+playerWidth/2, yPos+playerHeight/2, 0, 0, 3, -1); // Fast Smoke
-      particleManager2.display();
     }
   }// display
   
@@ -437,6 +447,15 @@ class Foosmen{
             else if(parent.zoneFlag == 0)
               balls[i].launchFireball( xPos + 50, yPos + playerHeight/2, parent.rotateVel, parent.yMove );
           }
+          else if( parent.hasSpecial && parent.tigers ){ //Throws normal ball and airball
+            if(parent.zoneFlag == 1){
+              balls[i].launchBall( xPos - 50, yPos + playerHeight/2, parent.rotateVel, parent.yMove );
+              decoyBalls[i].launchDecoyball( xPos - 50, yPos + playerHeight/2, parent.rotateVel, -parent.yMove );
+            }else if(parent.zoneFlag == 0){
+              balls[i].launchBall( xPos + 50, yPos + playerHeight/2, parent.rotateVel, parent.yMove );
+              decoyBalls[i].launchDecoyball( xPos + 50, yPos + playerHeight/2, parent.rotateVel, -parent.yMove );  
+            }
+          }
           else{ // Throws normal ball
             if(parent.zoneFlag == 1)
               balls[i].launchBall( xPos - 50, yPos + playerHeight/2, parent.rotateVel, parent.yMove );
@@ -453,6 +472,10 @@ class Foosmen{
   private void specialCollision(int ballID){
     if( balls[ballID].isFireball() && parent.tigers )
       parent.setDebuff();
+    if( decoyBalls[ballID].isDecoyball() && parent.dragons ){
+      decoyBalls[ballID].setInactive();
+      this.setConfused();
+    }
   }//specialCollision()
   
   void setGameTimer( double timer_g ){
@@ -469,6 +492,12 @@ class Foosmen{
     }// if-else-if button pressed
     return false;
   }// setDelay
+  
+  void setConfused(){
+    confusedTimer = confusedDuration + (float)gameTimer;
+    confused = true;
+    soundManager.playDecoyDeath();
+  }// setConfused()
   
   void setMinStopAngle(int newVal){
     minStopAngle = newVal;

@@ -76,14 +76,15 @@
  *              - Foosbar "Spring-loaded" mode reintegrated and better implemented.
  * 4/23/09      - Version 0.8.5
  *              - DebugConsole completely rewritten. All sounds back in. Some artwork in. Multiple foosbar control modes in.
+ *              - Full rotation modified. Spin gesture improved. Foosmen catch and throw implemented
+ * 4/24/09      - Fireball ability and debuff effect implemented.
+ *              - Decoyball ability implemented.
+ *
  * Notes:
- *      - [TODO] Add visual score counter above goals
  *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?
  *	- [TODO] Physics engine?
  *      - [TODO] Improve collision detection on goal zones
- *      - [TODO] Forward ball stop on foosman2
  *      - [TODO] 1-to-1 control over goalie zone?
- *      - [TODO] Rewrite to FSM format
  *      - [NOTE] Two close fingers to move bars works well on TacTile.
  *      - [NOTE] Foosman spin gesture works when FPS is 20-30 (60 too high).
  *      - [NOTE] Turret shoot-on-release works on TacTile only when usingMouse = false.
@@ -93,12 +94,12 @@
 // Gameplay Flags
 Boolean displayArt = true;
 
-Boolean redTeamTop = false;
+Boolean redTeamTop = true;
 
 Boolean yellowTeamWins = false;
 Boolean redTeamWins = false;
 
-Boolean debugText = true; // TEMP
+Boolean debugText = false; // TEMP
 Boolean debug2Text = false; // TEMP
 color debugColor = color(255,255,255); // TEMP
 
@@ -122,6 +123,7 @@ PFont font;
 
 // Data Structures / Objects
 Ball[] balls;
+Ball[] decoyBalls;
 int[] screenDimensions = new int[4];
 PImage ballImages[] = new PImage[360];
 PImage red_foosmanImages[] = new PImage[360];
@@ -187,6 +189,7 @@ class PlayState extends GameState
 
     font = loadFont("data/ui/fonts/Arial Bold-14.vlw"); // TEMP
     balls = new Ball[nBalls];
+    decoyBalls = new Ball[nBalls];
     
     // Loads Ball artwork
     filepath = "data/objects/ball/";
@@ -196,6 +199,7 @@ class PlayState extends GameState
     
     for( int i = 0; i < nBalls; i++ ){
       balls[i] = new Ball( -100, -100, 50, i, balls, screenDimensions, ballImages);
+      decoyBalls[i] = new Ball( -100, -100, 50, i, balls, screenDimensions, ballImages);
     }
 
     // Loads Red Foosman artwork
@@ -279,13 +283,17 @@ class PlayState extends GameState
     imgNets.draw();
     topGoal.collide(balls);
     bottomGoal.collide(balls);
-            
+    topGoal.collide(decoyBalls);
+    bottomGoal.collide(decoyBalls);
+    
     barManager.process(balls, timer.getSecondsActive());
-  
+    barManager.process(decoyBalls, timer.getSecondsActive());
+    
     topGoal.display();
     bottomGoal.display();
     
     drawBorders();
+    particleManager2.display();
     drawButtons();
     
     ballLauncher_bottom.process(timer.getSecondsActive()); 
@@ -305,7 +313,7 @@ class PlayState extends GameState
       text("Timer: "+timer_g, 16, 16*3);
       text("FPS: "+frameRate, 16, 16*4);
       text("Table Friction: "+tableFriction, 16, 16*5);
-      text("Last Scored (Top = 0, Bottom = 1): "+lastScored, 16, 16*12);
+      text("Last Scored (Top = 0, Bottom = 1): "+lastScored, 16, 16*10);
       if(  nBalls > 0 ){
         text("Ball 0 Speed: "+balls[0].getSpeed(), 16, 16*6);
         text("Ball 0 xVel: "+balls[0].xVel, 16, 16*7);
@@ -315,8 +323,10 @@ class PlayState extends GameState
       particleManager.displayDebug(debugColor, font);
       barManager.displayDebug(debugColor, font);
       barManager.displayHitbox();
-      for( int i = 0; i < nBalls; i++ )
+      for( int i = 0; i < nBalls; i++ ){
         balls[i].displayDebug(debugColor, font);
+        decoyBalls[i].displayDebug(debugColor,font);
+      }
     }
     
     if( timer.isActive() )
@@ -350,6 +360,7 @@ class PlayState extends GameState
         break;
         
       balls[i].setMaxVel(maxBallSpeed);
+      decoyBalls[i].setMaxVel(maxBallSpeed);
       
       if( balls[i].isActive() ){
         particleManager.trailParticles( 1, balls[i].diameter, balls[i].xPos, balls[i].yPos, 0, 0, 0 );
@@ -361,6 +372,11 @@ class PlayState extends GameState
         balls[i].setFriction(tableFriction);
         particleManager.explodeParticles( 5, balls[i].diameter, balls[i].xPos, balls[i].yPos, -balls[i].xVel/2, -balls[i].yVel/2, 2 );
       }// else if ball fireball
+      
+      if( decoyBalls[i].isDecoyball() ){
+        particleManager.trailParticles( 1, decoyBalls[i].diameter, decoyBalls[i].xPos, decoyBalls[i].yPos, 0, 0, 0 );
+        decoyBalls[i].process( timer.getSecondsActive() );          
+      }
     }// for all balls
   }// drawBalls
   
@@ -419,6 +435,8 @@ class PlayState extends GameState
        balls[0].launchBall(mouseX, mouseY, 5, 5);
     else if( key == 'f' || key == 'F' )
       balls[0].launchFireball(mouseX, mouseY, 5, 5);
+    else if( key == 'd' || key == 'D' )
+      decoyBalls[0].launchDecoyball(mouseX, mouseY, 5, 5);
   }// if keypressed
   
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )

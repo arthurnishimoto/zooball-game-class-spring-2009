@@ -64,14 +64,12 @@ class Game
     
     // Translate and Scale
     pushMatrix( );
-    if(scaleScreen){
-      translate( screenOffsetX, screenOffsetY );
-      scale( screenScale );
-    }
+    translate( screenOffsetX, screenOffsetY );
+    scale( screenScale );
     state.draw( );
-    popMatrix( );
     debugConsole.draw();
     state.input( ); // Placed after draw so input touches appear on top
+    popMatrix( );
   }
   
   public void drawDebugText( String string ) {

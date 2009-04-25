@@ -78,7 +78,7 @@ class Particle{
     else
       diameter -= dispersionRate;
     
-    if( active && diameter <= originalDiameter && dispersionRate < 0)
+    if( active && diameter >= 200 && dispersionRate < 0)
       active = false;
     if( active && diameter <= 0 )
       active = false;
