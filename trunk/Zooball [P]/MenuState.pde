@@ -51,8 +51,10 @@ class MenuState extends GameState
  
     topDragon = new Button( (int)game.getWidth() - 50 - 469, 161, "data/ui/buttons/dragons/disabled.png");
     topDragon.setLitImage( loadImage("data/ui/buttons/dragons/enabled.png") );
+    topDragon.setRotation( PI );
     topTiger = new Button( 50 + 469, 161, "data/ui/buttons/tigers/disabled.png");
     topTiger.setLitImage( loadImage("data/ui/buttons/tigers/enabled.png") );
+    topTiger.setRotation( PI );
     
     endLoad( );
   }// load
@@ -99,19 +101,15 @@ class MenuState extends GameState
   }// drawBackground
   
   private void drawButtons(){
-    imageMode(CORNERS);
     bottomTiger.process(font, timer.getSecondsActive());
     bottomTiger.setLit( (bottomChosen && bottomTigerTeam) );
     bottomDragon.process(font, timer.getSecondsActive());
     bottomDragon.setLit( (bottomChosen && bottomDragonTeam) );
     
-
     topTiger.process(font, timer.getSecondsActive());
     topTiger.setLit( (topChosen && topTigerTeam) );
-
     topDragon.process(font, timer.getSecondsActive());
     topDragon.setLit( (topChosen && topDragonTeam) );
-    imageMode(CORNERS);
   }// drawButtons
   
   private void drawDebugText( ) {

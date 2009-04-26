@@ -371,7 +371,7 @@ class PlayState extends GameState
   private void drawBalls(){
     // Draw Balls
     for( int i = 0; i < nBalls; i++ ){
-      if( !timer.isActive() )
+      if( balls[i] == null || !timer.isActive() )
         break;
   
       if( balls[i].isActive() ){

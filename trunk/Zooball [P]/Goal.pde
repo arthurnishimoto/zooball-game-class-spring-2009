@@ -79,7 +79,7 @@ class Goal{
     if( fireTimer > parent.timer.getSecondsActive() ){
       particleManager2.fireParticles( 5, 30, fireX, fireY, 0, 0, 0, 5);
       particleManager2.fireParticles( 5, 30, fireX, fireY, 0, 0, 0, 5);
-      particleManager2.smokeParticles( 5, 10, fireX, fireY, 0, 0, 3, -1); // Fast Smoke
+      particleManager2.smokeParticles( 5, 10, fireX, fireY, 0, (int)random(-1,2), 3 , -1 ); // Fast Smoke
     }else
       onFire = false;
   }// display
@@ -94,8 +94,10 @@ class Goal{
     
   // Check for balls colliding with the goal bars
   boolean collide(Ball[] balls){
-    
-    for( int i = 0; i < balls.length; i++ ){
+    for( int i = 0; i < nBalls; i++ ){
+      if( balls[i] == null )
+        return false;
+      
       float ballX = balls[i].xPos;
       float ballY = balls[i].yPos;
       float ballDia = balls[i].diameter;
