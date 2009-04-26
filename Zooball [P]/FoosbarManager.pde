@@ -114,13 +114,15 @@ class FoosbarManager{
   }// CTOR
   
   // Process manager tasks based on current state
-  void process(Ball[] balls, double timer_g){
+  void process(Ball[] balls, double timer_g, PlayState parent){
     if( state == ACTIVE ){
       for( int x = 0 ; x < nBars ; x++ ){
         bars[x].display();
-        bars[x].ballInArea(balls);
-        bars[x].collide(balls);
-        bars[x].setGameTimer(timer_g);
+        if( parent.timer.isActive() ){
+          bars[x].ballInArea(balls);
+          bars[x].collide(balls);
+          bars[x].setGameTimer(timer_g);
+        }
       }// for
     }else if ( state == INACTIVE ){
       // Inactive state
@@ -145,6 +147,18 @@ class FoosbarManager{
       bars[x].displayHitbox();
     }// for
   }// displayHitbox
+  
+   void displayStats(){
+    for( int x = 0 ; x < nBars ; x++ ){
+      bars[x].displayStats();
+    }// for
+  }// displayStats
+  
+  void updateFoosbarRecord(){
+    for( int x = 0 ; x < nBars ; x++ ){
+      bars[x].updateFoosbarRecord();
+    }// for
+  }// updateFoosbarRecord
   
   // Bar touch zone is pressed
   void barsPressed(float x, float y){

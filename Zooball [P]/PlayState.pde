@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 0.8
+ * Version: 0.9
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -79,6 +79,10 @@
  *              - Full rotation modified. Spin gesture improved. Foosmen catch and throw implemented
  * 4/24/09      - Fireball ability and debuff effect implemented.
  *              - Decoyball ability implemented.
+ * 4/25/09      - Version 0.9
+ *              - Foosbars now track and save game statistics
+ *              - Ball launcher now properly tracks which balls are queued up for firing - now multi-ball supported.
+ *              - Early menus added
  *
  * Notes:
  *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?
@@ -94,7 +98,7 @@
 // Gameplay Flags
 Boolean displayArt = true;
 
-Boolean redTeamTop = true;
+Boolean redTeamTop = false;
 
 Boolean yellowTeamWins = false;
 Boolean redTeamWins = false;
@@ -149,8 +153,9 @@ class PlayState extends GameState
   private CircularButton btnPauseTop, btnPauseBottom;
   private Image imgPitch, border, imgLines, imgNets, logo;
   int ballsInPlay = 0;
-  int ballQueue = 0;
-  int lastScored = -1;
+  int topQueue = 0;
+  int bottomQueue = 0;
+  int lastScored = -1; // 0 = top, 1 = bottom
     
   public PlayState( Game game ) {
     super( game );
@@ -158,12 +163,13 @@ class PlayState extends GameState
   
   public void load( ) {
     ballsInPlay = 0;
-    ballQueue = 0;
+    topQueue = 0;
+    bottomQueue = 0;
     lastScored = -1;
   
     imgPitch = new Image( "data/objects/stadium/gamefield_grass.gif" );
     imgPitch.setPosition( 0, 0 );
-    border = new Image( "data/objects/stadium/gamefield_woodtrim.png" );
+    border = new Image( "data/objects/stadium/woodtrim copy.png" );
     border.setPosition( 0, 0 );
     imgLines = new Image( "data/objects/stadium/gamefield_centerline_goalzones.png" );
     imgLines.setPosition( 0, 0 );
@@ -253,8 +259,6 @@ class PlayState extends GameState
     ballLauncher_top = new Turret( 75 , game.getWidth()/2 , 0 + 100, 150, 50);
     ballLauncher_top.setParentClass(this);
     ballLauncher_top.faceDown();
-    
-    coinToss();
 
     endLoad( );
   }// load()
@@ -268,10 +272,20 @@ class PlayState extends GameState
   public void draw( ) {
     frameRate(30); // Framerate must be below 60 to allow bar spin gesture.
     
-    if( ballsInPlay != 0 && ballsInPlay <= nBalls )
+    if( (ballsInPlay + topQueue + bottomQueue) < nBalls && lastScored == -1 )
       coinToss();
-    if( ballsInPlay == 0)
-      reloadBall();
+      
+    reloadBall();
+      
+    if( topQueue > 0 )
+      ballLauncher_top.enable();
+    else
+      ballLauncher_top.disable();
+      
+    if( bottomQueue > 0 )
+      ballLauncher_bottom.enable();
+    else
+      ballLauncher_bottom.disable();
       
     drawBackground( );
     
@@ -286,8 +300,8 @@ class PlayState extends GameState
     topGoal.collide(decoyBalls);
     bottomGoal.collide(decoyBalls);
     
-    barManager.process(balls, timer.getSecondsActive());
-    barManager.process(decoyBalls, timer.getSecondsActive());
+    barManager.process(balls, timer.getSecondsActive(), this);
+    barManager.process(decoyBalls, timer.getSecondsActive(), this);
     
     topGoal.display();
     bottomGoal.display();
@@ -314,6 +328,7 @@ class PlayState extends GameState
       text("FPS: "+frameRate, 16, 16*4);
       text("Table Friction: "+tableFriction, 16, 16*5);
       text("Last Scored (Top = 0, Bottom = 1): "+lastScored, 16, 16*10);
+      text("Ball Queue (Top = "+topQueue+" , Bottom = "+bottomQueue+")", 16, 16*11);
       if(  nBalls > 0 ){
         text("Ball 0 Speed: "+balls[0].getSpeed(), 16, 16*6);
         text("Ball 0 xVel: "+balls[0].xVel, 16, 16*7);
@@ -355,13 +370,10 @@ class PlayState extends GameState
   
   private void drawBalls(){
     // Draw Balls
-    for( int i = 0; i < balls.length; i++ ){
+    for( int i = 0; i < nBalls; i++ ){
       if( !timer.isActive() )
         break;
-        
-      balls[i].setMaxVel(maxBallSpeed);
-      decoyBalls[i].setMaxVel(maxBallSpeed);
-      
+  
       if( balls[i].isActive() ){
         particleManager.trailParticles( 1, balls[i].diameter, balls[i].xPos, balls[i].yPos, 0, 0, 0 );
         balls[i].process( timer.getSecondsActive() );
@@ -377,6 +389,8 @@ class PlayState extends GameState
         particleManager.trailParticles( 1, decoyBalls[i].diameter, decoyBalls[i].xPos, decoyBalls[i].yPos, 0, 0, 0 );
         decoyBalls[i].process( timer.getSecondsActive() );          
       }
+      balls[i].setMaxVel(maxBallSpeed);
+      decoyBalls[i].setMaxVel(maxBallSpeed);
     }// for all balls
   }// drawBalls
   
@@ -441,6 +455,7 @@ class PlayState extends GameState
   
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
        game.setState( game.getPausedState() );
+       
     barManager.barsPressed(x,y);
     
     ballLauncher_top.isHit(x,y);
@@ -456,23 +471,19 @@ class PlayState extends GameState
   
   void reloadBall(){
     if( lastScored == 0 ){
-      ballLauncher_bottom.enable();
+      bottomQueue++;
     }else if( lastScored == 1 ){
-      ballLauncher_top.enable();
+      topQueue++;
     }
+    lastScored = -1;
   }// reloadBall
   
   void coinToss(){
     float coinToss = random(2);
     if( coinToss >= 1 )
-      ballLauncher_bottom.enable();
+      bottomQueue++;
     else if( coinToss < 1 )
-      ballLauncher_top.enable();
-      
-    if( ballsInPlay == nBalls ){
-      ballLauncher_top.disable();
-      ballLauncher_bottom.disable();
-    }
+      topQueue++;
   }// coinToss
 
 }// class PlayState

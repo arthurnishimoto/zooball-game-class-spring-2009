@@ -43,10 +43,18 @@ class DebugConsole{
   }// CTOR
   
   public void draw(){
-    if(debugConsole)
+    // incrementer adjusted for slower input
+    if( frameRate > 55 )
+      timerIncrementer = 0.015/2;
+    else if( frameRate <= 30 )
+      timerIncrementer = 0.015;
+      
+    if(debugConsole && game.getPlayState().isLoaded() )
       displayPanel_1();
-    if(debugPanel2)
+    if(debugPanel2 && game.getPlayState().isLoaded() )
       displayPanel_2();
+    if(debugConsole && !(game.getPlayState().isLoaded()) )
+      displayPanel_0();
       
     debugButton.process(font, timer_g);
     debugButton.setLit( debugConsole || debugPanel2 );
@@ -67,10 +75,12 @@ class DebugConsole{
       }
     }// if debugButton
     
-    if(debugConsole)
+    if( debugConsole && game.getPlayState().isLoaded() )
       panel_1_input(x,y,finger);
-    else if(debugPanel2)
+    else if(debugPanel2 && game.getPlayState().isLoaded() )
       panel_2_input(x,y,finger);
+    if(debugConsole && !(game.getPlayState().isLoaded()) )
+      panel_0_input(x,y,finger);
   }// input()
   
   private void setupPanel(){
@@ -142,11 +152,111 @@ class DebugConsole{
     
   }// setupPanel
   
+  private void displayPanel_0(){
+    // background
+    fill(color(0,0,0, 150));
+    stroke(color(0,0,0));
+    rect(0, screenHeight - borderHeight/2 - 75*5, 450 , 450 );    
+    
+    // Buttons
+    muteButton.process(font, timer_g);
+    muteButton.setLit( soundManager.isMuted() );
+        
+    minus1.process(font, timer_g);
+    fill(255,255,255);
+    text("Volume\n("+soundManager.getGain()+")", 175, screenHeight - borderHeight/2 - 65*5);
+    plus1.process(font, timer_g);
+
+    round1.process(font, timer_g);
+    round1.setButtonText("");
+    round1.setLitColor( color(0, 255, 0) );
+    round1.setLit( false );
+      
+    round2.process(font, timer_g);
+    round2.setButtonText("Debug\nText");
+    round2.setLitColor( color(255, 0, 0) );
+    round2.setLit( debugText );
+    
+    round3.process(font, timer_g);
+    round3.setButtonText("");
+    round3.setLitColor( color(0,250,250) );
+    round3.setLit( false );
+    
+    round4.process(font, timer_g);
+    round4.setButtonText("");
+    round4.setLitColor( color(0,250,250) );
+    round4.setLit( false );
+    
+    textAlign(LEFT);    
+  }// displayPanel_0
+  
+  private void panel_0_input(float x, float y, int finger){
+  
+    if( muteButton.isHit(x,y) ){
+      if( soundManager.isMuted() )
+        soundManager.unmute();
+      else
+        soundManager.mute();
+    }// if muteButton
+      
+    if( minus1.isHit(x,y) ){
+      soundManager.subtractGain();
+    }// if minus 1
+    if( plus1.isHit(x,y) ){
+      soundManager.addGain();
+    }// if plus 1
+
+    if( minus2.isHit(x,y) ){
+    }// if minus 2
+    if( plus2.isHit(x,y) ){
+    }// if plus 2
+    
+    if( minus3.isHit(x,y) ){
+
+    }// if minus 3
+    if( plus3.isHit(x,y) ){
+
+    }// if plus 3
+    
+    if( minus4.isHit(x,y) ){
+
+    }// if minus 4
+    if( plus4.isHit(x,y) ){
+
+    }// if plus 4
+    
+    if( minus5.isHit(x,y) ){
+
+    }// if minus 5
+    if( plus5.isHit(x,y) ){
+
+    }// if plus5
+    
+    if( round1.isHit(x,y) ){
+
+    }// if round1
+    
+    if( round2.isHit(x,y) ){
+      if( debugText ){
+        debugText = false;
+      }else{
+        debugText = true;
+      }
+    }// if round2
+    
+    if( round3.isHit(x,y) ){
+
+    }// if round3
+    
+    if( round4.isHit(x,y) ){
+    }// if round4
+  }// panel_0_input()
+  
   private void displayPanel_1(){
     // background
     fill(color(0,0,0, 150));
     stroke(color(0,0,0));
-    rect(0, screenHeight - borderHeight/2 - 75*5, 450 , 500 );    
+    rect(0, screenHeight - borderHeight/2 - 75*5, 450 , 450 );    
     
     // Buttons
     muteButton.process(font, timer_g);
@@ -295,7 +405,7 @@ class DebugConsole{
     // background
     fill(color(0,0,0, 150));
     stroke(color(0,0,0));
-    rect(0, screenHeight - borderHeight/2 - 75*5, 450 , 500 );    
+    rect(0, screenHeight - borderHeight/2 - 75*5, 450 , 450 );    
     
     // Buttons
     minus1.process(font, timer_g);

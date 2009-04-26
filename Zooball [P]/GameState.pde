@@ -38,7 +38,11 @@ abstract class GameState
   
   public void reset( ) { timer.reset( ); loading = BEFORE; }
   public void enter( ) { timer.setActive( true ); }
-  public void exit( ) { timer.setActive( false ); }
+  
+  public void exit( ) {
+    soundManager.stopSounds();
+    timer.setActive( false );
+  }// exit
   
   public void input( ) {
     // Process mouse if clicked

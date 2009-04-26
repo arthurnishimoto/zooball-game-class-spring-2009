@@ -7,6 +7,7 @@
 class OverState extends GameState
 {
   private CircularButton btnReplayBottom, btnReplayTop, btnQuitBottom, btnQuitTop;
+  private Image gameOver;
   
   public OverState( Game game ) {
     super( game );
@@ -31,10 +32,13 @@ class OverState extends GameState
     btnQuitTop.setPosition( 897.5, 100 );
     btnQuitTop.setRadius( 50 );
     btnQuitTop.setRotation( PI );
+    gameOver = new Image("data/ui/text/GameOver2.png");
+    gameOver.setPosition(0,0);
     endLoad( );
   }
   
   public void enter(){
+    timer.reset();
     timer.setActive( true );
     soundManager.stopSounds();
     soundManager.playPostgame();
@@ -43,9 +47,12 @@ class OverState extends GameState
   public void draw( ) {
     drawBackground( );
     drawOverlay( );
-    drawButtons( );
     drawDebugText( );
     drawGameOverText( );
+    
+    if( timer.getSecondsActive() > 5 )
+      barManager.displayStats();
+    drawButtons( );
   }// draw()
   
   private void drawBackground( ) {
@@ -77,25 +84,26 @@ class OverState extends GameState
     }else if( yellowTeamWins ){
       fill(255,255,0);
       text("Yellow Team Wins", game.getWidth()/2, game.getHeight()/2 + 64*4);      
+    }else{
+      fill(0,255,0);
+      text("DRAW", game.getWidth()/2, game.getHeight()/2 + 64*4);
     }
-    
-    fill(255,255,255);
-    String buttonText = "GAME OVER";
-    text(buttonText, game.getWidth()/2, game.getHeight()/2 + 64*3);
+
+    gameOver.draw();
 
     pushMatrix();
     translate(game.getWidth()/2, game.getHeight()/2 - 64*3);
     rotate(radians(180));
-    
-    fill(255,255,255);
-    text(buttonText, 0, 0 + 64/2);  
-    
+   
     if( redTeamWins ){
       fill(255,0,0);
       text("Red Team Wins", 0, 0 + 64*2);
     }else if( yellowTeamWins ){
       fill(255,255,0);
       text("Yellow Team Wins", 0, 0 + 64*2);      
+    }else{
+      fill(0,255,0);
+      text("DRAW", 0, 0 + 64*2);            
     }
     
     popMatrix();
@@ -111,10 +119,12 @@ class OverState extends GameState
   public void checkButtonHit(float x, float y, int finger){
     if( btnReplayBottom.contains(x,y) || btnReplayTop.contains(x,y) ){
       game.reloadState(game.getPlayState());
+      barManager.updateFoosbarRecord();
     }// if replayButton
     
     if( btnQuitBottom.contains(x,y) || btnQuitTop.contains(x,y) ){
       game.setState(game.getMenuState());
+      barManager.updateFoosbarRecord();
     }// if quitButton
 
   }// checkButtonHit

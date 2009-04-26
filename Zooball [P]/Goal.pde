@@ -95,7 +95,7 @@ class Goal{
   // Check for balls colliding with the goal bars
   boolean collide(Ball[] balls){
     
-    for( int i = 0; i < nBalls; i++ ){
+    for( int i = 0; i < balls.length; i++ ){
       float ballX = balls[i].xPos;
       float ballY = balls[i].yPos;
       float ballDia = balls[i].diameter;
@@ -122,6 +122,11 @@ class Goal{
             setOnFire(balls[i].xPos,balls[i].yPos);
           if( balls[i].isDecoyball() )
             continue;
+          if( balls[i].lastBarHit != null ){
+            balls[i].lastBarHit.statistics[0] += 1; // Scored
+            if( teamNumber == balls[i].lastBarHit.zoneFlag ) // Scored on own goal
+              balls[i].lastBarHit.statistics[1] += 1;
+          }
           balls[i].setInactive();
           points++;
           soundManager.playGoal();
@@ -151,6 +156,11 @@ class Goal{
             setOnFire(balls[i].xPos,balls[i].yPos);
           if( balls[i].isDecoyball() )
             continue;
+          if( balls[i].lastBarHit != null ){
+            balls[i].lastBarHit.statistics[0] += 1; // Scored
+            if( teamNumber == balls[i].lastBarHit.zoneFlag ) // Scored on own goal
+              balls[i].lastBarHit.statistics[1] += 1;
+          }
           balls[i].setInactive();
           points++;
           soundManager.playGoal();

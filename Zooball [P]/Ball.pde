@@ -47,6 +47,9 @@ class Ball{
   float fireballDuration = 5;
   float fireballTimer = 0;
   
+  Foosbar lastBarHit;
+  Foosbar specialSource;
+  
   /**
    * Creates a new Ball object.
    *
@@ -73,6 +76,8 @@ class Ball{
     ID_no = ID;
     others = otr;
     hasArtwork = false;
+    lastBarHit = null;
+    specialSource = null;
   }// Ball CTOR
   
   /**
@@ -102,6 +107,8 @@ class Ball{
     others = otr;
     rotateImages = newImages;
     hasArtwork = true;
+    lastBarHit = null;
+    specialSource = null;
   }// Ball CTOR  
   
   /**
@@ -204,6 +211,7 @@ class Ball{
     yPos = y;
     xVel = xVeloc;
     yVel = yVeloc;
+    lastBarHit = null;
     setActive();
   }//launchBall 
   
@@ -426,6 +434,8 @@ class Ball{
      fill(debugColor);
      textFont(font,16);
      text("ID: " + ID_no, xPos+diameter, yPos-diameter/2 );
+     text("Last Bar Hit: " + lastBarHit, xPos+diameter, yPos-diameter/2 + 16*1);
+     text("Special Source: " + specialSource, xPos+diameter, yPos-diameter/2 + 16*2);
      
      fill(255,255,255);
      stroke(0,255,0);
@@ -447,6 +457,7 @@ class Ball{
   
   void setActive(){
     state = ACTIVE;
+    specialSource = null;
   }// setActive
 
   void setInactive(){

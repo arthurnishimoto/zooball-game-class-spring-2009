@@ -33,7 +33,11 @@ class Button{
   color idle_cl = color(#000000);
   color lit_cl = color( 255, 255, 255 );
   color pressed_cl = color(#FF0000);
+  float angle = 0;
 
+  boolean hasLitImage = false;
+  PImage litImage;
+  
   boolean active;
   String buttonText = "";
   color buttonTextColor = color(0,0,0);
@@ -109,6 +113,8 @@ class Button{
    
     if(hasImage)
       image( buttonImage, xPos, yPos );
+    if(hasLitImage && lit)
+      image( litImage, xPos, yPos );
     else if(!pressed && !lit){
       fill(idle_cl);
       stroke(idle_cl);
@@ -267,6 +273,11 @@ class Button{
   void setLitColor(color newColor){
     lit_cl = newColor;
   }// setLitColor
+
+  void setLitImage(PImage newImage){
+    litImage = newImage;
+    hasLitImage = true;
+  }// setLitImage  
   
   void setLit(boolean newBool){
     lit = newBool;
