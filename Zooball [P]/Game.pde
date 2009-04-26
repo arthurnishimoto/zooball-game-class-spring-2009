@@ -33,17 +33,15 @@ class Game
     menuState = new MenuState( this );
     playState = new PlayState( this );
     pausedState = new PausedState( this );
-
-    overState = new OverState( this );  // TEMP
+    overState = new OverState( this );
     
     introState.beginLoad( );
     menuState.beginLoad( );
     playState.beginLoad( );
     pausedState.beginLoad( );
+    overState.beginLoad( );
     
-    overState.beginLoad( ); // TEMP
-    
-    setState( overState );
+    setState( introState );
     
     calculateScreenTransformation( );
     noStroke( );

@@ -16,6 +16,7 @@
  * 4/9/09    - Hit box displayed, but not active
  * 4/19/09   - Removed image loading from constructor. Done by parent
  *             to load only one instance of each image.
+ * 4/24/09   - Catch/release ball and associated effects added.
  * ---------------------------------------------
  */
 
@@ -32,7 +33,6 @@ class Foosmen{
   Foosbar parent;
   int ballsRecentlyHit[];
   int ballCaught[];
-  int nBalls;
   
   boolean confused = false;
   float confusedDuration = 3;

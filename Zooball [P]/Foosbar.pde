@@ -18,6 +18,7 @@
  *           - Ball/bar basic top,left,bottom,right zone collision implemented. Bar at certain angle stops ball
  * 4/16/09   - Fixed "shaky" bar during very low rotation velocities
  * 4/21/09   - Version 0.3 - Revised "Spring-loaded" option for bar rotation. Applies velocity on press release.
+ * 4/24/09   - Catch/release ball and associated effects added.
  * ---------------------------------------------
  */
 
@@ -639,7 +640,7 @@ class Foosbar{
       output += "Dragons Tricked: " + record[5] + "\n";
     if( isDragon() )
       output += "Tigers set on fire: " + record[6] + "\n";    
-    output += "\nBoosters used: " + record[7];
+    output += "Boosters used: " + record[7];
     
     return output;
   }// getFoosbarInfo

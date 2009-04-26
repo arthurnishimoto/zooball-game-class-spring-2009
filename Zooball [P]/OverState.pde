@@ -117,6 +117,9 @@ class OverState extends GameState
   public String toString( ) { return "OverState"; }
   
   public void checkButtonHit(float x, float y, int finger){
+    if( timer.getSecondsActive() < 5 ) // Prevent accidental button press when screen first appears.
+      return;
+    
     if( btnReplayBottom.contains(x,y) || btnReplayTop.contains(x,y) ){
       game.reloadState(game.getPlayState());
       barManager.updateFoosbarRecord();

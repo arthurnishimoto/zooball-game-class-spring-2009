@@ -15,6 +15,8 @@
  * 4/1/09    - Support for rectuangular buttons
  *           - Button text displays up and down
  * 4/4/09    - Added a lit state
+ * 4/26/09   - Version 0.2
+ *           - Added litImage and rotation for circle, rect, and images. (hitBox does not rotate)
  * ---------------------------------------------
  */
  
@@ -35,9 +37,15 @@ class Button{
   color pressed_cl = color(#FF0000);
   float angle = 0;
 
+  float rotation = 0;
+
   boolean hasLitImage = false;
   PImage litImage;
   
+  boolean hasPressedImage = false;
+  PImage pressedImage;
+    
+    
   boolean active;
   String buttonText = "";
   color buttonTextColor = color(0,0,0);
@@ -66,7 +74,7 @@ class Button{
   }// Button CTOR
   
   /**
-   * Creates a new rectangular button. (x,y) is upper left
+   * Creates a new rectangular button. (x,y) is center
    *
    * @param new_xPos  - x position
    * @param new_yPos  - y position
@@ -82,8 +90,7 @@ class Button{
   }// Button CTOR
   
   /**
-   * @TODO Change newImage to an Image and rest of class accordingly
-   * Creates a new rectangular button with an image. (x,y) is upper left
+   * Creates a new rectangular button with an image. (x,y) is center
    *
    * @param new_xPos  - x position
    * @param new_yPos  - y position
@@ -91,8 +98,8 @@ class Button{
    */  
   Button( int new_xPos, int new_yPos, String newImage ){
     buttonImage = loadImage(newImage);
-    xPos = new_xPos-buttonImage.width/2;
-    yPos = new_yPos-buttonImage.height/2;
+    xPos = new_xPos;
+    yPos = new_yPos;
     diameter = buttonImage.width;
     hasImage = true;
   }// Button CTOR
@@ -101,42 +108,40 @@ class Button{
    * Sets button active, displays, updates timer.
    */
   void process(PFont font, double timer_g){
-    display(font);
+    if(hasImage)
+      displayImage();
+    else
+      display(font);
+    displayText();
     //displayDebug(color(0,255,0), font);
     //displayEdges(color(255,255,255));
     setGameTimer(timer_g);
   }// process
   
-  void display(PFont font){
+  void displayImage(){
     if( fadeAmount <= 1 )
       active = true;
-   
-    if(hasImage)
-      image( buttonImage, xPos, yPos );
-    if(hasLitImage && lit)
-      image( litImage, xPos, yPos );
-    else if(!pressed && !lit){
-      fill(idle_cl);
-      stroke(idle_cl);
-      if(isRound)
-        ellipse( xPos, yPos, diameter, diameter );
-      else if(isRectangle)
-        rect( xPos, yPos, rWidth, rHeight );
-    }else if(lit){
-      fill(lit_cl);
-      stroke(lit_cl);
-      if(isRound)
-        ellipse( xPos, yPos, diameter, diameter );
-      else if(isRectangle)
-        rect( xPos, yPos, rWidth, rHeight );
-    }else if(pressed){
-      fill(pressed_cl);
-      stroke(pressed_cl);
-      if(isRound)
-        ellipse( xPos, yPos, diameter, diameter );
-      else if(isRectangle)
-        rect( xPos, yPos, rWidth, rHeight );
-    }
+      
+    imageMode(CENTER);
+    pushMatrix();
+    translate(xPos, yPos);
+    rotate( rotation );
+    
+    image( buttonImage, 0, 0);
+    if( hasLitImage && lit )
+      image( litImage, 0, 0 );
+    if( hasPressedImage && pressed )
+      image( pressedImage, 0, 0 );
+      
+    popMatrix();
+    imageMode(CORNER);
+  }// displayImage
+  
+  void displayText(){
+    pushMatrix();
+    translate(xPos, yPos);
+    rotate( rotation );
+    
     
     fill(buttonTextColor);
     textFont(font,16);
@@ -147,28 +152,54 @@ class Button{
       textShift = 16;
     
     if( doubleSidedText || !invertText ){
-      if( isRound )
-        text(buttonText, xPos, yPos + textShift);
-      else if( hasImage )
-        text(buttonText, xPos + buttonImage.width/2, yPos + buttonImage.height/2 + textShift);
-      else if ( isRectangle )
-        text(buttonText, xPos + rWidth/2, yPos + rHeight/2 + textShift);
+      text(buttonText, 0, 0 + textShift);
     }// if text not inverted
     
     if( doubleSidedText || invertText ){
-      pushMatrix();
-      if( isRound )
-        translate(xPos, yPos - textShift);
-      else if( hasImage )
-        translate(xPos + buttonImage.width/2, yPos + buttonImage.height/2 - textShift);
-      else if ( isRectangle )
-        translate(xPos + rWidth/2, yPos + rHeight/2 - textShift);
+      translate(0, 0 - textShift);
       rotate(radians(180));
-      textAlign(CENTER);
       text(buttonText, 0, 0);  
-      popMatrix();
+      
     }// if doubleSidedtext
+    textAlign(LEFT);
+    popMatrix();
+  }// displayText
+  
+  void display(PFont font){
+    rectMode(CENTER);
+    pushMatrix();
+    translate(xPos, yPos);
+    rotate( rotation );
     
+    if( fadeAmount <= 1 )
+      active = true;
+
+    if(!pressed && !lit){
+      fill(idle_cl);
+      stroke(idle_cl);
+      if(isRound)
+        ellipse( 0, 0, diameter, diameter );
+      else if(isRectangle)
+        rect( 0, 0, rWidth, rHeight );
+    }else if(lit){
+      fill(lit_cl);
+      stroke(lit_cl);
+      if(isRound)
+        ellipse( 0, 0, diameter, diameter );
+      else if(isRectangle)
+        rect( 0, 0, rWidth, rHeight );
+    }else if(pressed){
+      fill(pressed_cl);
+      stroke(pressed_cl);
+      if(isRound)
+        ellipse( 0, 0, diameter, diameter );
+      else if(isRectangle)
+        rect( 0, 0, rWidth, rHeight );
+    }
+    
+    popMatrix();
+    rectMode(CORNER);
+
     if(fadeEnable){
       if(fadeIn && fadeAmount > 0)
         fadeAmount -= fadeSpeed;
@@ -186,9 +217,13 @@ class Button{
       rect( xPos, yPos, rWidth, rHeight );
     if(isRound)
       ellipse( xPos, yPos, diameter, diameter );
-
   }// display
-    
+  
+  /**
+   * Displays the hitbox edges of button
+   *
+   * @param debugColor - color of edges
+   */
   void displayEdges(color debugColor){
     fill(debugColor);
 
@@ -198,15 +233,15 @@ class Button{
       ellipse( xPos-diameter/2, yPos+diameter/2, 10, 10 ); // Bottom left
       ellipse( xPos+diameter/2, yPos+diameter/2, 10, 10 ); // Bottom Right      
     }else if(hasImage){
-      ellipse( xPos, yPos, 10, 10 ); // Top left
-      ellipse( xPos+buttonImage.width, yPos+buttonImage.height, 10, 10 ); // Bottom Right
-      ellipse( xPos+buttonImage.width, yPos, 10, 10 ); // Top right
-      ellipse( xPos, yPos+buttonImage.height, 10, 10 );// Bottom Left 
+      ellipse( xPos-buttonImage.width/2, yPos-buttonImage.height/2, 10, 10 ); // Top left
+      ellipse( xPos+buttonImage.width/2, yPos+buttonImage.height/2, 10, 10 ); // Bottom Right
+      ellipse( xPos+buttonImage.width/2, yPos-buttonImage.height/2 , 10, 10 ); // Top right
+      ellipse( xPos-buttonImage.width/2, yPos+buttonImage.height/2, 10, 10 );// Bottom Left 
     }else if(isRectangle){
-      ellipse( xPos, yPos, 10, 10 ); // Top left
-      ellipse( xPos+rWidth, yPos+rHeight, 10, 10 ); // Bottom Right
-      ellipse( xPos+rWidth, yPos, 10, 10 ); // Top right
-      ellipse( xPos, yPos+rHeight, 10, 10 );// Bottom Left       
+      ellipse( xPos-rWidth/2, yPos-rHeight/2, 10, 10 ); // Top left
+      ellipse( xPos+rWidth/2, yPos+rHeight/2, 10, 10 ); // Bottom Right
+      ellipse( xPos+rWidth/2, yPos-rHeight/2 , 10, 10 ); // Top right
+      ellipse( xPos-rWidth/2, yPos+rHeight/2, 10, 10 );// Bottom Left    
     }
   }//  displayEdges
   
@@ -236,7 +271,7 @@ class Button{
         }// if-else-if button pressed
       }// if x, y in area
     }else if(hasImage){
-      if( xCoord > xPos && xCoord < xPos+buttonImage.width && yCoord > yPos && yCoord < yPos+buttonImage.height){
+      if( xCoord > xPos-buttonImage.width/2 && xCoord < xPos+buttonImage.width/2 && yCoord > yPos - buttonImage.height/2  && yCoord < yPos+buttonImage.height/2){
         if (buttonLastPressed == 0){
           buttonLastPressed = gameTimer;
         }else if ( buttonLastPressed + buttonDownTime < gameTimer){
@@ -246,7 +281,7 @@ class Button{
         }// if-else-if button pressed
       }// if x, y in area
     }else if(isRectangle){
-       if( xCoord > xPos && xCoord < xPos+rWidth && yCoord > yPos && yCoord < yPos+rHeight){
+       if( xCoord > xPos-rWidth/2 && xCoord < xPos+rWidth/2 && yCoord > yPos - rHeight/2  && yCoord < yPos+rHeight/2){
         if (buttonLastPressed == 0){
           buttonLastPressed = gameTimer;
         }else if ( buttonLastPressed + buttonDownTime < gameTimer){
@@ -269,7 +304,7 @@ class Button{
   void setIdleColor(color newColor){
     idle_cl = newColor;
   }// setIdleColor
-
+  
   void setLitColor(color newColor){
     lit_cl = newColor;
   }// setLitColor
@@ -286,6 +321,11 @@ class Button{
   void setPressedColor(color newColor){
     pressed_cl = newColor;
   }// setPressedColor
+  
+  void setPressedImage(PImage newImage){
+    pressedImage = newImage;
+    hasPressedImage = true;
+  }// setPressedImage  
   
   void setButtonText(String newText){
     buttonText = newText;
@@ -330,6 +370,10 @@ class Button{
     fadeColor = newColor;
   }// setFadeColor
   
+  void setRotation(float newValue){
+    rotation = newValue;
+  }// setRotation
+  
   void fadeEnable(){
     fadeEnable = true;
   }// fadeEnable
@@ -344,6 +388,10 @@ class Button{
     else
       return false;  
   }// isActive
+  
+  boolean isLit(){
+    return lit;
+  }// isLit
   
   boolean isDoneFading(){
     return doneFading;
