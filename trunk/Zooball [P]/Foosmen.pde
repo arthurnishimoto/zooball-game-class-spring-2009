@@ -335,6 +335,7 @@ class Foosmen{
           ballsRecentlyHit[i] = 1;  // Flag collision has occured
           balls[i].kickBall( 2 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
           specialCollision(i);
+          parent.statistics[2] += 1; // Ball hit
           continue;
         }// if ball hit top hit zone
         else if(balls[i].yPos - balls[i].diameter/2 < hit_yPos + hit_height && balls[i].yPos + balls[i].diameter/2 > hit_yPos + hit_height/2)
@@ -343,6 +344,8 @@ class Foosmen{
           ballsRecentlyHit[i] = 1;  // Flag collision has occured
           balls[i].kickBall( 2 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
           specialCollision(i);
+          if( balls[i].getSpeed() > 0 )
+            parent.statistics[2] += 1; // Ball hit
           continue;
         }// else-if ball hits bottom hit
       }// if ball is between the left and right edges of the hit buffer
@@ -369,6 +372,8 @@ class Foosmen{
           ballsRecentlyHit[i] = 1;  // Flag collision has occured
           balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
           specialCollision(i);
+          if( balls[i].getSpeed() > 0 )
+            parent.statistics[2] += 1; // Ball hit
           continue;
           
         }// if Ball is between the left hit buffer and center
@@ -384,6 +389,8 @@ class Foosmen{
               
           ballsRecentlyHit[i] = 1;  // Flag collision has occured
           balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          if( balls[i].getSpeed() > 0 )
+            parent.statistics[2] += 1; // Ball hit
           specialCollision(i);
           continue;
         }// if Ball is between the right hit buffer and center
@@ -422,20 +429,27 @@ class Foosmen{
     if( parent.debuffed )
       return;
       
+    if( parent.barRotation > minStopAngle && parent.barRotation < maxStopAngle ){
+      parent.statistics[4] += 1;
+      balls[ballID].setInactive();
+      hasBall = true;
+      parent.hasBall = true;
+      ballCaught[ballID] = 1;
+      ballsRecentlyHit[ballID] = 0;
+    }      
+    
     // If ball hits player from back, stop ball instead of catch
     if( parent.zoneFlag == 1 && rightHit ){
       balls[ballID].stopBall();
+      parent.statistics[3] += 1; // Balls stopped
       return;
     }else if( parent.zoneFlag == 0 && leftHit ){
       balls[ballID].stopBall();
+      parent.statistics[3] += 1;  // Balls stopped
       return;
     }
-    
-    balls[ballID].setInactive();
-    hasBall = true;
-    parent.hasBall = true;
-    ballCaught[ballID] = 1;
-    ballsRecentlyHit[ballID] = 0;
+
+
   }// catchBall
   
   void releaseBall(){
@@ -446,6 +460,7 @@ class Foosmen{
               balls[i].launchFireball( xPos - 50, yPos + playerHeight/2, parent.rotateVel, parent.yMove );
             else if(parent.zoneFlag == 0)
               balls[i].launchFireball( xPos + 50, yPos + playerHeight/2, parent.rotateVel, parent.yMove );
+            balls[i].specialSource = parent.getFoosbar();
           }
           else if( parent.hasSpecial && parent.tigers ){ //Throws normal ball and airball
             if(parent.zoneFlag == 1){
@@ -455,6 +470,7 @@ class Foosmen{
               balls[i].launchBall( xPos + 50, yPos + playerHeight/2, parent.rotateVel, parent.yMove );
               decoyBalls[i].launchDecoyball( xPos + 50, yPos + playerHeight/2, parent.rotateVel, -parent.yMove );  
             }
+            balls[i].specialSource = parent.getFoosbar();
           }
           else{ // Throws normal ball
             if(parent.zoneFlag == 1)
@@ -470,11 +486,15 @@ class Foosmen{
   }// releaseBall
   
   private void specialCollision(int ballID){
-    if( balls[ballID].isFireball() && parent.tigers )
+    balls[ballID].lastBarHit = parent.getFoosbar();
+    if( balls[ballID].isFireball() && parent.tigers && !parent.debuffed ){
       parent.setDebuff();
+      balls[ballID].specialSource.statistics[6] += 1; // Tigers set on fire
+    }
     if( decoyBalls[ballID].isDecoyball() && parent.dragons ){
       decoyBalls[ballID].setInactive();
       this.setConfused();
+      balls[ballID].specialSource.statistics[5] += 1; // Dragons confused
     }
   }//specialCollision()
   

@@ -64,6 +64,11 @@ class Foosbar{
   
   int screenWidth, screenHeight, borderWidth, borderHeight;
   
+  //Statistics
+  int numStatistics = 20;
+  byte[] statistics;
+  byte[] record;
+  
   /**
    * Setups a new Foosbar object.
    *
@@ -88,6 +93,8 @@ class Foosbar{
     teamColor = tColor;
     zoneFlag = zoneFlg;
     foosmenImages = images;
+    statistics = new byte[numStatistics];
+    record = loadBytes("data/records/"+this.getFoosbarID()+".dat");  
   }// CTOR
 
   /**
@@ -261,6 +268,27 @@ class Foosbar{
     if( hasBall )
       barRotation = 0; // Locks bar rotation if hasBall
   }// display
+
+  void displayStats(){
+    fill( 0, 0, 0, 150 );
+    rect(xPos, yMinTouchArea, barWidth, yMaxTouchArea);
+    
+    textAlign(CENTER);
+    fill(teamColor);
+    textFont(font,14);
+ 
+    if( zoneFlag == 1){
+
+      text( getFoosbarInfo(), xPos + barWidth/2, yMinTouchArea + 32);
+    }else if( zoneFlag == 0){
+      pushMatrix();
+      translate( xPos + barWidth/2, yMinTouchArea + yMaxTouchArea - 32);
+      rotate( PI );
+      text( getFoosbarInfo(),0, 0);
+      popMatrix();
+    }//
+    textAlign(LEFT);
+  }// displayStats
   
   void displayZones(){
     noStroke();
@@ -489,6 +517,14 @@ class Foosbar{
     return rotationEnabled;
   }// isRotationEnabled
   
+  boolean isDragon(){
+    return dragons;
+  }// isDragon
+  
+  boolean isTiger(){
+    return tigers;
+  }// isTiger
+  
   int getMinStopAngle(){
     for( int i = 0; i < nPlayers; i++ )
       return foosPlayers[i].getMinStopAngle();
@@ -501,5 +537,145 @@ class Foosbar{
     return 0;
   }// getMaxStopAngle
 
+  int getFoosbarID(){
+    if( (redTeamTop && zoneFlag == 0) || (!redTeamTop && zoneFlag == 1) ){
+      switch(nPlayers){
+        case(1):
+          return 0;
+        case(2):
+          return 1;
+        case(3):
+          return 3;
+        case(4):
+          return 2;
+        default:
+          return -1;    
+      }// switch      
+    }else if( (redTeamTop && zoneFlag == 1) || (!redTeamTop && zoneFlag == 0) ){
+      switch(nPlayers){
+        case(1):
+          return 4;
+        case(2):
+          return 5;
+        case(3):
+          return 7;
+        case(4):
+          return 6;
+        default:
+          return -1;    
+      }// switch      
+    }
+    return -1;
+  }// getFoosbarID
+  
+  
+  Foosbar getFoosbar(){
+    return this;
+  }// getFoosbar
+  
+  void updateFoosbarRecord(){
+    if( statistics[0] > record[0] )
+      record[0] = statistics[0];
+    if( statistics[1] > record[1] )
+      record[1] = statistics[1];
+    if( statistics[2] > record[2] )
+      record[2] = statistics[2];
+    if( statistics[3] > record[3] )
+      record[3] = statistics[3];
+    if( statistics[4] > record[4] )
+      record[4] = statistics[4];
+    if( statistics[5] > record[5] )
+      record[5] = statistics[5];
+    if( statistics[6] > record[6] )
+      record[6] = statistics[6];
+    saveBytes("data/records/"+this.getFoosbarID()+".dat", record);
+  }// updateFoosbarRecord
+  
+  String getFoosbarInfo(){
+    if( record == null ){
+      saveBytes("data/records/"+this.getFoosbarID()+".dat", statistics);
+      record = loadBytes("data/records/"+this.getFoosbarID()+".dat");  
+    }else
+      record = loadBytes("data/records/"+this.getFoosbarID()+".dat"); 
+    
+    String output = "";
+    
+    output += this;    
+    output += "Statistics\n";
+    output += "Goals scored: " + statistics[0];
+    if( statistics[0] > record[0] )
+      output += " NEW!";
+    output += "\nGoals scored on own team: " + statistics[1];
+    if( statistics[1] > record[1] )
+      output += " NEW!";
+    output += "\nBall hits: " + statistics[2];
+    if( statistics[2] > record[2] )
+      output += " NEW!";
+    output += "\nBall stops: " + statistics[3];
+    if( statistics[3] > record[3] )
+      output += " NEW!";
+    output += "\nBalls caught: " + statistics[4];
+    if( statistics[4] > record[4] )
+      output += " NEW!";
+    if( isTiger() )
+      output += "\nDragons Tricked: " + statistics[5];
+    if( statistics[5] > record[5] )
+      output += " NEW!";
+    if( isDragon() )
+      output += "\nTigers set on fire: " + statistics[6];
+    if( statistics[6] > record[6] )
+      output += " NEW!";
+    output += "\nBoosters used: " + statistics[7];
+    if( statistics[7] > record[7] )
+      output += " NEW!";
+      
+    output += "\n\n\nRecord\n\n";
+    output += "Goals scored: " + record[0] + "\n";
+    output += "Goals scored on own team: " + record[1] + "\n";
+    output += "Ball hits: " + record[2] + "\n";
+    output += "Ball stops: " + record[3] + "\n";
+    output += "Balls caught: " + record[4] + "\n";
+    if( isTiger() )
+      output += "Dragons Tricked: " + record[5] + "\n";
+    if( isDragon() )
+      output += "Tigers set on fire: " + record[6] + "\n";    
+    output += "\nBoosters used: " + record[7];
+    
+    return output;
+  }// getFoosbarInfo
+  
+  public String toString(){
+    String output = "";
+    
+    // Team Name
+    if( redTeamTop && zoneFlag == 0)
+      output += "Dragons ";
+    else if ( redTeamTop && zoneFlag == 1)
+      output += "Tigers ";
+    else if( !redTeamTop && zoneFlag == 1)
+      output += "Dragons ";
+    else if ( !redTeamTop && zoneFlag == 0)
+      output += "Tigers ";
+      
+    // Position
+    switch(nPlayers){
+      case(1):
+        output += "Goalkeeper\n";
+        break;
+      case(2):
+        output += "Defense\n";
+        break;
+      case(3):
+        output += "Attack\n";
+        break;
+      case(4):
+        output += "Midfield\n";
+        break;
+      default:
+        output += "UNKNOWN POSITION\n";
+        break;      
+    }// switch
+    return output;
+  }//toString()
 }// class Foosbar
 

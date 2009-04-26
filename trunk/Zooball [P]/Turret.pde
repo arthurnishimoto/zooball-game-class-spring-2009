@@ -7,10 +7,11 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto (anishimo)
- * Version: 0.1
+ * Version: 0.2
  *
  * Version Notes:
  * 3/20/09	- Initial version 0.1
+ * 4/26/09      - Properly tracks multiple ball loads
  * ---------------------------------------------
  */
  
@@ -211,10 +212,7 @@ class Turret{
   
   void shoot(){
     soundManager.playKick();
-    
-    if( parent.ballQueue == nBalls )
-       parent.ballQueue = 0;
-    
+        
     currentRecoil = recoil;
     
     float newXVel = fireVelocity*cos(radians(angle+180));
@@ -222,15 +220,23 @@ class Turret{
     float newXPos = xPos;
     float newYPos;
     
-    if( facingUp)
+    int thisQueue;
+    if( facingUp){
       newYPos = yPos-50;
-    else
+      thisQueue = parent.bottomQueue;
+      parent.bottomQueue--;
+    }else{
       newYPos = yPos+50;
-
-    balls[parent.ballQueue].launchBall(newXPos, newYPos, newXVel, newYVel);
+      thisQueue = parent.topQueue;
+      parent.topQueue--;
+    }
+    
+    for(int i = 0; i < balls.length; i++)
+      if( balls[i].isInactive() && thisQueue > 0 ){
+        balls[i].launchBall(newXPos, newYPos, newXVel, newYVel);
+        break;
+      }
     parent.ballsInPlay++;
-    parent.ballQueue++;
-    disable();
   }// shoot
   
   void setParentClass(PlayState newParent){

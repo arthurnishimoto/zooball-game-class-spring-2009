@@ -7,6 +7,7 @@
 class Game
 {
   private GameState state;
+  private IntroState introState;
   private LoadingState loadingState;
   private MenuState menuState;
   private PlayState playState;
@@ -26,7 +27,8 @@ class Game
   
   public Game( ) {
     debugFont = loadFont( "data/ui/fonts/Arial Bold-14.vlw" );
-   
+    
+    introState = new IntroState( this );
     loadingState = new LoadingState( this );
     menuState = new MenuState( this );
     playState = new PlayState( this );
@@ -34,13 +36,14 @@ class Game
 
     overState = new OverState( this );  // TEMP
     
+    introState.beginLoad( );
     menuState.beginLoad( );
     playState.beginLoad( );
     pausedState.beginLoad( );
     
     overState.beginLoad( ); // TEMP
     
-    setState( playState );
+    setState( overState );
     
     calculateScreenTransformation( );
     noStroke( );
@@ -118,6 +121,7 @@ class Game
     setState(state);
   }// reloadState
   
+  public IntroState getIntroState( ) { return introState; }
   public MenuState getMenuState( ) { return menuState; }
   public PlayState getPlayState( ) { return playState; }
   public PausedState getPausedState( ) { return pausedState; }

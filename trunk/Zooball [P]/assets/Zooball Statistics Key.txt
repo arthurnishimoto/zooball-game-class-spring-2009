@@ -1,0 +1,22 @@
+Foosbar ID
+0  Red Goalkeeper
+1  Red Defense
+2  Red Midfield
+3  Red Attack
+4  Yellow Goalkeeper
+5  Yellow Defense
+6  Yellow Midfield
+7  Yellow Attack
+
+statistics[]/record[]
+[0]  # of points scored
+[1]  # of points scored on own goal
+[2]  # of times ball hit
+[3]  # of time ball stopped
+[4]  # of times ball caught
+[5]  # of dragons confused
+[6]  # of tigers set on fire
+[7]  # of times booster used
+[8]  Fastest speed of kick
+[9]  Distance slid up/down
+[10] Distance spun

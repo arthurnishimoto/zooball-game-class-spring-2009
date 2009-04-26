@@ -41,7 +41,6 @@ void setup( ) {
   
   soundManager = new SoundManager(this);
   debugConsole = new DebugConsole();
-  
   game = new Game( );
 }
 
