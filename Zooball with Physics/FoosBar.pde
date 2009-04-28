@@ -11,7 +11,8 @@ public class FoosBar
   private Vector2D velocity[]; // x=angular, y=linear
   private double rotation[]; // angular rotation, normalized from -pi to pi
   private Vector2D forces; // I don't think this will actually be used
-  private double mass, momentOfInertia, friction;
+  private Vector2D friction; // Although this is probalby technically incorrect, allow for different friction in different directions
+  private double mass, momentOfInertia;
   // Foosmen Instances
   private double[] foosmenPositions;
   private double radius;
@@ -55,7 +56,7 @@ public class FoosBar
     rotation = new double[] { 0, 0 };
     forces = new Vector2D( 0, 0 );
     mass = 35 + foosmen * 5; // mass of bar plus mass of each foosman
-    friction = -0.5 * mass * 500; // gravity ~9.8m/s^2 what is that in px/s^2
+    friction = new Vector2D( -1 * mass * 500, -0.5 * mass * 500 ); // gravity ~9.8m/s^2 what is that in px/s^2
 
     double height = 0.5 * ( (A.y - B.y) + (D.y - C.y) );
     double width = 0.5 * ( (D.x - A.x) + (C.x - B.x) );
@@ -120,7 +121,7 @@ public class FoosBar
   private Vector2D acceleration( Vector2D position, Vector2D velocity ) {
     // sliding friction
     Vector2D direction = new Vector2D( velocity.x == 0 ? 0 : velocity.x < 0 ? -1 : 1, velocity.y == 0 ? 0 : velocity.y < 0 ? -1 : 1 );
-    return new Vector2D( direction.x * 2 * friction / momentOfInertia, direction.y * friction / mass );
+    return new Vector2D( direction.x * friction.x / momentOfInertia, direction.y * friction.y / mass );
   }
   
   public void drawDebug( ) {
