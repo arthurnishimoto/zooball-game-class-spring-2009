@@ -6,7 +6,10 @@
  */
 class PlayState extends GameState
 {
-  private float SCREEN_LEFT=0, SCREEN_RIGHT=1920, SCREEN_TOP=0, SCREEN_BOTTOM=1080, FIELD_LEFT=75, FIELD_RIGHT=1920-75, FIELD_TOP=25, FIELD_BOTTOM=1080-25, GOAL_SIZE=250;
+  private float SCREEN_LEFT=0, SCREEN_RIGHT=1920, SCREEN_TOP=0, SCREEN_BOTTOM=1080,
+                FIELD_LEFT=75, FIELD_RIGHT=SCREEN_RIGHT-75, FIELD_TOP=25, FIELD_BOTTOM=SCREEN_BOTTOM-25,
+                GOAL_SIZE=250, GOAL_TOP=FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), GOAL_BOTTOM=FIELD_BOTTOM-0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE),
+                ZONE_COUNT=8, ZONE_WIDTH=(FIELD_RIGHT-FIELD_LEFT)/ZONE_COUNT;
   private long lastUpdate = 0;
   private Image imgChalk, imgStadiumTop, imgStadiumBottom, imgStadiumLeft, imgStadiumRight, imgEnabledLED, imgDisabledLED;
   private CircularButton btnPauseTop, btnPauseBottom;
@@ -71,8 +74,8 @@ class PlayState extends GameState
   }
   
   public void test7( ) {
-    // Corner Test
-    ball.setPosition( 1920*0.5 + 300, 150 );
+    // Ball Between Two Boosters
+    ball.setPosition( 1920*0.5 + 200, 150 );
     ball.setVelocity( 0, 40 );
   }
 
@@ -110,18 +113,18 @@ class PlayState extends GameState
     vertWalls[4] = new Line( SCREEN_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), SCREEN_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE) );
     vertWalls[5] = new Line( SCREEN_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), SCREEN_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE) );
     boosters = new Booster[12];
-    boosters[0] = new BoosterStrip( 665, 220, 150, 75, new Vector2D( 0, 1500 ) );
-    boosters[1] = new BoosterStrip( 1920-665, 220, 150, 75, new Vector2D( 0, 1500 ) );
-    boosters[2] = new BoosterStrip( 665, 1080-220, 150, 75, new Vector2D( 0, -1500 ) );
-    boosters[3] = new BoosterStrip( 1920-665, 1080-220, 150, 75, new Vector2D( 0, -1500 ) );
-    boosters[4] = new BoosterStrip( 372, 315, 150, 75, new Vector2D( -900, 1200 ) );
-    boosters[5] = new BoosterStrip( 1920-372, 315, 150, 75, new Vector2D( 900, 1200 ) );
-    boosters[6] = new BoosterStrip( 372, 1080-315, 150, 75, new Vector2D( -900, -1200 ) );
-    boosters[7] = new BoosterStrip( 1920-372, 1080-315, 150, 75, new Vector2D(900, -1200 ) );
-    boosters[8] = new BoosterCorner( 75, 25, 80, 225, new Vector2D( 80, 80 ) );
-    boosters[9] = new BoosterCorner( 75, 1080-25, 80, -225, new Vector2D( 80, -80 ) );
-    boosters[10] = new BoosterCorner( 1920-75, 25, -80, 225, new Vector2D( -80, 80 ) );
-    boosters[11] = new BoosterCorner( 1920-75, 1080-25, -80, -225, new Vector2D( -80, -80 ) );
+    boosters[0] = new BoosterStrip( FIELD_LEFT + 3*ZONE_WIDTH, FIELD_TOP+150, 150, 75, new Vector2D( 0, 1500 ) );
+    boosters[1] = new BoosterStrip( FIELD_RIGHT - 3*ZONE_WIDTH, FIELD_TOP+150, 150, 75, new Vector2D( 0, 1500 ) );
+    boosters[2] = new BoosterStrip( FIELD_LEFT + 3*ZONE_WIDTH, FIELD_BOTTOM-150, 150, 75, new Vector2D( 0, -1500 ) );
+    boosters[3] = new BoosterStrip( FIELD_RIGHT - 3*ZONE_WIDTH, FIELD_BOTTOM-150, 150, 75, new Vector2D( 0, -1500 ) );
+    boosters[4] = new BoosterStrip( FIELD_LEFT + 1.5*ZONE_WIDTH, FIELD_TOP+300, 150, 75, new Vector2D( -1200, 900 ) );
+    boosters[5] = new BoosterStrip( FIELD_RIGHT - 1.5*ZONE_WIDTH, FIELD_TOP+300, 150, 75, new Vector2D( 1200, 900 ) );
+    boosters[6] = new BoosterStrip( FIELD_LEFT + 1.5*ZONE_WIDTH, FIELD_BOTTOM-300, 150, 75, new Vector2D( -1200, -900 ) );
+    boosters[7] = new BoosterStrip( FIELD_RIGHT - 1.5*ZONE_WIDTH, FIELD_BOTTOM-300, 150, 75, new Vector2D( 1200, -900 ) );
+    boosters[8] = new BoosterCorner( FIELD_LEFT, FIELD_TOP, 80, 225, new Vector2D( 80, 80 ) );
+    boosters[9] = new BoosterCorner( FIELD_LEFT, FIELD_BOTTOM, 80, -225, new Vector2D( 80, -80 ) );
+    boosters[10] = new BoosterCorner( FIELD_RIGHT, FIELD_TOP, -80, 225, new Vector2D( -80, 80 ) );
+    boosters[11] = new BoosterCorner( FIELD_RIGHT, FIELD_BOTTOM, -80, -225, new Vector2D( -80, -80 ) );
     imgEnabledLED = new Image( "ui/led/white/enabled.png" );
     imgEnabledLED.setSize( 25, 25 );
     imgDisabledLED = new Image( "ui/led/white/disabled.png" );
@@ -185,13 +188,13 @@ class PlayState extends GameState
       boosters[i].draw( );
     ball.draw( );
     bar.drawDebug( );
-    drawStadium( );
-    for ( int i = 0; i < horzWalls.length; i++ )
-      horzWalls[i].draw( );
-    for ( int i = 0; i < vertWalls.length; i++ )
-      vertWalls[i].draw( );
+    drawStadiumDebug( );
+    //for ( int i = 0; i < horzWalls.length; i++ )
+    //  horzWalls[i].draw( );
+    //for ( int i = 0; i < vertWalls.length; i++ )
+    //  vertWalls[i].draw( );
     //drawScore( );
-    drawButtons( );
+    //drawButtons( );
     drawDebugText( );
   }
 
@@ -200,15 +203,38 @@ class PlayState extends GameState
   }
 
   private void drawPitch( ) {
-    float x = 75, y = 25;
-    float width = (1920-75-75)/8, height = 1080-25-25;
-    for ( int i = 0; i < 8; i++ ) {
-      fill( 0x9E, 0xC6, 0x33 );
-      rect( x + width*i, y, width/2, height );
+    for ( int i = 0; i < ZONE_COUNT; i++ ) {
       fill( 0x79, 0xAE, 0x27 );
-      rect( x + width*(i + 0.5), y, width/2, height );
+      rect( FIELD_LEFT + i*ZONE_WIDTH, FIELD_TOP, ZONE_WIDTH, FIELD_BOTTOM-FIELD_TOP );
+      fill( 0x9E, 0xC6, 0x33 );
+      rect( FIELD_LEFT + i*ZONE_WIDTH, FIELD_TOP, ZONE_WIDTH*0.5, FIELD_BOTTOM-FIELD_TOP );
     }
+    fill( 0.5*(0x9E+0x79), 0.5*(0xC6+0xAE), 0.5*(0x33+0x27) );
+    quad( SCREEN_LEFT, GOAL_TOP, FIELD_LEFT, GOAL_TOP, FIELD_LEFT, GOAL_BOTTOM, SCREEN_LEFT, GOAL_BOTTOM );
+    quad( SCREEN_RIGHT, GOAL_TOP, FIELD_RIGHT, GOAL_TOP, FIELD_RIGHT, GOAL_BOTTOM, SCREEN_RIGHT, GOAL_BOTTOM );
     //imgChalk.draw( );
+  }
+  
+  private void drawStadiumDebug( ) {
+    fill( 0x72, 0x21, 0x11 );
+    quad( SCREEN_LEFT, SCREEN_TOP, FIELD_LEFT, FIELD_TOP, FIELD_RIGHT, FIELD_TOP, SCREEN_RIGHT, SCREEN_TOP );
+    quad( SCREEN_LEFT, SCREEN_BOTTOM, FIELD_LEFT, FIELD_BOTTOM, FIELD_RIGHT, FIELD_BOTTOM, SCREEN_RIGHT, SCREEN_BOTTOM );
+    quad( SCREEN_LEFT, SCREEN_TOP, FIELD_LEFT, FIELD_TOP, FIELD_LEFT, GOAL_TOP, SCREEN_LEFT, GOAL_TOP );
+    quad( SCREEN_LEFT, SCREEN_BOTTOM, FIELD_LEFT, FIELD_BOTTOM, FIELD_LEFT, GOAL_BOTTOM, SCREEN_LEFT, GOAL_BOTTOM );
+    quad( SCREEN_RIGHT, SCREEN_TOP, FIELD_RIGHT, FIELD_TOP, FIELD_RIGHT, GOAL_TOP, SCREEN_RIGHT, GOAL_TOP );
+    quad( SCREEN_RIGHT, SCREEN_BOTTOM, FIELD_RIGHT, FIELD_BOTTOM, FIELD_RIGHT, GOAL_BOTTOM, SCREEN_RIGHT, GOAL_BOTTOM );
+    // UIC
+    fill( 0xCC, 0, 0 );
+    rect( FIELD_LEFT, SCREEN_TOP+6, FIELD_RIGHT-FIELD_LEFT, FIELD_TOP-SCREEN_TOP-6-6 ); // Side Marker
+    rect( SCREEN_RIGHT, GOAL_TOP, (FIELD_RIGHT-SCREEN_RIGHT)*0.5, GOAL_SIZE ); // Goal
+    fill( 255 );
+    rect( FIELD_RIGHT, GOAL_TOP, 5, GOAL_SIZE );
+    // LSU
+    fill( 0xFD, 0xD0, 0x23 );
+    rect( FIELD_LEFT, FIELD_BOTTOM+6, FIELD_RIGHT-FIELD_LEFT, SCREEN_BOTTOM-FIELD_BOTTOM-6-6 ); // Side Marker
+    rect( SCREEN_LEFT, GOAL_TOP, (FIELD_LEFT-SCREEN_LEFT)*0.5, GOAL_SIZE ); // Goal
+    fill( 255 );
+    rect( FIELD_LEFT, GOAL_TOP, -5, GOAL_SIZE );
   }
 
   private void drawStadium( ) {
@@ -216,53 +242,6 @@ class PlayState extends GameState
     imgStadiumBottom.draw( );
     imgStadiumLeft.draw( );
     imgStadiumRight.draw( );
-  }
-
-  private void drawScore( ) {
-    float scoreSize = 25;
-    float scoreSpacing = 10;
-
-    float leftCenterX = 37.5;
-    float leftCenterY = 540;
-    int leftScore = 4;
-    float leftInitialY = leftScore > 1 ? scoreSize * leftScore + scoreSpacing * ( leftScore - 1) : scoreSize * leftScore;
-    pushMatrix( );
-    //translate( leftCenterX - scoreSize * 0.5, ( game.getHeight( ) - leftInitialY ) * 0.5 );
-    translate( leftCenterX - scoreSize * 0.5, leftCenterY + (5*scoreSize + 6*scoreSpacing)*0.5 );
-    for ( int i = 0; i < 7; i++ ) {
-      /*
-      //rect( 0, 0, scoreSize, scoreSize );
-       fill( 255 );
-       ellipse( scoreSize * 0.5, scoreSize * 0.5, scoreSize, scoreSize );
-       fill( 0xFD, 0xD0, 0x23 );
-       ellipse( scoreSize * 0.5, scoreSize * 0.5, scoreSize - 8, scoreSize - 8 );
-       */
-      if ( i < leftScore ) imgEnabledLED.draw( );
-      else imgDisabledLED.draw( );
-      translate( 0, -scoreSize -scoreSpacing );
-    }
-    popMatrix( );
-
-    float rightCenterX = 1882.5;
-    float rightCenterY = 540;
-    int rightScore = 6;
-    //float rightInitialY = rightScore > 1 ? scoreSize * rightScore + scoreSpacing * ( rightScore - 1) : scoreSize * rightScore;
-    pushMatrix( );
-    //translate( rightCenterX - scoreSize * 0.5, ( game.getHeight( ) - rightInitialY ) * 0.5 );
-    translate( rightCenterX - scoreSize * 0.5, rightCenterY - (7*scoreSize + 6*scoreSpacing)*0.5 );
-    for ( int i = 0; i < 7; i++ ) {
-      /*
-      //rect( 0, 0, scoreSize, scoreSize );
-       fill( 255 );
-       ellipse( scoreSize * 0.5, scoreSize * 0.5, scoreSize, scoreSize );
-       fill( 0xCC, 0x00, 0x00 );
-       ellipse( scoreSize * 0.5, scoreSize * 0.5, scoreSize - 8, scoreSize - 8 );
-       */
-      if ( i < rightScore ) imgEnabledLED.draw( );
-      else imgDisabledLED.draw( );
-      translate( 0, scoreSize + scoreSpacing );
-    }
-    popMatrix( );
   }
 
   private void drawButtons( ) {
