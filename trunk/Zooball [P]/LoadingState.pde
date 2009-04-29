@@ -55,7 +55,7 @@ class LoadingState extends GameState
   private float getOverlayAlpha( ) {
     float FULL_CYCLE = 2.0;
     float HALF_CYCLE = 1.0;
-    float seconds = timer.getSecondsActive( );
+    float seconds = (float)timer.getSecondsActive( );
     float position = seconds - floor( seconds / FULL_CYCLE ) * FULL_CYCLE;
     if ( position > HALF_CYCLE)
       return map( position, HALF_CYCLE, FULL_CYCLE, 180, 0 );

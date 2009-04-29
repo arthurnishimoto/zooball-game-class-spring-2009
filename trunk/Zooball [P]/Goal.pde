@@ -193,7 +193,7 @@ class Goal{
     onFire = true;
     fireX = x;
     fireY = y;
-    fireTimer = fireDuration + parent.timer.getSecondsActive();
+    fireTimer = fireDuration + (float)parent.timer.getSecondsActive();
   }// setOnFire
   
   int getScore(){
