@@ -33,7 +33,7 @@ class Turret{
   color pressed_cl = color( 255, 0, 0 );
   color enabled_cl = color( 0, 255, 0 );
   
-  float fireVelocity = 10;
+  float fireVelocity = 555;
   float recoil = 50;
   float currentRecoil = 0;
   int shotNo = 0;

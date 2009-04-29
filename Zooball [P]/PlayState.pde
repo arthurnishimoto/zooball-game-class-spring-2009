@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 0.9
+ * Version: 0.9.5
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -83,6 +83,9 @@
  *              - Foosbars now track and save game statistics
  *              - Ball launcher now properly tracks which balls are queued up for firing - now multi-ball supported.
  *              - Early menus added
+ * 4/26/09      - Added mouse recording (for tutorial)
+ * 4/29/09      - Version 0.9.5
+ *              - Physics engine implementation - Phase One - Balls and Walls
  *
  * Notes:
  *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?
@@ -113,7 +116,7 @@ boolean demoMode = true;
 int nBalls = 1;
 int maxScore = 5;
 float tableFriction = 0.01; // Default = 0.01
-int maxBallSpeed = 15;
+int maxBallSpeed = 400;
 int rotateInc = 15; // Global rotation increment for artwork
 
 int borderWidth = 0;
@@ -154,6 +157,18 @@ FoosbarManager barManager;
 
 class PlayState extends GameState
 {
+  private float SCREEN_LEFT=0, SCREEN_RIGHT=1920, SCREEN_TOP=0, SCREEN_BOTTOM=1080,
+                FIELD_LEFT=100, FIELD_RIGHT=SCREEN_RIGHT-100, FIELD_TOP=100, FIELD_BOTTOM=SCREEN_BOTTOM-100,
+                GOAL_SIZE=300, GOAL_TOP=FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), GOAL_BOTTOM=FIELD_BOTTOM-0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE),
+                ZONE_COUNT=8, ZONE_WIDTH=(FIELD_RIGHT-FIELD_LEFT)/ZONE_COUNT;
+  private long lastUpdate = 0;
+  //private Image imgChalk, imgStadiumTop, imgStadiumBottom, imgStadiumLeft, imgStadiumRight, imgEnabledLED, imgDisabledLED;
+  //private CircularButton btnPauseTop, btnPauseBottom;
+  //private Ball ball;
+  //private Booster[] boosters;
+  private Line[] horzWalls, vertWalls, goalWalls;
+  //private FoosBar bar;
+  
   private CircularButton btnPauseTop, btnPauseBottom;
   private Image imgPitch, border, imgLines, imgNets, logo;
   int ballsInPlay = 0;
@@ -166,6 +181,39 @@ class PlayState extends GameState
   }// CTOR
   
   public void load( ) {
+    Vector2D center = new Vector2D( game.getWidth()*0.5, game.getHeight()*0.5 );
+    //bar = new FoosBar( 1920*0.5, 1080*0.5, 3 );
+    // example: redirected to goal
+    //ball = new Ball( new Vector2D( center.x - 200, 220 - 50 ), new Vector2D( 250, 0 ), 2.5, 27.5, 0.1 );
+    // example: stuck between two boosters
+    //ball = new Ball( 1920-665-(75*0.5), 75 );
+    //ball.setVelocity( 8.5, 55 );
+    // example: won't get stuck in corner
+    //ball = new Ball( new Vector2D( 1920-400, 170 ), new Vector2D( 78, -32 ), 2.5, 27.5, 0.1 );
+    //ball = new Ball( 1920-400, 170 );
+    //ball.setVelocity( 78, -32 );
+    //ball = new Ball( 100, 600 );
+    // HORIZONTAL "WALLS"
+    horzWalls = new Line[6];
+    // top and bottom of field
+    horzWalls[0] = new Line( FIELD_LEFT, FIELD_TOP, FIELD_RIGHT, FIELD_TOP );
+    horzWalls[1] = new Line( FIELD_LEFT, FIELD_BOTTOM, FIELD_RIGHT, FIELD_BOTTOM );
+    // top and bottom of goals
+    horzWalls[2] = new Line( SCREEN_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), FIELD_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE) );
+    horzWalls[3] = new Line( SCREEN_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE), FIELD_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE) );
+    horzWalls[4] = new Line( SCREEN_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), FIELD_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE) );
+    horzWalls[5] = new Line( SCREEN_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE), FIELD_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE) );
+    // VERTICAL "WALLS"
+    vertWalls = new Line[6];
+    // left and right of field
+    vertWalls[0] = new Line( FIELD_LEFT, FIELD_TOP, FIELD_LEFT, FIELD_TOP + 0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE) );
+    vertWalls[1] = new Line( FIELD_LEFT, FIELD_TOP + 0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE), FIELD_LEFT, FIELD_BOTTOM );
+    vertWalls[2] = new Line( FIELD_RIGHT, FIELD_TOP, FIELD_RIGHT, FIELD_TOP + 0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE) );
+    vertWalls[3] = new Line( FIELD_RIGHT, FIELD_TOP + 0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE), FIELD_RIGHT, FIELD_BOTTOM );
+    // left and right of goals
+    vertWalls[4] = new Line( SCREEN_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), SCREEN_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE) );
+    vertWalls[5] = new Line( SCREEN_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), SCREEN_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE) );
+    
     ballsInPlay = 0;
     topQueue = 0;
     bottomQueue = 0;
@@ -190,6 +238,8 @@ class PlayState extends GameState
     for ( int i = 0; i < max; i++ )
       r.nextDouble( ); 
     
+    
+    
     yellowTeamWins = false;
     redTeamWins = false;
     
@@ -212,7 +262,7 @@ class PlayState extends GameState
       balls[i] = new Ball( -100, -100, 50, i, balls, screenDimensions, ballImages);
       decoyBalls[i] = new Ball( -100, -100, 50, i, balls, screenDimensions, ballImages);
     }
-
+    
     // Loads Red Foosman artwork
     //filepath = "data/objects/foosmen_red/";
     //filename = "red_top_";
@@ -268,6 +318,44 @@ class PlayState extends GameState
     endLoad( );
   }// load()
   
+  public void update( ) {
+    super.update( );
+    long time = timer.getMicrosecondsActive( );
+    int multiSample = 10;
+    double dt = (time - lastUpdate) / 1000000.0 / multiSample;
+    for ( int i = 0; i < multiSample; i++ ) 
+      step( dt );
+    lastUpdate = time;
+  }// update
+  
+  private void step( double dt ) {
+    // ADD FORCES
+    //for ( int i = 0; i < boosters.length; i++ )
+    //  if ( boosters[i].contains( ball.getPosition( ) ) )
+    //    ball.addForce( boosters[i].getForce( ) );
+      
+    for(int i = 0; i < nBalls; i++ ){
+      balls[i].clearForces( );
+
+      // STEP FORWARD
+      balls[i].step( dt );
+      //bar.step( dt );
+      
+      // DO BALL/WALL COLLISIONS
+      balls[i].clearWallContacts( );
+      for( int j = 0; j < horzWalls.length; j++ )
+        balls[i].collide( horzWalls[j] );
+      for( int j = 0; j < vertWalls.length; j++ )
+        balls[i].collide( vertWalls[j] );
+        
+      // DO FOOSBAR/BALL COLLISIONS
+      //bar.collide( ball );
+    }
+    // DO FOOSBAR/WALL COLLISIONS
+    //bar.collide( horzWalls[0] );
+    //bar.collide( horzWalls[1] );
+  }// step
+  
   public void enter(){
     timer.setActive( true );
     soundManager.stopSounds();
@@ -321,6 +409,8 @@ class PlayState extends GameState
     drawDebugText();
     
     if(debugText){
+      drawStadiumDebug( );
+      
       fill(0,0,0,150);
       stroke(0,0,0);
       rect(0,0, 400, 16*12 );
@@ -361,6 +451,28 @@ class PlayState extends GameState
     imgLines.draw();
     logo.draw();
   }// drawBackGround()
+  
+  private void drawStadiumDebug( ) {
+    fill( 0x72, 0x21, 0x11 );
+    quad( SCREEN_LEFT, SCREEN_TOP, FIELD_LEFT, FIELD_TOP, FIELD_RIGHT, FIELD_TOP, SCREEN_RIGHT, SCREEN_TOP );
+    quad( SCREEN_LEFT, SCREEN_BOTTOM, FIELD_LEFT, FIELD_BOTTOM, FIELD_RIGHT, FIELD_BOTTOM, SCREEN_RIGHT, SCREEN_BOTTOM );
+    quad( SCREEN_LEFT, SCREEN_TOP, FIELD_LEFT, FIELD_TOP, FIELD_LEFT, GOAL_TOP, SCREEN_LEFT, GOAL_TOP );
+    quad( SCREEN_LEFT, SCREEN_BOTTOM, FIELD_LEFT, FIELD_BOTTOM, FIELD_LEFT, GOAL_BOTTOM, SCREEN_LEFT, GOAL_BOTTOM );
+    quad( SCREEN_RIGHT, SCREEN_TOP, FIELD_RIGHT, FIELD_TOP, FIELD_RIGHT, GOAL_TOP, SCREEN_RIGHT, GOAL_TOP );
+    quad( SCREEN_RIGHT, SCREEN_BOTTOM, FIELD_RIGHT, FIELD_BOTTOM, FIELD_RIGHT, GOAL_BOTTOM, SCREEN_RIGHT, GOAL_BOTTOM );
+    // UIC
+    //fill( 0xCC, 0, 0 );
+    //rect( FIELD_LEFT, SCREEN_TOP+6, FIELD_RIGHT-FIELD_LEFT, FIELD_TOP-SCREEN_TOP-6-6 ); // Side Marker
+    //rect( SCREEN_RIGHT, GOAL_TOP, (FIELD_RIGHT-SCREEN_RIGHT)*0.5, GOAL_SIZE ); // Goal
+    //fill( 255 );
+    //rect( FIELD_RIGHT, GOAL_TOP, 5, GOAL_SIZE );
+    // LSU
+    //fill( 0xFD, 0xD0, 0x23 );
+    //rect( FIELD_LEFT, FIELD_BOTTOM+6, FIELD_RIGHT-FIELD_LEFT, SCREEN_BOTTOM-FIELD_BOTTOM-6-6 ); // Side Marker
+    //rect( SCREEN_LEFT, GOAL_TOP, (FIELD_LEFT-SCREEN_LEFT)*0.5, GOAL_SIZE ); // Goal
+    //fill( 255 );
+    //rect( FIELD_LEFT, GOAL_TOP, -5, GOAL_SIZE );
+  }// drawStadiumDebug( )
   
   public String toString( ) { return "PlayState"; }
   
@@ -497,5 +609,63 @@ class PlayState extends GameState
     //fill(0,0,0, 150);
     //rect( 
   }// demoMode
+  
+  public void test1( ) {
+    // Front on ball/bar collision -- with boosters and two "goals"
+    balls[0].setPosition( 1920*0.5+350, 1080*0.5 - 400 );
+    balls[0].setVelocity( -350, 50 );
+    //bar.setPosition( 1920*0.5, 1080*0.5 - 275 );
+    //bar.setVelocity( -3, 300 );
+    //bar.setRotation( Math.PI*0.6 );
+  }
+  
+  public void test2( ) {
+    // Corner on ball/bar collision
+    balls[0].setPosition( 1920*0.5+75, 1080-180 );
+    balls[0].setVelocity( 0, 0 );
+    //bar.setPosition( 1920*0.5, 1080*0.5 );
+    //bar.setVelocity( -0.9, 250 );
+    //bar.setRotation( 0 );
+  }
+  
+  public void test3( ) {
+    // Bar/Ball/Wall - Ball Between Players
+    balls[0].setPosition( 1920*0.5, 1080-450 );
+    balls[0].setVelocity( 0, 0 );
+    //bar.setPosition( 1920*0.5, 1080*0.5 );
+    //bar.setVelocity( 0, 500 );
+    //bar.setRotation( 0 );
+  }
+  
+  public void test4( ) {
+    // Bar/Ball/Wall - Bar Side
+    balls[0].setPosition( 1920*0.5, 1080-50 );
+    balls[0].setVelocity( 0, 0 );
+    //bar.setPosition( 1920*0.5, 1080*0.5 );
+    //bar.setVelocity( 0, 800 );
+    //bar.setRotation( 0 );
+  }
+  
+  public void test5( ) {
+    // Bar/Ball/Wall - Bar Corner
+    balls[0].setPosition( 1920*0.5+80, 1080-50 );
+    balls[0].setVelocity( 0, 0 );
+    //bar.setPosition( 1920*0.5, 1080*0.5 );
+    //bar.setVelocity( -1.3, 555 );
+    //bar.setRotation( 0 );
+  }
+  
+  public void test6( ) {
+    // Corner Test
+    balls[0].setPosition( 1920-300, 100 );
+    balls[0].setVelocity( 100, -40 );
+  }
+  
+  public void test7( ) {
+    // Ball Between Two Boosters
+    balls[0].setPosition( 1920*0.5 + 200, 150 );
+    balls[0].setVelocity( 0, 40 );
+  }
+  
 }// class PlayState
 

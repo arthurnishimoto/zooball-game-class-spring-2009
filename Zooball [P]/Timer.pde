@@ -6,9 +6,9 @@
  */
 class Timer {
   private boolean active;
-  private int activeTime;
-  private int inactiveTime;
-  private int lastTime;
+  private long activeTime;
+  private long inactiveTime;
+  private long lastTime;
 
   /**
    * Creates a new Timer object.
@@ -23,7 +23,7 @@ class Timer {
    * millisecond precision, but not necessarily millisecond accuracy. No guarantees are made about
    * how frequently values change.
    */
-  private int getTime( ) { return (int) ( System.nanoTime( ) / 1000000 ); }
+  private long getTime( ) { return System.nanoTime( ) / 1000; }
   
   public void reset( ) {
     active = false;
@@ -33,7 +33,7 @@ class Timer {
   }
 
   public void update( ) {
-    int time = getTime( );
+    long time = getTime( );
 
     if ( active ) activeTime += ( time - lastTime );
     else inactiveTime += ( time - lastTime );
@@ -46,7 +46,7 @@ class Timer {
    * update occurs.
    */
   public void setActive( boolean active ) {
-    int time = getTime( );
+    long time = getTime( );
 
     if ( active && !this.active ) {
       inactiveTime += ( time - lastTime );
@@ -61,14 +61,14 @@ class Timer {
   }
   public boolean isActive( ) { return active; }
 
-  private String timeToString( int time ) { return String.format( "%02d:%04.1f", time / 60000, ( time % 60000 ) / 1000.0f ); }
+  private String timeToString( long time ) { return String.format( "%02d:%04.1f", time / 60000000, ( time % 60000000 ) / 1000.0f ); }
   
-  public int getMillisecondsActive( ) { return activeTime; }
-  public float getSecondsActive( ) { return activeTime / 1000.0f; }
+  public long getMicrosecondsActive( ) { return activeTime; }
+  public double getSecondsActive( ) { return activeTime / 1000000.0f; }
   public String getTimeActive( ) { return timeToString( activeTime ); }
   
-  public int getMillisecondsInactive( ) { return inactiveTime; }
-  public float getSecondsInactive( ) { return inactiveTime / 1000.0f; }
+  public long getMicrosecondsInactive( ) { return inactiveTime; }
+  public double getSecondsInactive( ) { return inactiveTime / 1000000.0f; }
   public String getTimeInactive( ) { return timeToString( inactiveTime ); }
 }
 
