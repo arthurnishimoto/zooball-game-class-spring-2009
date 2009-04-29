@@ -27,10 +27,16 @@ public class BoosterCorner extends Booster
   }
   
   public void draw( ) {
-    super.draw( );
-  }// draw
+    fill( 0.5*(0x9E+0x79), 0.5*(0xC6+0xAE), 0.5*(0x33+0x27) );
+    //fill( 235 );
+    beginShape( );
+    for (int i = 0; i < points.length; i++ )
+      vertex( (float)points[i].x, (float)points[i].y );
+    endShape(CLOSE);
+  }
   
   public void drawDebug( ) {
+    super.draw( );
     // DEBUG
     fill( 255 );
     ellipse( (float)center.x, (float)center.y, 5, 5 );
@@ -43,5 +49,5 @@ public class BoosterCorner extends Booster
     ellipse( (float)center.x, (float)center.y, diameter, diameter );
     noStroke( );
     // END DEBUG
-  }// draw  
+  }
 }
