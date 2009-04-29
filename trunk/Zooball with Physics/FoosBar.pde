@@ -24,13 +24,11 @@ public class FoosBar
     BALL_RADIUS = 25;
     BALL_DIAMETER = 50;
     A = new Vector2D( -16, 40 );
-    //B = new Vector2D( -7, -94 );
     B = new Vector2D( -7, -106 );
-    //C = new Vector2D( 7, -94 );
     C = new Vector2D( 7, -106 );
     D = new Vector2D( 16, 40 );
     //PLAY_FIELD_Z = -73; // This seemed more accurate based on the renders
-    PLAY_FIELD_Z = -68;
+    PLAY_FIELD_Z = -68; // This allows for a wider cross-section
     double a = -PLAY_FIELD_Z;
     double h = C.magnitude( );
     MIN_ROTATION = -Math.acos( a/h );
@@ -56,14 +54,11 @@ public class FoosBar
     rotation = new double[] { 0, 0 };
     forces = new Vector2D( 0, 0 );
     mass = 35 + foosmen * 5; // mass of bar plus mass of each foosman
-    friction = new Vector2D( -1 * mass * 500, -0.5 * mass * 500 ); // gravity ~9.8m/s^2 what is that in px/s^2
+    friction = new Vector2D( -2 * mass * 500, -0.5 * mass * 500 ); // gravity ~9.8m/s^2 what is that in px/s^2
 
     double height = 0.5 * ( (A.y - B.y) + (D.y - C.y) );
     double width = 0.5 * ( (D.x - A.x) + (C.x - B.x) );
     momentOfInertia = mass * ( height*height + width*width ) / 12;
-    
-    //println("Mass: " + mass);
-    //println("I: " + momentOfInertia);
   }
 
   public void step( double dt ) {
@@ -107,13 +102,11 @@ public class FoosBar
     velocity[next].add( a4 );
 
     // Velocity might converge to something like, 0.038590812... radians/s so just kill it.
-    if ( Math.abs( velocity[next].x ) < 0.5 && velocity[current].x == velocity[next].x )
+    if ( velocity[current].x == velocity[next].x && Math.abs( velocity[next].x ) < 0.5 )
       velocity[next].x = 0;
     // Velocity might converge to something like, 0.038590812... px/s so just kill it.
-    if ( Math.abs( velocity[next].y ) < 2 && velocity[current].y == velocity[next].y )
+    if ( velocity[current].y == velocity[next].y && Math.abs( velocity[next].y ) < 2 )
       velocity[next].y = 0;
-      
-    //println( velocity[next] );
 
     current = next;
   }
@@ -135,23 +128,25 @@ public class FoosBar
     Vector2D d = rotatePoint( D, sinTheta, cosTheta );
     pushMatrix( );
     translate( (float)position[current].x, (float)position[current].y );
-    strokeWeight( 1 );
     fill( 0, 0 );
+    //*
     stroke( 255, 225, 0 );
     ellipse( 0, 0, (float)(radius+radius), (float)(radius+radius) );
     stroke( 255, 0, 0 );
     rect( (float)MIN_OFFSET, (float)(foosmenPositions[0]-FOOSMAN_HALF_WIDTH), (float)(MAX_OFFSET-MIN_OFFSET), (float)(foosmenPositions[foosmenPositions.length-1]-foosmenPositions[0]+FOOSMAN_WIDTH) );
     stroke( 255, 255, 0 );
     rect( (float)(MIN_OFFSET-BALL_RADIUS), (float)(foosmenPositions[0]-FOOSMAN_HALF_WIDTH-BALL_RADIUS), (float)(MAX_OFFSET-MIN_OFFSET+BALL_DIAMETER), (float)(foosmenPositions[foosmenPositions.length-1]-foosmenPositions[0]+FOOSMAN_WIDTH+BALL_DIAMETER) );
+    //*/
     for ( int i = 0; i < foosmenPositions.length; i++ ) {
       pushMatrix( );
       translate( 0, (float)foosmenPositions[i] );
+      //*
       // connections
       stroke( 255, 0, 255 );
       line( (float)a.x, (float)FOOSMAN_HALF_WIDTH, (float)b.x, (float)FOOSMAN_HALF_WIDTH );
       line( (float)c.x, (float)FOOSMAN_HALF_WIDTH, (float)d.x, (float)FOOSMAN_HALF_WIDTH );
       line( (float)a.x, (float)-FOOSMAN_HALF_WIDTH, (float)b.x, (float)-FOOSMAN_HALF_WIDTH );
-      line( (float)c.x, (float)-FOOSMAN_HALF_WIDTH, (float)d.x, (float)-FOOSMAN_HALF_WIDTH );
+      line( (float)c.x, (float)-FOOSMAN_HALF_WIDTH, (float)d.x, (float)-FOOSMAN_HALF_WIDTH );      
       if ( rotation[current] < 0.5*Math.PI && rotation[current] > -0.5*Math.PI ) {
         // bottom
         stroke( 0, 0, 255 );
@@ -180,18 +175,20 @@ public class FoosBar
         line( (float)c.x, (float)FOOSMAN_HALF_WIDTH, (float)b.x, (float)FOOSMAN_HALF_WIDTH );
         line( (float)b.x, (float)-FOOSMAN_HALF_WIDTH, (float)b.x, (float)FOOSMAN_HALF_WIDTH );
       }
+      //*/
       // intersection
       double[] x = intersectionFoosmanX( );
       if( x != null ) {
         stroke( 255, 0, 0 );
         line( (float)(x[0]-position[current].x), (float)-FOOSMAN_HALF_WIDTH, (float)(x[0]-position[current].x), (float)FOOSMAN_HALF_WIDTH );
+        line( (float)(x[0]-position[current].x), (float)FOOSMAN_HALF_WIDTH, (float)(x[1]-position[current].x), (float)FOOSMAN_HALF_WIDTH );
+        line( (float)(x[0]-position[current].x), (float)-FOOSMAN_HALF_WIDTH, (float)(x[1]-position[current].x), (float)-FOOSMAN_HALF_WIDTH );
         line( (float)(x[1]-position[current].x), (float)-FOOSMAN_HALF_WIDTH, (float)(x[1]-position[current].x), (float)FOOSMAN_HALF_WIDTH );
         stroke( 255, 255, 0 );
         rect( (float)(x[0]-position[current].x-BALL_RADIUS), (float)(-FOOSMAN_HALF_WIDTH-BALL_RADIUS), (float)((x[1]-position[current].x)-(x[0]-position[current].x)+BALL_DIAMETER), (float)(FOOSMAN_WIDTH+BALL_DIAMETER) );
       }
       popMatrix( );
     }
-    strokeWeight( 1 );
     noStroke( );
     popMatrix( );
   }
@@ -201,18 +198,18 @@ public class FoosBar
   }
   
   // TODO: currently this only works on horizontal wall, generalize it to vertical or angled
-  public void collide( Line wall ) {
+  public boolean collide( Line wall ) {
     double pY = wall.getP1( ).y;
     double nY = position[current].y - pY; // normal pointing towards the ball
     
     // check for interpenetration
     if ( nY*nY > radius*radius )
-      return;
+      return false;
     
     // "A collision occurs when a point on one body touches a point on another body with a
     //  negative relative normal velocity."
     if ( velocity[current].y * nY >= 0 ) // relative normal velocity, the wall isn't moving
-       return;
+       return false;
      
     double elasticity = 0.2; // 1 = elastic, 0 = plastic
     //      -(1 + e) * v . n
@@ -226,18 +223,20 @@ public class FoosBar
     
     nY = nY == 0 ? 0 : nY > 0 ? 1 : -1; // normalize nY
     position[current].y = pY + nY * radius;
+    
+    return true;
   }
   
-  public void collide( Ball ball ) {
+  public boolean collide( Ball ball ) {
     // players are rotated above the play field
     if ( isAbovePlayField( ) )
-      return;
+      return false;
 
     double ballRight = ball.getX( ) + ball.getRadius( );
     double ballLeft = ball.getX( ) - ball.getRadius( );
     // ball outside of bar's reach
     if ( ( ballLeft > position[current].x + MAX_OFFSET ) || ( ballRight < position[current].x + MIN_OFFSET ) )
-      return;
+      return false;
     
     double ballTop = ball.getY( ) - ball.getRadius( );
     double ballBottom = ball.getY( ) + ball.getRadius( );
@@ -245,14 +244,14 @@ public class FoosBar
     double barBottom = position[current].y + foosmenPositions[foosmenPositions.length-1] + FOOSMAN_HALF_WIDTH;
     // ball is above or below bar's players
     if( ballBottom < barTop || ballTop > barBottom )
-      return;
+      return false;
  
     double[] foosmanX = intersectionFoosmanX( ); // the previous checks are to avoid getting the intersection when possible
     double barLeft = foosmanX[0];
     double barRight = foosmanX[1];
     // ball is left or right of bar's players
     if ( ballRight < barLeft || ballLeft > barRight )
-      return;
+      return false;
       
     //  We now know the intersection of the foosmen with the playing field, and that
     //  the ball is inside the smallest bounding box that includes all players.
@@ -357,7 +356,7 @@ public class FoosBar
         Vector2D p = points[0];
         double cd2 = Vector2D.sub( points[0], ballCenter ).magnitudeSquared( ); // cd2 = (closest distance)^2
         // check to see if point[1] is closer
-        double d2 = Vector2D.sub( points[1], ballCenter ).magnitudeSquared( ); // d2 = distance^p
+        double d2 = Vector2D.sub( points[1], ballCenter ).magnitudeSquared( ); // d2 = distance^2
         if ( d2 < cd2 ) {
           p = points[1];
           cd2 = d2;
@@ -379,6 +378,31 @@ public class FoosBar
         if ( cd2 <= ball.getRadius( ) * ball.getRadius( ) ) {
           //println("BALL IS TOUCHING FOOSMAN " + (i+1) + " AT TIME: " + game.state.timer.getSecondsActive( ) );
           
+          //*
+          /////////    HACK FOR FOOSMAN COMING DOWN ON TOP OF BALL    \\\\\\\\\\
+          
+          int previous = current ^ 1;
+          
+          if ( rotation[previous] > MAX_ROTATION ) {
+            // Foosman just came down from the left side (its moving to the right) and is inside the ball.
+            // So move the left side of the ball to the right side of the foosman.
+            ballCenter.x = points[3].x + ball.getRadius( );
+            ball.setPosition( ballCenter.x, ballCenter.y );
+            p = points[3]; // change the point of collision
+          }
+          // foosman just came down from the left side
+          else if ( rotation[previous] < MIN_ROTATION ) {
+            // Foosman just came down from the right side (its moving to the left) and is inside the ball.
+            // So move the right side of the ball to the left side of the foosman.
+            ballCenter.x = points[2].x - ball.getRadius( );
+            ball.setPosition( ballCenter.x, ballCenter.y );
+            p = points[3]; // change the point of collision
+          }
+          
+          /////////                     END HACK                      \\\\\\\\\\
+          //*/
+          
+          
           // So now we know that the ball and the player are either touching or interpentrating.
           // We need to get their relative normal velocity. If they are moving apart, there is no
           // collision.
@@ -395,7 +419,7 @@ public class FoosBar
           // "A collision occurs when a point on one body touches a point on another body with a
           //  negative relative normal velocity."
           if ( vBF.dot( n ) >= 0 ) // relative normal velocity
-            return;
+            return false;
             
           //println("BALL IS COLLIDING WITH FOOSMAN " + (i+1) + " AT TIME: " + game.state.timer.getSecondsActive( ) );
           
@@ -410,7 +434,6 @@ public class FoosBar
               //        -(1 + e) * vBF . n
               //  j = ------------------------
               //      n . n  * ( 1/mB + 1/mF )
-              // impulse = Vector2D.scale( new Vector2D( 0, vBF.y ), -( 1 + elasticity ) ).dot( nY ) / ( Vector2D.dot( nY, nY ) * ( 1/mass + 1/ball.getMass( ) ) );
               impulse = vBF.y * -( 1 + elasticity ) * n.y / ( n.y * n.y * ( 1/mass + 1/ball.getMass( ) ) );
               //              j
               //  vB2 = vB1 + -- * n
@@ -424,9 +447,10 @@ public class FoosBar
             else {
               // The ball is touching the wall in the direction we're trying to hit it. We need to apply some trickery.
               // Trickery 1: Lower the elasticity for the ball collision.
+              // impulse = vBF.x * -( 1 + elasticity ) * n.x / ( n.x * n.x / ball.getMass( ) + ( rFPdotN * rFPdotN / momentOfInertia ) );
               impulse = vBF.y * -( 1 + 0 ) * n.y / ( n.y * n.y * ( 1/mass + 1/ball.getMass( ) ) );
-              // Trickery 2: Have the foosman hit a horizontal "wall" at the point on the ball that it really.
               ballVelocity.y = ballVelocity.y + n.y * impulse / ball.getMass( );
+              // Trickery 2: Have the foosman hit a horizontal "wall" at the point on the ball that it really.
               double nY = n.y == 0 ? 0 : n.y > 0 ? 1 : -1; // normalize nY
               double pY = ballCenter.y + ball.getRadius( ) * -nY;
               collide( new Line(0, pY, 1920, pY ) );
@@ -434,31 +458,45 @@ public class FoosBar
             }
           }
           if ( n.x != 0 ) {
-            //                 -(1 + e) * vBF . n
-            //  j = ------------------------------------------
-            //      n . n  * ( 1/mB ) + ( ( rFP . n )^2 ) / If
             double rFPdotN = rFPx * n.x; // ignores z of rFP
-            impulse = vBF.x * -( 1 + elasticity ) * n.x / ( n.x * n.x / ball.getMass( ) + ( rFPdotN * rFPdotN / momentOfInertia ) );
-            //              j
-            //  vB2 = vB1 + -- * n
-            //              mB
-            ballVelocity.x = ballVelocity.x + n.x * impulse / ball.getMass( );
-            //               rFPperp . jn
-            //  wF2 = wF1 - --------------    <--- w = angular velocity
-            //                     I
-            velocity[current].x = velocity[current].x - rFPx * n.x * impulse / momentOfInertia;
+            if ( ball.getWallContacts( ).x * n.x >= 0 ) {
+              // We don't have to worry about the ball touching the wall. Just apply the impulse to both and be done with it.
+              
+              //                 -(1 + e) * vBF . n
+              //  j = ------------------------------------------
+              //      n . n  * ( 1/mB ) + ( ( rFP . n )^2 ) / If
+              impulse = vBF.x * -( 1 + elasticity ) * n.x / ( n.x * n.x / ball.getMass( ) + ( rFPdotN * rFPdotN / momentOfInertia ) );
+              //              j
+              //  vB2 = vB1 + -- * n
+              //              mB
+              ballVelocity.x = ballVelocity.x + n.x * impulse / ball.getMass( );
+              //               rFPperp . jn
+              //  wF2 = wF1 - --------------    <--- w = angular velocity
+              //                     I
+              velocity[current].x = velocity[current].x - rFPx * n.x * impulse / momentOfInertia;
+            }
+            else {
+              // The ball is touching the wall in the direction we're trying to hit it. We need to apply some trickery.
+              // Trickery 1: Lower the elasticity for the ball collision.
+              impulse = vBF.x * -( 1 + -0.3 ) * n.x / ( n.x * n.x / ball.getMass( ) + ( rFPdotN * rFPdotN / momentOfInertia ) );
+              ballVelocity.x = ballVelocity.x + n.x * impulse / ball.getMass( );
+              // Trickery 2: Just flip the velocity of the foosman and dampen it until I can figure out something better.
+              velocity[current].x = -velocity[current].x*0.5;
+              // Trickery 3: rotate the player backward to before they hit, to prevent a foosman from passing through the ball.
+              rotation[current] = rotation[previous]; // This is not correct, but will fail semi-gracefully... TODO: calculate rotation needed to put the foosbar in the correct spot
+            }
           }
           ball.setVelocity( ballVelocity.x, ballVelocity.y );
           
           // TODO: If ball is not touching a wall, move it to touch at point at p. If the ball
           // is touching the wall, move the player to touch at point p.
-          return;
+          return true;
         }
       }
     }
     
     // ball is not inside any of the players' individual bounding box
-    return;
+    return false;
   }
 
   //               Z
@@ -537,17 +575,24 @@ public class FoosBar
 
   public Vector2D getPosition( ) { return new Vector2D( position[current] ); }
   public void setPosition( double x, double y ) {
+    int previous = current^1;
+    position[previous].x = x;
+    position[previous].y = y;
     position[current].x = x;
     position[current].y = y;
   }
   public Vector2D getVelocity( ) { return velocity[current]; }
   public void setVelocity( double angular, double linear ) {
+    int previous = current^1;
+    velocity[previous].x = angular;
+    velocity[previous].y = linear;
     velocity[current].x = angular;
     velocity[current].y = linear;
   }
   public double getRotation( ) { return rotation[current]; }
   public void setRotation( double rotation ) {
     this.rotation[current] = normalizeRotation( rotation );
+    this.rotation[current^1] = this.rotation[current];
   }
 }
 

@@ -2,11 +2,15 @@ public class BoosterStrip extends Booster
 {
   Vector2D center;
   double radiusSquared;
+  Image img;
+  float rotation;
   
-  public BoosterStrip( double x, double y, double width, double height, Vector2D force ) {
+  public BoosterStrip( double x, double y, Vector2D force ) {
     super( force );
     center = new Vector2D( x, y );
-    setPoints( width, height );
+    setPoints( 150, 75 );
+    img = new Image( "objects/booster/translucent.png" );
+    rotation = HALF_PI - atan2( (float)force.x, (float)force.y );
   }
   
   private void setPoints( double width, double height ) {
@@ -35,7 +39,17 @@ public class BoosterStrip extends Booster
   }
   
   public void draw( ) {
-    super.draw( );
+    //drawDebug( );
+    pushMatrix( );
+    translate( (float)center.x, (float)center.y );
+    rotate( rotation );
+    translate( -75, -37.5 );
+    img.draw( );
+    popMatrix( );
+  }
+  
+  public void drawDebug( ) {
+    super.drawDebug( );
     // DEBUG
     fill( 255 );
     ellipse( (float)center.x, (float)center.y, 5, 5 );

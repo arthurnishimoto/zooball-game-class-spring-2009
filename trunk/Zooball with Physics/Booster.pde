@@ -1,6 +1,6 @@
 public class Booster
 {
-  private Vector2D points[];
+  protected Vector2D points[];
   protected Vector2D normals[], force;
   protected int c = color( 128 );
   
@@ -29,7 +29,9 @@ public class Booster
     return true;
   }
   
-  public void draw( ) {
+  public void draw( ) { }
+  
+  public void drawDebug( ) {
     fill( c );
     beginShape( );
     for (int i = 0; i < points.length; i++ )

@@ -31,4 +31,5 @@ public class Line
   
   public Vector2D getP1( ) { return new Vector2D( a ); }
   public Vector2D getP2( ) { return new Vector2D( b ); }
+  public String toString( ) { return "[ " + a + " " + b + " ]"; }
 }
