@@ -34,14 +34,14 @@ class Game
     playState = new PlayState( this );
     pausedState = new PausedState( this );
     overState = new OverState( this );
-    
+        
     introState.beginLoad( );
     menuState.beginLoad( );
     playState.beginLoad( );
     pausedState.beginLoad( );
     overState.beginLoad( );
     
-    setState( introState );
+    setState( playState );
     
     calculateScreenTransformation( );
     noStroke( );
@@ -65,8 +65,10 @@ class Game
     
     // Translate and Scale
     pushMatrix( );
+    if( scaleScreen ){
     translate( screenOffsetX, screenOffsetY );
     scale( screenScale );
+    }
     state.draw( );
     debugConsole.draw();
     state.input( ); // Placed after draw so input touches appear on top
@@ -126,7 +128,6 @@ class Game
   
   public OverState getOverState( ) { return overState; }
   //public LeavingState getLeavingState( ) { return leavingState; }
-  
   
   public float getWidth( ) { return DEFAULT_WIDTH; }
   public float getHeight( ) { return DEFAULT_HEIGHT; }

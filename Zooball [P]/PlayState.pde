@@ -107,6 +107,8 @@ Boolean debugText = false; // TEMP
 Boolean debug2Text = false; // TEMP
 color debugColor = color(255,255,255); // TEMP
 
+boolean demoMode = true;
+
 // Gameplay Initial Variables
 int nBalls = 1;
 int maxScore = 5;
@@ -137,6 +139,8 @@ color topColor;
 color bottomColor;
 Turret ballLauncher_bottom;
 Turret ballLauncher_top;
+String[] tutorialText;
+
 
 // Rotate animation images
 String filepath;
@@ -175,7 +179,8 @@ class PlayState extends GameState
     imgLines.setPosition( 0, 0 );
     imgNets = new Image( "data/objects/stadium/gamefield_nets.png" );
     imgNets.setPosition( 0, 0 );
-    logo = new Image( "data/objects/stadium/gamefield_logo.png" );
+    //logo = new Image( "data/objects/stadium/gamefield_logo.png" );
+    logo = new Image( "data/objects/stadium/blank.png" );
     logo.setPosition( 0, 0 );    
     
     // spin a while to test the loading screen
@@ -211,7 +216,7 @@ class PlayState extends GameState
     // Loads Red Foosman artwork
     //filepath = "data/objects/foosmen_red/";
     //filename = "red_top_";
-    filepath = "data/objects/dragon_360/";
+    filepath = "data/objects/uicDragons/";
     filename = "dragon_";
     for(int i = 0; i < 360; i += rotateInc)
       red_foosmanImages[i] = loadImage(filepath + filename + i + extention);
@@ -219,7 +224,7 @@ class PlayState extends GameState
     // Loads Yellow Foosman artwork
     //filepath = "data/objects/foosmen_yellow/";
     //filename = "yellow_top_";
-    filepath = "data/objects/tiger_360/";
+    filepath = "data/objects/lsuTigers/";
     filename = "tiger_";
     for(int i = 0; i < 360; i += rotateInc)
       yellow_foosmanImages[i] = loadImage(filepath + filename + i + extention);      
@@ -441,16 +446,14 @@ class PlayState extends GameState
     
   // Keyboard input
   if(keyPressed && usingMouse){
-    if( key == 'b' || key == 'B' )
+    if( key == 'j' || key == 'J' )
+       balls[0].launchBall(mouseX, mouseY, -5, 0);
+    else if( key == 'l' || key == 'L' )
        balls[0].launchBall(mouseX, mouseY, 5, 0);
-    else if( key == 'v' || key == 'V' )
-       balls[0].launchBall(mouseX, mouseY, 0, 5);
-    else if( key == 'n' || key == 'N' )
-       balls[0].launchBall(mouseX, mouseY, 5, 5);
-    else if( key == 'f' || key == 'F' )
-      balls[0].launchFireball(mouseX, mouseY, 5, 5);
-    else if( key == 'd' || key == 'D' )
-      decoyBalls[0].launchDecoyball(mouseX, mouseY, 5, 5);
+    else if( key == 'i' || key == 'I' )
+       balls[0].launchBall(mouseX, mouseY, 0, -5);
+    else if( key == 'k' || key == 'K' )
+      balls[0].launchFireball(mouseX, mouseY, 0, 5);
   }// if keypressed
   
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
@@ -462,10 +465,12 @@ class PlayState extends GameState
     ballLauncher_top.rotateIsHit(x,y);
     ballLauncher_bottom.isHit(x,y);
     ballLauncher_bottom.rotateIsHit(x,y);
-    
+        
     // Player can touch the ball if get stuck (must be moving very slow or stopped)
     for( int i = 0; i < nBalls; i++ ){
-        balls[i].isHit(x,y);
+      if( balls[i] == null )
+        continue;
+      balls[i].isHit(x,y);
     }// for nBalls     
   }// checkButtonHit
   
@@ -485,6 +490,12 @@ class PlayState extends GameState
     else if( coinToss < 1 )
       topQueue++;
   }// coinToss
-
+  
+  public void demoMode(){
+    tutorialText = loadStrings("data/tutorialText.txt");
+    
+    //fill(0,0,0, 150);
+    //rect( 
+  }// demoMode
 }// class PlayState
 

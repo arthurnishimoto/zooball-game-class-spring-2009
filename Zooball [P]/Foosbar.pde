@@ -357,7 +357,7 @@ class Foosbar{
         fingerTest.xPos = xCoord;
         fingerTest.yPos = yCoord;
         
-        fingerTest.display();
+        //fingerTest.display();
         
         buttonValue = (yPos-buttonPos)/(yPos-barWidth-barHeight);
         pressed = true;

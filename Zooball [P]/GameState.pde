@@ -3,7 +3,7 @@
  *
  * Author:  Andy Bursavich
  * Version: 0.1
- */
+ */ 
 abstract class GameState
 {
   protected Game game;
@@ -12,7 +12,9 @@ abstract class GameState
   private final static int BEFORE = 0;
   private final static int DURING = 1;
   private final static int AFTER = 2;
+
   
+
   public GameState( Game game ) {
     this.game = game;
     timer = new Timer( );
@@ -45,6 +47,49 @@ abstract class GameState
   }// exit
   
   public void input( ) {
+    
+    // Displays mouse position
+    if(usingMouse){
+      float xCoord = mouseX;    
+      float yCoord = mouseY;
+  		
+      //Draw mouse
+      fill( #000000 );
+      noStroke();
+      ellipse( xCoord, yCoord, 20, 20 );
+    }
+    
+    if(!mousePressed && usingMouse && recordingMouse)
+      mouseRecorder += ( mouseX +" "+ mouseY + " FALSE ");
+    else if(mousePressed && usingMouse && recordingMouse)
+      mouseRecorder += ( mouseX +" "+ mouseY + " TRUE ");
+      
+    if( playbackMouse ){
+      if( mousePlayback[playbackItr].length() > 0 ){
+        //println("xCoord = "+mousePlayback[playbackItr]);
+        //println("yCoord = "+mousePlayback[playbackItr+1]);
+        //println("T/F = "+mousePlayback[playbackItr+2]);
+        float xCoord = Float.valueOf(mousePlayback[playbackItr].trim()).floatValue();
+        float yCoord = Float.valueOf(mousePlayback[playbackItr+1].trim()).floatValue();
+        if( mousePlayback[playbackItr+2].equals("TRUE") ){
+  	  fill( #FF0000 );
+  	  noStroke();
+  	  ellipse( xCoord, yCoord, 20, 20 );          
+          checkButtonHit(xCoord,yCoord, 1);
+        }else{
+   	  fill( #000000 );
+  	  noStroke();
+  	  ellipse( xCoord, yCoord, 20, 20 );              
+        }
+        playbackItr += 3;
+      }// if
+      else{
+        //println(mousePlayback[playbackItr+1]);
+        playbackMouse = false;
+        playbackItr = 0;
+      }
+    }// if playbackMouse
+    
     // Process mouse if clicked
     if(mousePressed && usingMouse){
       float xCoord = mouseX;    
@@ -54,7 +99,7 @@ abstract class GameState
       fill( #FF0000 );
       noStroke();
       ellipse( xCoord, yCoord, 20, 20 );
-  
+           
       // ANY CHANGES HERE MUST BE COPIED TO TOUCH ELSE-IF BELOW
       checkButtonHit(xCoord,yCoord, 1);
       debugConsole.input(xCoord,yCoord, 1);

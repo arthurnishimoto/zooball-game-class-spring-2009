@@ -8,6 +8,12 @@ Boolean connectToTacTile = false;
 Boolean usingMouse = true;
 Boolean scaleScreen = true; // All input is off-centered when scaled
 
+Boolean recordingMouse = false;
+Boolean playbackMouse = false;
+String[] mousePlayback;
+String mouseRecorder = "";
+int playbackItr = 0;
+
 //Touch API
 TouchAPI tacTile;
 
@@ -46,7 +52,15 @@ void setup( ) {
 
 void draw( ) {
   game.loop( );
-}
+  
+  if( recordingMouse ){
+    fill(255,0,0);
+    ellipse(10,10,10,10);
+  }else if( playbackMouse ){
+    fill(0,255,0);
+    ellipse(10,10,10,10);
+  }
+}// draw
 
 void keyPressed( KeyEvent e ) {
   if ( game != null ) {
@@ -54,6 +68,25 @@ void keyPressed( KeyEvent e ) {
       game.toggleDebugMode(  );
     else if ( e.getKeyChar( ) == 's' || e.getKeyChar( ) == 'S' )
       game.toggleStrokeMode( );
+    else if ( e.getKeyChar( ) == 'Q' || e.getKeyChar( ) == 'Q' )
+      if( recordingMouse ){
+        recordingMouse = false;
+        mouseRecorder += " EOF ";
+        String words = mouseRecorder;
+        String[] list = split(words, ' ');
+        // now write the strings to a file, each on a separate line
+        saveStrings("data/list.txt", list);
+      }else
+         recordingMouse = true;
+    else if ( e.getKeyChar( ) == 'W' || e.getKeyChar( ) == 'W' ){
+      if( playbackMouse ){
+        playbackMouse = false;
+      }else{
+        playbackMouse = true;
+        mousePlayback = loadStrings("data/list.txt");
+      }
+      
+    }
   }
   super.keyPressed( e ); // Pass event up the chain so ESC still works
 }
