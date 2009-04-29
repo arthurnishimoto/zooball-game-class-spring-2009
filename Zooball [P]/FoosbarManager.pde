@@ -155,6 +155,18 @@ class FoosbarManager{
       bars[x].collide( balls );
     }// for nBars
   }// collide
+
+  void collide(Ball balls){
+    for( int x = 0 ; x < nBars ; x++ ){
+      bars[x].collide( balls );
+    }// for nBars
+  }// collide
+  
+  void step(double dt){
+    for( int x = 0 ; x < nBars ; x++ ){
+      bars[x].step( dt );
+    }// for nBars
+  }// step
   
   // Displays team zone areas
   void displayZones(){
