@@ -432,8 +432,8 @@ class PlayState extends GameState
     topGoal.collide(decoyBalls);
     bottomGoal.collide(decoyBalls);
 
-    //barManager.process(balls, timer.getSecondsActive(), this);
-    //barManager.process(decoyBalls, timer.getSecondsActive(), this);
+    barManager.process(balls, timer.getSecondsActive(), this);
+    barManager.process(decoyBalls, timer.getSecondsActive(), this);
 
     topGoal.display();
     bottomGoal.display();

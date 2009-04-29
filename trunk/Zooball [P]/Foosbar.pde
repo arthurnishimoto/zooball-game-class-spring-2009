@@ -435,7 +435,11 @@ class Foosbar{
           rotateVel = 0;
         }
       }
-  
+      
+      this.setRotation( radians(-barRotation) );
+      barRotation = degrees( -(float)this.getRotation() );
+      println(barRotation);
+      
       if( barRotation >= 360 )
         barRotation = 0;
       else if( barRotation < 0 )
