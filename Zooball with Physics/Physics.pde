@@ -4,8 +4,8 @@ Game game;
 
 void setup( ) {
   Image.setPApplet( this ); // Image stores a static instance of this PApplet to call Processing methods. This must be set before creating any Image objects.
-  size( screen.width, screen.height, OPENGL );
-  //size( 960, 540, OPENGL );
+  //size( screen.width, screen.height, OPENGL );
+  size( 960, 540, OPENGL );
   game = new Game( );
 }
 
@@ -33,6 +33,10 @@ void keyPressed( KeyEvent e ) {
       game.getPlayState( ).test6( );
     else if ( e.getKeyChar( ) == '7' )
       game.getPlayState( ).test7( );
+    else if ( e.getKeyChar( ) == '8' )
+      game.getPlayState( ).test8( );
+    else if ( e.getKeyChar( ) == '9' )
+      game.getPlayState( ).test9( );
   }
   super.keyPressed( e ); // Pass event up the chain so ESC still works
 }

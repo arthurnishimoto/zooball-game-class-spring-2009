@@ -7,9 +7,9 @@
 class PlayState extends GameState
 {
   private float SCREEN_LEFT=0, SCREEN_RIGHT=1920, SCREEN_TOP=0, SCREEN_BOTTOM=1080,
-                FIELD_LEFT=75, FIELD_RIGHT=SCREEN_RIGHT-75, FIELD_TOP=25, FIELD_BOTTOM=SCREEN_BOTTOM-25,
-                GOAL_SIZE=250, GOAL_TOP=FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), GOAL_BOTTOM=FIELD_BOTTOM-0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE),
-                ZONE_COUNT=8, ZONE_WIDTH=(FIELD_RIGHT-FIELD_LEFT)/ZONE_COUNT;
+  FIELD_LEFT=SCREEN_LEFT+75, FIELD_RIGHT=SCREEN_RIGHT-75, FIELD_TOP=SCREEN_TOP+25, FIELD_BOTTOM=SCREEN_BOTTOM-25,
+  GOAL_SIZE=275, GOAL_TOP=FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), GOAL_BOTTOM=FIELD_BOTTOM-0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE),
+  ZONE_COUNT=8, ZONE_WIDTH=(FIELD_RIGHT-FIELD_LEFT)/ZONE_COUNT;
   private long lastUpdate = 0;
   private Image imgChalk, imgStadiumTop, imgStadiumBottom, imgStadiumLeft, imgStadiumRight, imgEnabledLED, imgDisabledLED;
   private CircularButton btnPauseTop, btnPauseBottom;
@@ -21,7 +21,7 @@ class PlayState extends GameState
   public PlayState( Game game ) {
     super( game );
   }
-  
+
   public void test1( ) {
     // Front on ball/bar collision -- with boosters and two "goals"
     ball.setPosition( 1920*0.5+350, 1080*0.5 - 400 );
@@ -30,16 +30,16 @@ class PlayState extends GameState
     bar.setVelocity( -3, 300 );
     bar.setRotation( Math.PI*0.6 );
   }
-  
+
   public void test2( ) {
     // Corner on ball/bar collision
     ball.setPosition( 1920*0.5+75, 1080-180 );
     ball.setVelocity( 0, 0 );
     bar.setPosition( 1920*0.5, 1080*0.5 );
-    bar.setVelocity( -0.9, 250 );
+    bar.setVelocity( -1.1, 250 );
     bar.setRotation( 0 );
   }
-  
+
   public void test3( ) {
     // Bar/Ball/Wall - Ball Between Players
     ball.setPosition( 1920*0.5, 1080-450 );
@@ -48,7 +48,7 @@ class PlayState extends GameState
     bar.setVelocity( 0, 500 );
     bar.setRotation( 0 );
   }
-  
+
   public void test4( ) {
     // Bar/Ball/Wall - Bar Side
     ball.setPosition( 1920*0.5, 1080-50 );
@@ -57,26 +57,42 @@ class PlayState extends GameState
     bar.setVelocity( 0, 800 );
     bar.setRotation( 0 );
   }
-  
+
   public void test5( ) {
     // Bar/Ball/Wall - Bar Corner
     ball.setPosition( 1920*0.5+80, 1080-50 );
     ball.setVelocity( 0, 0 );
     bar.setPosition( 1920*0.5, 1080*0.5 );
-    bar.setVelocity( -1.3, 555 );
+    bar.setVelocity( -1.45, 555 );
     bar.setRotation( 0 );
   }
-  
+
   public void test6( ) {
+    ball.setPosition( FIELD_RIGHT-ball.getRadius( ), 1080*0.5+130 );
+    ball.setVelocity( 0, 0 );
+    bar.setPosition( FIELD_RIGHT-0.5*ZONE_WIDTH, 1080*0.5+130 );
+    bar.setVelocity( 4, 0 );
+    bar.setRotation( Math.PI*0.5 );
+  }
+
+  public void test7( ) {
+    ball.setPosition( FIELD_RIGHT-ball.getRadius( ), 1080*0.5+150 );
+    ball.setVelocity( 0, 0 );
+    bar.setPosition( FIELD_RIGHT-0.5*ZONE_WIDTH, 1080*0.5+150 );
+    bar.setVelocity( -4, 0 );
+    bar.setRotation( Math.PI*0.5 );
+  }
+
+  public void test8( ) {
     // Corner Test
     ball.setPosition( 1920-300, 100 );
     ball.setVelocity( 100, -40 );
   }
   
-  public void test7( ) {
+  public void test9( ) {
     // Ball Between Two Boosters
-    ball.setPosition( 1920*0.5 + 200, 150 );
-    ball.setVelocity( 0, 40 );
+    ball.setPosition( 1920*0.5 + 200, 100 );
+    ball.setVelocity( 0, 175 );
   }
 
   public void load( ) {
@@ -113,24 +129,25 @@ class PlayState extends GameState
     vertWalls[4] = new Line( SCREEN_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), SCREEN_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE) );
     vertWalls[5] = new Line( SCREEN_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), SCREEN_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE) );
     boosters = new Booster[12];
-    boosters[0] = new BoosterStrip( FIELD_LEFT + 3*ZONE_WIDTH, FIELD_TOP+150, 150, 75, new Vector2D( 0, 1500 ) );
-    boosters[1] = new BoosterStrip( FIELD_RIGHT - 3*ZONE_WIDTH, FIELD_TOP+150, 150, 75, new Vector2D( 0, 1500 ) );
-    boosters[2] = new BoosterStrip( FIELD_LEFT + 3*ZONE_WIDTH, FIELD_BOTTOM-150, 150, 75, new Vector2D( 0, -1500 ) );
-    boosters[3] = new BoosterStrip( FIELD_RIGHT - 3*ZONE_WIDTH, FIELD_BOTTOM-150, 150, 75, new Vector2D( 0, -1500 ) );
-    boosters[4] = new BoosterStrip( FIELD_LEFT + 1.5*ZONE_WIDTH, FIELD_TOP+300, 150, 75, new Vector2D( -1200, 900 ) );
-    boosters[5] = new BoosterStrip( FIELD_RIGHT - 1.5*ZONE_WIDTH, FIELD_TOP+300, 150, 75, new Vector2D( 1200, 900 ) );
-    boosters[6] = new BoosterStrip( FIELD_LEFT + 1.5*ZONE_WIDTH, FIELD_BOTTOM-300, 150, 75, new Vector2D( -1200, -900 ) );
-    boosters[7] = new BoosterStrip( FIELD_RIGHT - 1.5*ZONE_WIDTH, FIELD_BOTTOM-300, 150, 75, new Vector2D( 1200, -900 ) );
-    boosters[8] = new BoosterCorner( FIELD_LEFT, FIELD_TOP, 80, 225, new Vector2D( 80, 80 ) );
-    boosters[9] = new BoosterCorner( FIELD_LEFT, FIELD_BOTTOM, 80, -225, new Vector2D( 80, -80 ) );
-    boosters[10] = new BoosterCorner( FIELD_RIGHT, FIELD_TOP, -80, 225, new Vector2D( -80, 80 ) );
-    boosters[11] = new BoosterCorner( FIELD_RIGHT, FIELD_BOTTOM, -80, -225, new Vector2D( -80, -80 ) );
+    boosters[0] = new BoosterStrip( FIELD_LEFT + 3*ZONE_WIDTH, FIELD_TOP+150, new Vector2D( 0, 1500 ) );
+    boosters[1] = new BoosterStrip( FIELD_RIGHT - 3*ZONE_WIDTH, FIELD_TOP+150, new Vector2D( 0, 1500 ) );
+    boosters[2] = new BoosterStrip( FIELD_LEFT + 3*ZONE_WIDTH, FIELD_BOTTOM-150, new Vector2D( 0, -1500 ) );
+    boosters[3] = new BoosterStrip( FIELD_RIGHT - 3*ZONE_WIDTH, FIELD_BOTTOM-150, new Vector2D( 0, -1500 ) );
+    boosters[4] = new BoosterStrip( FIELD_LEFT + 1.5*ZONE_WIDTH, FIELD_TOP+315, new Vector2D( -1200, 900 ) );
+    boosters[5] = new BoosterStrip( FIELD_RIGHT - 1.5*ZONE_WIDTH, FIELD_TOP+315, new Vector2D( 1200, 900 ) );
+    boosters[6] = new BoosterStrip( FIELD_LEFT + 1.5*ZONE_WIDTH, FIELD_BOTTOM-315, new Vector2D( -1200, -900 ) );
+    boosters[7] = new BoosterStrip( FIELD_RIGHT - 1.5*ZONE_WIDTH, FIELD_BOTTOM-315, new Vector2D( 1200, -900 ) );
+    boosters[8] = new BoosterCorner( FIELD_LEFT, FIELD_TOP, 90, 250, new Vector2D( 80, 80 ) );
+    boosters[9] = new BoosterCorner( FIELD_LEFT, FIELD_BOTTOM, 90, -250, new Vector2D( 80, -80 ) );
+    boosters[10] = new BoosterCorner( FIELD_RIGHT, FIELD_TOP, -90, 250, new Vector2D( -80, 80 ) );
+    boosters[11] = new BoosterCorner( FIELD_RIGHT, FIELD_BOTTOM, -90, -250, new Vector2D( -80, -80 ) );
     imgEnabledLED = new Image( "ui/led/white/enabled.png" );
     imgEnabledLED.setSize( 25, 25 );
     imgDisabledLED = new Image( "ui/led/white/disabled.png" );
     imgDisabledLED.setSize( 25, 25 );
     imgChalk = new Image( "objects/stadium/chalk.gif" );
-    imgChalk.setPosition( 75, 25 );
+    imgChalk.setPosition( FIELD_LEFT, FIELD_TOP );
+    imgChalk.setSize( FIELD_RIGHT-FIELD_LEFT, FIELD_BOTTOM-FIELD_TOP );
     imgStadiumTop = new Image( "objects/stadium/top.png" );
     imgStadiumTop.setPosition( 0, 0 );
     imgStadiumBottom = new Image( "objects/stadium/bottom.png" );
@@ -152,9 +169,9 @@ class PlayState extends GameState
   public void update( ) {
     super.update( );
     long time = timer.getMicrosecondsActive( );
-    int multiSample = 10;
-    double dt = (time - lastUpdate) / 1000000.0 / multiSample;
-    for ( int i = 0; i < multiSample; i++ ) 
+    int samples = 50;
+    double dt = (time - lastUpdate) / 1000000.0 / samples;
+    for ( int i = 0; i < samples; i++ ) 
       step( dt );
     lastUpdate = time;
   }
@@ -186,13 +203,10 @@ class PlayState extends GameState
     drawPitch( );
     for ( int i = 0; i < boosters.length; i++ )
       boosters[i].draw( );
+    drawChalk( );
     ball.draw( );
     bar.drawDebug( );
     drawStadiumDebug( );
-    //for ( int i = 0; i < horzWalls.length; i++ )
-    //  horzWalls[i].draw( );
-    //for ( int i = 0; i < vertWalls.length; i++ )
-    //  vertWalls[i].draw( );
     //drawScore( );
     //drawButtons( );
     drawDebugText( );
@@ -212,9 +226,35 @@ class PlayState extends GameState
     fill( 0.5*(0x9E+0x79), 0.5*(0xC6+0xAE), 0.5*(0x33+0x27) );
     quad( SCREEN_LEFT, GOAL_TOP, FIELD_LEFT, GOAL_TOP, FIELD_LEFT, GOAL_BOTTOM, SCREEN_LEFT, GOAL_BOTTOM );
     quad( SCREEN_RIGHT, GOAL_TOP, FIELD_RIGHT, GOAL_TOP, FIELD_RIGHT, GOAL_BOTTOM, SCREEN_RIGHT, GOAL_BOTTOM );
+    /*
+    fill( 255 );
+    rect( FIELD_LEFT, GOAL_TOP, -5, GOAL_SIZE );
+    rect( FIELD_RIGHT, GOAL_TOP, 5, GOAL_SIZE );
+    */
     //imgChalk.draw( );
   }
   
+  private void drawChalk( ) {
+    float px = 3;
+    fill( 255 );
+    // outline
+    rect( FIELD_LEFT, FIELD_TOP, px, FIELD_BOTTOM-FIELD_TOP );
+    rect( FIELD_RIGHT, FIELD_TOP, -px, FIELD_BOTTOM-FIELD_TOP );
+    rect( FIELD_LEFT, FIELD_TOP, FIELD_RIGHT-FIELD_LEFT, px );
+    rect( FIELD_LEFT, FIELD_BOTTOM, FIELD_RIGHT-FIELD_LEFT, -px );
+    // center line
+    rect( FIELD_LEFT+0.5*(FIELD_RIGHT-FIELD_LEFT-px), FIELD_TOP, px, FIELD_BOTTOM-FIELD_TOP );
+    // goalie box
+    
+    // center circle
+    fill( 0, 0 );
+    strokeWeight( px );
+    stroke( 255 );
+    ellipse( FIELD_LEFT+0.5*(FIELD_RIGHT-FIELD_LEFT), FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 1.5*ZONE_WIDTH, 1.5*ZONE_WIDTH );
+    strokeWeight( 1 );
+    noStroke( );
+  }
+
   private void drawStadiumDebug( ) {
     fill( 0x72, 0x21, 0x11 );
     quad( SCREEN_LEFT, SCREEN_TOP, FIELD_LEFT, FIELD_TOP, FIELD_RIGHT, FIELD_TOP, SCREEN_RIGHT, SCREEN_TOP );
@@ -225,16 +265,12 @@ class PlayState extends GameState
     quad( SCREEN_RIGHT, SCREEN_BOTTOM, FIELD_RIGHT, FIELD_BOTTOM, FIELD_RIGHT, GOAL_BOTTOM, SCREEN_RIGHT, GOAL_BOTTOM );
     // UIC
     fill( 0xCC, 0, 0 );
-    rect( FIELD_LEFT, SCREEN_TOP+6, FIELD_RIGHT-FIELD_LEFT, FIELD_TOP-SCREEN_TOP-6-6 ); // Side Marker
+    rect( FIELD_LEFT, SCREEN_TOP+5, FIELD_RIGHT-FIELD_LEFT, FIELD_TOP-SCREEN_TOP-10 ); // Side Marker
     rect( SCREEN_RIGHT, GOAL_TOP, (FIELD_RIGHT-SCREEN_RIGHT)*0.5, GOAL_SIZE ); // Goal
-    fill( 255 );
-    rect( FIELD_RIGHT, GOAL_TOP, 5, GOAL_SIZE );
     // LSU
     fill( 0xFD, 0xD0, 0x23 );
-    rect( FIELD_LEFT, FIELD_BOTTOM+6, FIELD_RIGHT-FIELD_LEFT, SCREEN_BOTTOM-FIELD_BOTTOM-6-6 ); // Side Marker
+    rect( FIELD_LEFT, FIELD_BOTTOM+5, FIELD_RIGHT-FIELD_LEFT, SCREEN_BOTTOM-FIELD_BOTTOM-10 ); // Side Marker
     rect( SCREEN_LEFT, GOAL_TOP, (FIELD_LEFT-SCREEN_LEFT)*0.5, GOAL_SIZE ); // Goal
-    fill( 255 );
-    rect( FIELD_LEFT, GOAL_TOP, -5, GOAL_SIZE );
   }
 
   private void drawStadium( ) {
@@ -257,6 +293,7 @@ class PlayState extends GameState
     return "PlayState"; 
   }
 }
+
 
 
 
