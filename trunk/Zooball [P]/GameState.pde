@@ -42,7 +42,7 @@ abstract class GameState
   public void enter( ) { timer.setActive( true ); }
   
   public void exit( ) {
-    soundManager.stopSounds();
+    soundManager.pauseSounds();
     timer.setActive( false );
   }// exit
   

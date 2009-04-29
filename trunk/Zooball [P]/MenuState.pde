@@ -8,6 +8,8 @@ class MenuState extends GameState
 {
   private CircularButton zooballLogo, zooballLogo_dragon, zooballLogo_tiger, zooballLogo_start;
   private Button bottomDragon, bottomTiger, topDragon, topTiger;
+  private Button temp_screen;
+  
   boolean topChosen = false;
   boolean bottomChosen = false;
   boolean topDragonTeam = false;
@@ -15,6 +17,11 @@ class MenuState extends GameState
   boolean topTigerTeam = false;
   boolean bottomTigerTeam = false;
   boolean playEnabled = false;
+  
+  final private static int MENU = 1;
+  final private static int FIELD_SELECT = 2;
+  int state = MENU;
+  double menuTransitionDelay;
   
   public MenuState( Game game ) {
     super( game );
@@ -56,8 +63,18 @@ class MenuState extends GameState
     topTiger.setLitImage( loadImage("data/ui/buttons/tigers/enabled.png") );
     topTiger.setRotation( PI );
     
+    temp_screen = new Button( (int)game.getWidth()/2 , (int)game.getHeight()/2, "data/ui/logos/4b_menu_screen_Joan.png");
+    temp_screen.setButtonText("PLACEHOLDER IMAGE");
+    temp_screen.setButtonTextColor(color(255,255,255));
+    temp_screen.setButtonTextSize(64);
+    
     endLoad( );
   }// load
+  
+  public void enter( ) {
+    timer.setActive( true );
+    soundManager.playJungle();
+  }// enter
   
   public void update( ) {
     super.update( );
@@ -67,8 +84,39 @@ class MenuState extends GameState
   
   public void draw( ) {
     drawBackground( );
-    drawButtons();
+    switch(state){
+      case(MENU):
+        drawButtons();
+        break;
+      case(FIELD_SELECT):
+        temp_screen.process(font, timer.getSecondsActive());
+        break;
+      default:
+        println("Warning: Unknown sub-state "+state+"called in MenuState.");
+        break;
+    }// switch
 
+    drawDebugText( );
+  }// draw
+  
+  private void drawBackground( ) {
+    background( 0 );
+    //fill( 0x00, 0x33, 0x66 ); // blue
+    fill( 250, 161, 36 ); // 
+    rect( 0, 0, game.getWidth( ), game.getHeight( ) );
+  }// drawBackground
+  
+  private void drawButtons(){
+    bottomTiger.process(font, timer.getSecondsActive());
+    bottomTiger.setLit( (bottomChosen && bottomTigerTeam) );
+    bottomDragon.process(font, timer.getSecondsActive());
+    bottomDragon.setLit( (bottomChosen && bottomDragonTeam) );
+    
+    topTiger.process(font, timer.getSecondsActive());
+    topTiger.setLit( (topChosen && topTigerTeam) );
+    topDragon.process(font, timer.getSecondsActive());
+    topDragon.setLit( (topChosen && topDragonTeam) );
+    
     if( bottomDragonTeam && topTigerTeam ){
       zooballLogo_start.draw();
       redTeamTop = false;
@@ -90,26 +138,7 @@ class MenuState extends GameState
       zooballLogo.draw();
       playEnabled = false;
     }
-    drawDebugText( );
-  }// draw
-  
-  private void drawBackground( ) {
-    background( 0 );
-    //fill( 0x00, 0x33, 0x66 ); // blue
-    fill( 250, 161, 36 ); // 
-    rect( 0, 0, game.getWidth( ), game.getHeight( ) );
-  }// drawBackground
-  
-  private void drawButtons(){
-    bottomTiger.process(font, timer.getSecondsActive());
-    bottomTiger.setLit( (bottomChosen && bottomTigerTeam) );
-    bottomDragon.process(font, timer.getSecondsActive());
-    bottomDragon.setLit( (bottomChosen && bottomDragonTeam) );
     
-    topTiger.process(font, timer.getSecondsActive());
-    topTiger.setLit( (topChosen && topTigerTeam) );
-    topDragon.process(font, timer.getSecondsActive());
-    topDragon.setLit( (topChosen && topDragonTeam) );
   }// drawButtons
   
   private void drawDebugText( ) {
@@ -119,28 +148,44 @@ class MenuState extends GameState
   public String toString( ) { return "MenuState"; }
   
   public void checkButtonHit(float x, float y, int finger){
-    if( zooballLogo.contains(x,y) && playEnabled ){
-      game.reloadState( game.getPlayState() );
-      game.setState( game.getPlayState() );
-    }
-    if( bottomDragon.isHit(x,y) ){
-      bottomChosen = true;
-      bottomDragonTeam = true;
-      bottomTigerTeam = false;
-    }if( bottomTiger.isHit(x,y) ){
-      bottomChosen = true;
-      bottomDragonTeam = false;
-      bottomTigerTeam = true;
-    }
-    if( topDragon.isHit(x,y) ){
-      topChosen = true;
-      topTigerTeam = false;
-      topDragonTeam = true;
-    }if( topTiger.isHit(x,y) ){
-      topChosen = true;
-      topTigerTeam = true;
-      topDragonTeam = false;
-    }      
+    switch(state){
+      case(MENU):
+        if( zooballLogo.contains(x,y) && playEnabled ){
+          state = FIELD_SELECT;
+          menuTransitionDelay = timer.getSecondsActive() + 2;
+          //game.reloadState( game.getPlayState() );
+          //game.setState( game.getPlayState() );
+        }
+        if( bottomDragon.isHit(x,y) ){
+          bottomChosen = true;
+          bottomDragonTeam = true;
+          bottomTigerTeam = false;
+          soundManager.playFire();
+        }if( bottomTiger.isHit(x,y) ){
+          bottomChosen = true;
+          bottomDragonTeam = false;
+          bottomTigerTeam = true;
+          soundManager.playTiger();
+        }
+        if( topDragon.isHit(x,y) ){
+          topChosen = true;
+          topTigerTeam = false;
+          topDragonTeam = true;
+          soundManager.playFire();
+        }if( topTiger.isHit(x,y) ){
+          topChosen = true;
+          topTigerTeam = true;
+          topDragonTeam = false;
+          soundManager.playTiger();
+        }
+        break;
+      case(FIELD_SELECT):
+        if( temp_screen.isHit(x,y) && menuTransitionDelay < timer.getSecondsActive() ){
+          game.reloadState( game.getPlayState() );
+          game.setState( game.getPlayState() );
+        }
+        break;
+    }// switch
   }// checkButtonHit
   
 }// class MenuState

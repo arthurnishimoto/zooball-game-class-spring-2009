@@ -26,8 +26,8 @@ class SoundManager{
   Minim minim;
   
   // Sample Names
-  AudioPlayer goal, gameplay, postgame;
-  AudioSample aPlayer, kick, bounce, decoyDeath;
+  AudioPlayer goal, gameplay, postgame, jungle;
+  AudioSample aPlayer, kick, bounce, decoyDeath, launchBall, fire, sizzle, tiger;
   AudioSample logoMusic;
 
   // parent type must match main class 
@@ -39,11 +39,16 @@ class SoundManager{
     bounce = minim.loadSample("data/sounds/bounce.wav");
     decoyDeath = minim.loadSample("data/sounds/pacdies.mp3");
     logoMusic = minim.loadSample("data/sounds/logo_TEMP.wav");
+    launchBall = minim.loadSample("data/sounds/launch.wav");
+    fire = minim.loadSample("data/sounds/fire.wav");
+    sizzle = minim.loadSample("data/sounds/sizzle.wav");
+    tiger = minim.loadSample("data/sounds/tiger.wav");
     
     // Load Player - Longer sounds like music
-    goal = minim.loadFile("data/sounds/gooaal.wav");
+    goal = minim.loadFile("data/sounds/goal.wav");
     gameplay = minim.loadFile("data/sounds/gameplay.wav");
     postgame = minim.loadFile("data/sounds/postgame.wav");
+    jungle = minim.loadFile("data/sounds/jungle.wav");
 
     // Known commands for Minim AudioSample and AudioPlayer
     // mute, unmute, isMuted, setGain, getGain.
@@ -73,6 +78,11 @@ class SoundManager{
     logoMusic.mute();
     gameplay.mute();
     postgame.mute();
+    launchBall.mute();
+    fire.mute();
+    sizzle.mute();
+    tiger.mute();
+    jungle.mute();
     muted = true;
   }// mute
   
@@ -84,6 +94,11 @@ class SoundManager{
     logoMusic.unmute();
     gameplay.unmute();
     postgame.unmute();
+    launchBall.unmute();
+    fire.unmute();
+    sizzle.unmute();
+    tiger.unmute();
+    jungle.unmute();
     muted = false;
   }// unmute  
 
@@ -99,7 +114,11 @@ class SoundManager{
     logoMusic.setGain(gain);
     gameplay.setGain(gain);
     postgame.setGain(gain);
-    
+    launchBall.setGain(gain);
+    fire.setGain(gain);
+    sizzle.setGain(gain);
+    tiger.setGain(gain);
+    jungle.setGain(gain);
     return true;
   }// setGain
   
@@ -129,16 +148,19 @@ class SoundManager{
     goal.pause();
     gameplay.pause();
     postgame.pause();
+    jungle.pause();
     
     goal.rewind();
     gameplay.rewind();
     postgame.rewind();
+    jungle.rewind();
   }// stopSounds
   
   void pauseSounds(){
     goal.pause();
     gameplay.pause();
-    postgame.pause();   
+    postgame.pause();
+    jungle.pause();
   }// pauseSound
   
   
@@ -164,6 +186,22 @@ class SoundManager{
     logoMusic.trigger();
   }// playLogoMusic
   
+  void playLaunchBall(){
+    launchBall.trigger();
+  }// playLaunchBall
+  
+  void playFire(){
+    fire.trigger();
+  }// playFire
+  
+  void playSizzle(){
+    sizzle.trigger();
+  }// playSizzle
+  
+  void playTiger(){
+    tiger.trigger();
+  }// playTiger
+  
   void playGameplay(){
     if( gameplay.isPlaying() ){
       gameplay.pause();
@@ -182,4 +220,12 @@ class SoundManager{
     postgame.loop();
   }// playPostgame
   
+   void playJungle(){
+    if( jungle.isPlaying() ){
+      jungle.pause();
+      return;
+    }
+    jungle.rewind();
+    jungle.loop();
+  }// playJungle
 }// class soundManager
