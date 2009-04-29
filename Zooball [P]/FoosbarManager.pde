@@ -47,14 +47,14 @@ class FoosbarManager{
       // Syntax: MTFoosbar2(float new_xPos, float new_yPos, float new_barWidth, float new_barHeight, int players, color teamColor, zoneFlag 0 = (top half of screen) 1 = (bottom half of screen))
       if( nBars == 8 ){ // Modified regulation size (Reduced center players from 5 to 4)
         if ( redTeamTop ){
-          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 0, team1_Images);
-          bars[1] = new Foosbar( (1+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team1, 0, team1_Images);
-          bars[2] = new Foosbar( (2+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team2, 1, team2_Images);
-          bars[3] = new Foosbar( (3+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 4, team1, 0, team1_Images);
-          bars[4] = new Foosbar( (4+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 4, team2, 1, team2_Images);
-          bars[5] = new Foosbar( (5+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team1, 0, team1_Images);
-          bars[6] = new Foosbar( (6+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team2, 1, team2_Images);
-          bars[7] = new Foosbar( (7+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team2, 1, team2_Images);
+          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team1, 0, team1_Images);
+          bars[1] = new Foosbar( (1+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 2, team1, 0, team1_Images);
+          bars[2] = new Foosbar( (2+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team2, 1, team2_Images);
+          bars[3] = new Foosbar( (3+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 5, team1, 0, team1_Images);
+          bars[4] = new Foosbar( (4+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 5, team2, 1, team2_Images);
+          bars[5] = new Foosbar( (5+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team1, 0, team1_Images);
+          bars[6] = new Foosbar( (6+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 2, team2, 1, team2_Images);
+          bars[7] = new Foosbar( (7+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team2, 1, team2_Images);
           bars[0].setupBars(screenDim, balls);
           bars[1].setupBars(screenDim, balls);
           bars[2].setupBars(screenDim, balls);
@@ -65,14 +65,14 @@ class FoosbarManager{
           bars[7].setupBars(screenDim, balls);
           break;
         }else{
-          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team2, 0, team2_Images);
-          bars[1] = new Foosbar( (1+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team2, 0, team2_Images);
-          bars[2] = new Foosbar( (2+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team1, 1, team1_Images);
-          bars[3] = new Foosbar( (3+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 4, team2, 0, team2_Images);
-          bars[4] = new Foosbar( (4+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 4, team1, 1, team1_Images);
-          bars[5] = new Foosbar( (5+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team2, 0, team2_Images);
-          bars[6] = new Foosbar( (6+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team1, 1, team1_Images);
-          bars[7] = new Foosbar( (7+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 1, team1_Images);
+          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team2, 0, team2_Images);
+          bars[1] = new Foosbar( (1+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 2, team2, 0, team2_Images);
+          bars[2] = new Foosbar( (2+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team1, 1, team1_Images);
+          bars[3] = new Foosbar( (3+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 5, team2, 0, team2_Images);
+          bars[4] = new Foosbar( (4+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 5, team1, 1, team1_Images);
+          bars[5] = new Foosbar( (5+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team2, 0, team2_Images);
+          bars[6] = new Foosbar( (6+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 2, team1, 1, team1_Images);
+          bars[7] = new Foosbar( (7+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team1, 1, team1_Images);
           bars[0].setupBars(screenDim, balls);
           bars[1].setupBars(screenDim, balls);
           bars[2].setupBars(screenDim, balls);
@@ -84,12 +84,12 @@ class FoosbarManager{
           break;
         }
       }else if( nBars == 6 ){
-        bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 0, team1_Images);
-        bars[1] = new Foosbar( (1+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team1, 0, team1_Images);
-        bars[2] = new Foosbar( (2+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team2, 1, team2_Images);
-        bars[3] = new Foosbar( (3+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team1, 0, team1_Images);
-        bars[4] = new Foosbar( (4+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 2, team2, 1, team2_Images);
-        bars[5] = new Foosbar( (5+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team2, 1, team2_Images);
+        bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team1, 0, team1_Images);
+        bars[1] = new Foosbar( (1+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 2, team1, 0, team1_Images);
+        bars[2] = new Foosbar( (2+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team2, 1, team2_Images);
+        bars[3] = new Foosbar( (3+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team1, 0, team1_Images);
+        bars[4] = new Foosbar( (4+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 2, team2, 1, team2_Images);
+        bars[5] = new Foosbar( (5+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team2, 1, team2_Images);
         bars[0].setupBars(screenDim, balls);
         bars[1].setupBars(screenDim, balls);
         bars[2].setupBars(screenDim, balls);
@@ -99,28 +99,28 @@ class FoosbarManager{
         break;
       }else if( nBars == 2 ){
         if ( redTeamTop ){
-          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 0, team1_Images);
-          bars[1] = new Foosbar( (7+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team2, 1, team2_Images);
+          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team1, 0, team1_Images);
+          bars[1] = new Foosbar( (7+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team2, 1, team2_Images);
           bars[0].setupBars(screenDim, balls);
           bars[1].setupBars(screenDim, balls);
           break;
         }else{
-          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team2, 0, team2_Images);
-          bars[1] = new Foosbar( (7+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 1, team1_Images);
+          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team2, 0, team2_Images);
+          bars[1] = new Foosbar( (7+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team1, 1, team1_Images);
           bars[0].setupBars(screenDim, balls);
           bars[1].setupBars(screenDim, balls);
           break;
         }
       }else if( x%2 == 0 ){ // If even
         if( x == 0 || x == nBars) // Goalie - One player position
-          bars[x] = new Foosbar( (x+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 0, team1_Images);
+          bars[x] = new Foosbar( (x+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team1, 0, team1_Images);
         else
-          bars[x] = new Foosbar( (x+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team1, 0, team1_Images);
+          bars[x] = new Foosbar( (x+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team1, 0, team1_Images);
       }else{ // else odd
         if( x == 0 || x == nBars-1) // Goalie - One player position
-          bars[x] = new Foosbar( (x+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team2, 1, team2_Images);
+          bars[x] = new Foosbar( (x+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team2, 1, team2_Images);
         else
-          bars[x] = new Foosbar( (x+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 3, team2, 1, team2_Images);
+          bars[x] = new Foosbar( (x+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team2, 1, team2_Images);
       }
       bars[x].setupBars(screenDim, balls);
     }// for
@@ -134,7 +134,7 @@ class FoosbarManager{
         bars[x].display();
         if( parent.timer.isActive() ){
           bars[x].ballInArea(balls);
-          bars[x].collide(balls);
+          //bars[x].collide(balls);
           bars[x].setGameTimer(timer_g);
         }
       }// for
@@ -142,6 +142,19 @@ class FoosbarManager{
       // Inactive state
     }// state if-else-if
   }// process
+  
+  void collide(Line[] horzWalls){
+    for( int x = 0 ; x < nBars ; x++ ){
+      bars[x].collide( horzWalls[0] );
+      bars[x].collide( horzWalls[1] );
+    }// for nBars
+  }// collide
+  
+  void collide(Ball[] balls){
+    for( int x = 0 ; x < nBars ; x++ ){
+      bars[x].collide( balls );
+    }// for nBars
+  }// collide
   
   // Displays team zone areas
   void displayZones(){

@@ -158,7 +158,7 @@ class Foosmen{
     if( !displayArt ){
     // Team Color
     fill( parent.teamColor );
-    rect(xPos-orig_Width/2, yPos, orig_Width, playerHeight);
+    rect(xPos-orig_Width/2, yPos , orig_Width, playerHeight);
     }
     
     if( hasBall ){
@@ -174,7 +174,7 @@ class Foosmen{
     // Images
     pushMatrix();
     imageMode(CENTER);
-    translate(xPos, yPos + playerHeight/2);
+    translate(xPos, yPos);
 
     float barRotation = parent.barRotation;
     
@@ -246,38 +246,38 @@ class Foosmen{
       else
         stroke( 0, 255, 0);
       fill( 0,0,0 );
-      ellipse( hit_xPos, hit_yPos, 5, 5 ); // Upper left
-      ellipse( hit_xPos + hit_width , hit_yPos, 5, 5 ); // Upper Right
-      ellipse( hit_xPos , hit_yPos + hit_height, 5, 5 ); // Lower Left
-      ellipse( hit_xPos + hit_width, hit_yPos + hit_height, 5, 5 ); // Lower Right
+      ellipse( hit_xPos, hit_yPos - hit_height/2, 5, 5 ); // Upper left
+      ellipse( hit_xPos + hit_width, hit_yPos - hit_height/2, 5, 5 ); // Upper Right
+      ellipse( hit_xPos , hit_yPos + hit_height/2, 5, 5 ); // Lower Left
+      ellipse( hit_xPos + hit_width, hit_yPos + hit_height/2, 5, 5 ); // Lower Right
       
       // Hit buffer
-      ellipse( hit_xPos - hitBuffer, hit_yPos - hitBuffer, 5, 5 ); // Upper left
-      ellipse( hit_xPos + hit_width + hitBuffer, hit_yPos - hitBuffer, 5, 5 ); // Upper Right
-      ellipse( hit_xPos - hitBuffer, hit_yPos + hit_height + hitBuffer, 5, 5 ); // Lower Left
-      ellipse( hit_xPos + hit_width + hitBuffer, hit_yPos + hit_height + hitBuffer, 5, 5 ); // Lower Right
+      ellipse( hit_xPos - hitBuffer, hit_yPos - hit_height/2 - hitBuffer, 5, 5 ); // Upper left
+      ellipse( hit_xPos + hit_width + hitBuffer, hit_yPos - hit_height/2 - hitBuffer, 5, 5 ); // Upper Right
+      ellipse( hit_xPos - hitBuffer, hit_yPos + hit_height/2 + hitBuffer, 5, 5 ); // Lower Left
+      ellipse( hit_xPos + hit_width + hitBuffer, hit_yPos + hit_height/2 + hitBuffer, 5, 5 ); // Lower Right
     }
     
     if( topBufferHit ){
       fill(255,255,0);
       stroke(0,0,0);
-      rect( hit_xPos - hitBuffer, hit_yPos - hitBuffer, hit_width + hitBuffer*2, 5 );
+      rect( hit_xPos - hitBuffer, hit_yPos - hit_height/2 - hitBuffer, hit_width + hitBuffer*2, 5 );
       topBufferHit = false;
     }if( bottomBufferHit ){
       fill(255,255,0);
       stroke(0,0,0);
-      rect( hit_xPos - hitBuffer, hit_yPos + hit_height + hitBuffer, hit_width + hitBuffer*2, 5 );
+      rect( hit_xPos - hitBuffer, hit_yPos + hit_height/2 + hitBuffer, hit_width + hitBuffer*2, 5 );
       bottomBufferHit = false;   
     }
     if( topHit ){
       fill(255,0,0);
       stroke(0,0,0);
-      rect( hit_xPos, hit_yPos, hit_width, 5 );
+      rect( hit_xPos, hit_yPos - hit_height/2, hit_width, 5 );
       topHit = false;
     }if( bottomHit ){
       fill(255,0,0);
       stroke(0,0,0);
-      rect( hit_xPos, hit_yPos + hit_height, hit_width, 5 );
+      rect( hit_xPos, hit_yPos + hit_height/2, hit_width, 5 );
       bottomHit = false;
     }
     
@@ -398,7 +398,7 @@ class Foosmen{
         }// if Ball is between the right hit buffer and center
       }// If Ball is between top and bottom hit buffer edges
       
-      /*
+      
       // If ball is within hit box... (Left-right collision)
       if( balls[i].xPos+balls[i].diameter/2 > hit_xPos && balls[i].xPos-balls[i].diameter/2 < hit_xPos + hit_width ) // Ball right within left side && Ball left is within right side
         if( balls[i].yPos+balls[i].diameter/2 > hit_yPos && balls[i].yPos-balls[i].diameter/2 < hit_yPos + hit_height ) // Ball bottom is within top side && Ball top is within bottom side
@@ -415,7 +415,7 @@ class Foosmen{
             balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert xVel ) + add bar speed
             continue;            
           }// if ball hits left side of Foosmen
-      */
+
       
       // If bar not hit and recently hit, clear flag
       if(ballsRecentlyHit[i] == 1){
@@ -488,6 +488,7 @@ class Foosmen{
   }// releaseBall
   
   private void specialCollision(int ballID){
+    
     balls[ballID].lastBarHit = parent.getFoosbar();
     if( balls[ballID].isFireball() && parent.tigers && !parent.debuffed ){
       parent.setDebuff();

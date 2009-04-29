@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 0.9.5
+ * Version: 0.9.7
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -86,8 +86,11 @@
  * 4/26/09      - Added mouse recording (for tutorial)
  * 4/29/09      - Version 0.9.5
  *              - Physics engine implementation - Phase One - Balls and Walls
+ *              - Version 0.9.7
+ *              - Physics engine implementation - Phase Two - Boosters and Bars (Partial)
  *
  * Notes:
+ *      - [TODO - CRITICAL] Fix null pointer exception in balls[] and decoyBalls[]
  *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?
  *	- [TODO] Physics engine?
  *      - [TODO] Improve collision detection on goal zones
@@ -154,6 +157,7 @@ String extention = ".png";
 ParticleManager particleManager = new ParticleManager( 2000, 5 ); // Ball trail effects
 ParticleManager particleManager2 = new ParticleManager( 2000, 3 ); // Fire effects
 FoosbarManager barManager;
+BoosterManager boosterManager;
 
 class PlayState extends GameState
 {
@@ -161,11 +165,8 @@ class PlayState extends GameState
                 FIELD_LEFT=100, FIELD_RIGHT=SCREEN_RIGHT-100, FIELD_TOP=100, FIELD_BOTTOM=SCREEN_BOTTOM-100,
                 GOAL_SIZE=300, GOAL_TOP=FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), GOAL_BOTTOM=FIELD_BOTTOM-0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE),
                 ZONE_COUNT=8, ZONE_WIDTH=(FIELD_RIGHT-FIELD_LEFT)/ZONE_COUNT;
+  private float[] fieldDimensions = new float[5];
   private long lastUpdate = 0;
-  //private Image imgChalk, imgStadiumTop, imgStadiumBottom, imgStadiumLeft, imgStadiumRight, imgEnabledLED, imgDisabledLED;
-  //private CircularButton btnPauseTop, btnPauseBottom;
-  //private Ball ball;
-  //private Booster[] boosters;
   private Line[] horzWalls, vertWalls, goalWalls;
   //private FoosBar bar;
   
@@ -214,6 +215,12 @@ class PlayState extends GameState
     vertWalls[4] = new Line( SCREEN_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), SCREEN_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE) );
     vertWalls[5] = new Line( SCREEN_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), SCREEN_RIGHT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP+GOAL_SIZE) );
     
+    fieldDimensions[0] = FIELD_LEFT;
+    fieldDimensions[1] = FIELD_RIGHT;
+    fieldDimensions[2] = FIELD_TOP;
+    fieldDimensions[3] = FIELD_BOTTOM;
+    fieldDimensions[4] = ZONE_WIDTH;
+    
     ballsInPlay = 0;
     topQueue = 0;
     bottomQueue = 0;
@@ -227,8 +234,8 @@ class PlayState extends GameState
     imgLines.setPosition( 0, 0 );
     imgNets = new Image( "data/objects/stadium/gamefield_nets.png" );
     imgNets.setPosition( 0, 0 );
-    //logo = new Image( "data/objects/stadium/gamefield_logo.png" );
-    logo = new Image( "data/objects/stadium/blank.png" );
+    logo = new Image( "data/objects/stadium/gamefield_logo.png" );
+    //logo = new Image( "data/objects/stadium/blank.png" );
     logo.setPosition( 0, 0 );    
     
     // spin a while to test the loading screen
@@ -315,6 +322,8 @@ class PlayState extends GameState
     ballLauncher_top.setParentClass(this);
     ballLauncher_top.faceDown();
 
+    boosterManager = new BoosterManager(1, fieldDimensions); // 1 = Easy, 2 - Medium, 3 - Hard
+
     endLoad( );
   }// load()
   
@@ -329,14 +338,21 @@ class PlayState extends GameState
   }// update
   
   private void step( double dt ) {
+    for(int i = 0; i < nBalls; i++ ){
+      if(balls[i] == null)
+        balls[i] = new Ball( -100, -100, 50, i, balls, screenDimensions, ballImages);
+      if(decoyBalls[i] == null)
+        decoyBalls[i] = new Ball( -100, -100, 50, i, balls, screenDimensions, ballImages);
+    }
+    
+    Booster[] boosters = boosterManager.getBoosters();
     // ADD FORCES
-    //for ( int i = 0; i < boosters.length; i++ )
-    //  if ( boosters[i].contains( ball.getPosition( ) ) )
-    //    ball.addForce( boosters[i].getForce( ) );
-      
     for(int i = 0; i < nBalls; i++ ){
       balls[i].clearForces( );
-
+      for ( int j = 0; j < boosters.length; j++ )
+        if ( boosters[j].contains( balls[i].getPosition( ) ) )
+          balls[i].addForce( boosters[j].getForce( ) );
+      
       // STEP FORWARD
       balls[i].step( dt );
       //bar.step( dt );
@@ -349,22 +365,20 @@ class PlayState extends GameState
         balls[i].collide( vertWalls[j] );
         
       // DO FOOSBAR/BALL COLLISIONS
-      //bar.collide( ball );
+      barManager.collide( balls );
     }
     // DO FOOSBAR/WALL COLLISIONS
-    //bar.collide( horzWalls[0] );
-    //bar.collide( horzWalls[1] );
+    barManager.collide( horzWalls );
   }// step
   
   public void enter(){
     timer.setActive( true );
-    soundManager.stopSounds();
     soundManager.playGameplay();
   }// enter()  
   
   public void draw( ) {
     frameRate(30); // Framerate must be below 60 to allow bar spin gesture.
-    
+
     if( (ballsInPlay + topQueue + bottomQueue) < nBalls && lastScored == -1 )
       coinToss();
       
@@ -381,10 +395,11 @@ class PlayState extends GameState
       ballLauncher_bottom.disable();
       
     drawBackground( );
-    
-    particleManager.display();
+ 
+    boosterManager.display();
     barManager.displayZones();
     
+    particleManager.display();
     drawBalls();
     
     imgNets.draw();
@@ -431,8 +446,9 @@ class PlayState extends GameState
         text("Ball 0 Angle: "+degrees(atan2(balls[0].yVel,balls[0].xVel)), 16, 16*9);
       }
       particleManager.displayDebug(debugColor, font);
-      barManager.displayDebug(debugColor, font);
       barManager.displayHitbox();
+      boosterManager.displayDebug();
+      barManager.displayDebug(debugColor, font);
       for( int i = 0; i < nBalls; i++ ){
         balls[i].displayDebug(debugColor, font);
         decoyBalls[i].displayDebug(debugColor,font);

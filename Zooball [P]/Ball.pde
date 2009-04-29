@@ -552,7 +552,7 @@ class Ball{
     vel = sqrt(abs(sq(xVel))+abs(sq(yVel)));
     
     imageRotation = (int)degrees((float)rotation[current])%360;
-    println(imageRotation);
+
     if(imageRotation >= 360 )
       imageRotation = 0;
       
@@ -671,6 +671,7 @@ class Ball{
 
   void setInactive(){
     state = INACTIVE;
+    this.setVelocity(0,0);
   }// setInactive
   
   void setFireball(){

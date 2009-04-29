@@ -17,6 +17,7 @@
  * 4/4/09    - Added a lit state
  * 4/26/09   - Version 0.2
  *           - Added litImage and rotation for circle, rect, and images. (hitBox does not rotate)
+ * 4/29/09   - Font size added.
  * ---------------------------------------------
  */
  
@@ -24,7 +25,7 @@ class Button{
   PImage buttonImage;
   int xPos, yPos;
   double buttonDownTime = 0.2;
-  double buttonLastPressed = -1;
+  double buttonLastPressed = -1; // -1 allows pressed on start, 0 if delay desired
   double gameTimer;
   boolean hasImage = false;
   boolean isRound = false;
@@ -36,6 +37,7 @@ class Button{
   color lit_cl = color( 255, 255, 255 );
   color pressed_cl = color(#FF0000);
   float angle = 0;
+  int fontSize = 16;
 
   float rotation = 0;
 
@@ -144,12 +146,12 @@ class Button{
     
     
     fill(buttonTextColor);
-    textFont(font,16);
+    textFont(font,fontSize);
     textAlign(CENTER);
   
     int textShift = 0;
     if( doubleSidedText )
-      textShift = 16;
+      textShift = fontSize;
     
     if( doubleSidedText || !invertText ){
       text(buttonText, 0, 0 + textShift);
@@ -331,9 +333,13 @@ class Button{
     buttonText = newText;
   }// setButtonText  
   
+  void setButtonTextSize(int newSize){
+    fontSize = newSize;
+  }// setButtonTextSize
+  
   void setButtonTextColor(color newColor){
     buttonTextColor = newColor;
-  }// setButtonText 
+  }// setButtonTextColor
 
   void setDoubleSidedText( boolean newBool ){
     doubleSidedText = newBool;
