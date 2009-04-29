@@ -28,6 +28,7 @@ class SoundManager{
   // Sample Names
   AudioPlayer goal, gameplay, postgame;
   AudioSample aPlayer, kick, bounce, decoyDeath;
+  AudioSample logoMusic;
 
   // parent type must match main class 
   SoundManager(Zooball parent){
@@ -37,6 +38,7 @@ class SoundManager{
     kick = minim.loadSample("data/sounds/kick.wav");
     bounce = minim.loadSample("data/sounds/bounce.wav");
     decoyDeath = minim.loadSample("data/sounds/pacdies.mp3");
+    logoMusic = minim.loadSample("data/sounds/logo_TEMP.wav");
     
     // Load Player - Longer sounds like music
     goal = minim.loadFile("data/sounds/gooaal.wav");
@@ -68,6 +70,7 @@ class SoundManager{
     bounce.mute();
     goal.mute();
     decoyDeath.mute();
+    logoMusic.mute();
     gameplay.mute();
     postgame.mute();
     muted = true;
@@ -78,6 +81,7 @@ class SoundManager{
     bounce.unmute();
     goal.unmute();
     decoyDeath.unmute();
+    logoMusic.unmute();
     gameplay.unmute();
     postgame.unmute();
     muted = false;
@@ -92,6 +96,7 @@ class SoundManager{
     bounce.setGain(gain);
     goal.setGain(gain);
     decoyDeath.setGain(gain);
+    logoMusic.setGain(gain);
     gameplay.setGain(gain);
     postgame.setGain(gain);
     
@@ -154,6 +159,10 @@ class SoundManager{
   void playDecoyDeath(){
     decoyDeath.trigger();
   }// playDecoyDeath
+  
+  void playLogoMusic(){
+    logoMusic.trigger();
+  }// playLogoMusic
   
   void playGameplay(){
     if( gameplay.isPlaying() ){

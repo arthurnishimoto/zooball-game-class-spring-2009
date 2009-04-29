@@ -27,6 +27,13 @@ class IntroState extends GameState
     endLoad( );
   }
   
+  public void enter(){
+    timer.reset();
+    timer.setActive( true );
+    soundManager.stopSounds();
+    soundManager.playLogoMusic();
+  }// enter()  
+  
   public void update( ) {
     super.update( );
     if ( timer.getSecondsActive( ) > 5.0 )

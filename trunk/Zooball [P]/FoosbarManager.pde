@@ -97,6 +97,20 @@ class FoosbarManager{
         bars[4].setupBars(screenDim, balls);
         bars[5].setupBars(screenDim, balls);
         break;
+      }else if( nBars == 2 ){
+        if ( redTeamTop ){
+          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 0, team1_Images);
+          bars[1] = new Foosbar( (7+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team2, 1, team2_Images);
+          bars[0].setupBars(screenDim, balls);
+          bars[1].setupBars(screenDim, balls);
+          break;
+        }else{
+          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team2, 0, team2_Images);
+          bars[1] = new Foosbar( (7+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 1, team1_Images);
+          bars[0].setupBars(screenDim, balls);
+          bars[1].setupBars(screenDim, balls);
+          break;
+        }
       }else if( x%2 == 0 ){ // If even
         if( x == 0 || x == nBars) // Goalie - One player position
           bars[x] = new Foosbar( (x+1)*(screenWidth)/fieldLines-barWidth/2 , 0, barWidth, screenHeight, 1, team1, 0, team1_Images);
