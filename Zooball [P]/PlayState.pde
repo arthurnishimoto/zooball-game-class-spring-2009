@@ -169,8 +169,8 @@ class PlayState extends GameState
     GOAL_SIZE=275, GOAL_TOP=FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), GOAL_BOTTOM=FIELD_BOTTOM-0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE),
     ZONE_COUNT=8, ZONE_WIDTH=(FIELD_RIGHT-FIELD_LEFT)/ZONE_COUNT;
   private float[] fieldDimensions = new float[5];
-  private long lastUpdate = 0;
   private Line[] horzWalls, vertWalls, goalWalls;
+  private long lastUpdate = 0; // physics time in microseconds
 
   private CircularButton btnPauseTop, btnPauseBottom;
   private Image imgPitch, border, imgLines, imgNets, logo;
@@ -326,13 +326,18 @@ class PlayState extends GameState
   }// load()
 
   public void update( ) {
-    super.update( );
-    long time = timer.getMicrosecondsActive( );
-    int multiSample = 10;
-    double dt = (time - lastUpdate) / 1000000.0 / multiSample;
-    for ( int i = 0; i < multiSample; i++ ) 
-      step( dt );
-    lastUpdate = time;
+    super.update( ); // update PlayState timer
+    long time = timer.getMicrosecondsActive( ); // get current game time
+    // step until physics time is caught with up or past current game time
+    while ( lastUpdate < time ) {
+      // The chosen step size means that the physics is updated 200 times/second,
+      // or about 3.333 times/frame when running at 60 frames/second. This size can
+      // be lowered to prevent tunneling (objects passing through each other, before
+      // collision can be detected) or raised if performance is an issue (but it isn't).
+      step( 0.005 ); // step physics objects forward by 0.005 seconds and handle collisions
+      lastUpdate += 5000; // update physics time by the equivalent 5000 microseconds
+    }
+
   }// update
 
   private void step( double dt ) {
@@ -587,13 +592,13 @@ class PlayState extends GameState
     // Keyboard input
     if(keyPressed && usingMouse){
       if( key == 'j' || key == 'J' )
-        balls[0].launchBall(mouseX, mouseY, -5, 0);
+        balls[0].launchBall(mouseX, mouseY, -150, 0);
       else if( key == 'l' || key == 'L' )
-        balls[0].launchBall(mouseX, mouseY, 5, 0);
+        balls[0].launchBall(mouseX, mouseY, 150, 0);
       else if( key == 'i' || key == 'I' )
-        balls[0].launchBall(mouseX, mouseY, 0, -5);
+        balls[0].launchBall(mouseX, mouseY, 0, -150);
       else if( key == 'k' || key == 'K' )
-        balls[0].launchFireball(mouseX, mouseY, 0, 5);
+        balls[0].launchBall(mouseX, mouseY, 0, 150);
     }// if keypressed
 
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )

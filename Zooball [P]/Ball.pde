@@ -656,6 +656,10 @@ class Ball{
     
   // Getters/Setters
   
+  int getID(){
+    return ID_no;
+  }//getID
+  
   float getSpeed(){
     return sqrt(sq(xVel)+sq(yVel));
   }// getSpeed
