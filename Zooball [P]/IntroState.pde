@@ -36,7 +36,7 @@ class IntroState extends GameState
   
   public void update( ) {
     super.update( );
-    if ( timer.getSecondsActive( ) > 5.0 )
+    if ( timer.getSecondsActive( ) > 5.0 && pos == finalPos )
       game.setState( game.getMenuState( ) );
   }
   

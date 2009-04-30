@@ -88,9 +88,9 @@
  *              - Physics engine implementation - Phase One - Balls and Walls
  *              - Version 0.9.7
  *              - Physics engine implementation - Phase Two - Boosters and Bars (Partial)
+ * 4/30/09      - Physics engine implementation - Phase Two - Boosters and Bars (Complete) - Need to fix images
  *
  * Notes:
- *      - [TODO - CRITICAL] Fix null pointer exception in balls[] and decoyBalls[]
  *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?
  *	- [TODO] Physics engine?
  *      - [TODO] Improve collision detection on goal zones
@@ -113,7 +113,7 @@ Boolean debugText = true; // TEMP
 Boolean debug2Text = false; // TEMP
 color debugColor = color(255,255,255); // TEMP
 
-boolean demoMode = true;
+boolean demoMode = false;
 
 // Gameplay Initial Variables
 int nBalls = 1;
@@ -130,12 +130,14 @@ int fieldLines = 9; // Divisions, not actual lines. 1 line appears on screen edg
 int nBars = fieldLines - 1; 
 int barWidth = 213;
 
+int FIELD_MODE = 2; // Booster difficulty: 1 = Easy, 2 - Normal (No boosters), 3 - Hard 
+
 double timer_g = 0; // TEMP
 PFont font;
 
 // Data Structures / Objects
-Ball[] balls;
-Ball[] decoyBalls;
+Ball[] balls = new Ball[nBalls];
+Ball[] decoyBalls = new Ball[nBalls];
 int[] screenDimensions = new int[4];
 PImage ballImages[] = new PImage[360];
 PImage red_foosmanImages[] = new PImage[360];
@@ -145,8 +147,9 @@ color topColor;
 color bottomColor;
 Turret ballLauncher_bottom;
 Turret ballLauncher_top;
-String[] tutorialText;
 
+String[] tutorialText;
+String previousText;
 
 // Rotate animation images
 String filepath;
@@ -162,13 +165,12 @@ BoosterManager boosterManager;
 class PlayState extends GameState
 {
   private float SCREEN_LEFT=0, SCREEN_RIGHT=1920, SCREEN_TOP=0, SCREEN_BOTTOM=1080,
-  FIELD_LEFT=100, FIELD_RIGHT=SCREEN_RIGHT-100, FIELD_TOP=100, FIELD_BOTTOM=SCREEN_BOTTOM-100,
-  GOAL_SIZE=300, GOAL_TOP=FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), GOAL_BOTTOM=FIELD_BOTTOM-0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE),
-  ZONE_COUNT=8, ZONE_WIDTH=(FIELD_RIGHT-FIELD_LEFT)/ZONE_COUNT;
+    FIELD_LEFT=SCREEN_LEFT+100, FIELD_RIGHT=SCREEN_RIGHT-100, FIELD_TOP=SCREEN_TOP+100, FIELD_BOTTOM=SCREEN_BOTTOM-100,
+    GOAL_SIZE=275, GOAL_TOP=FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), GOAL_BOTTOM=FIELD_BOTTOM-0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE),
+    ZONE_COUNT=8, ZONE_WIDTH=(FIELD_RIGHT-FIELD_LEFT)/ZONE_COUNT;
   private float[] fieldDimensions = new float[5];
   private long lastUpdate = 0;
   private Line[] horzWalls, vertWalls, goalWalls;
-  private Foosbar bar; // TEST
 
   private CircularButton btnPauseTop, btnPauseBottom;
   private Image imgPitch, border, imgLines, imgNets, logo;
@@ -183,7 +185,6 @@ class PlayState extends GameState
 
   public void load( ) {
     Vector2D center = new Vector2D( game.getWidth()*0.5, game.getHeight()*0.5 );
-    bar = new Foosbar( 1920*0.5, 1080*0.5, 3 );
     // example: redirected to goal
     //ball = new Ball( new Vector2D( center.x - 200, 220 - 50 ), new Vector2D( 250, 0 ), 2.5, 27.5, 0.1 );
     // example: stuck between two boosters
@@ -271,16 +272,12 @@ class PlayState extends GameState
     }
 
     // Loads Red Foosman artwork
-    //filepath = "data/objects/foosmen_red/";
-    //filename = "red_top_";
     filepath = "data/objects/uicDragons/";
     filename = "dragon_";
     for(int i = 0; i < 360; i += rotateInc)
       red_foosmanImages[i] = loadImage(filepath + filename + i + extention);
 
     // Loads Yellow Foosman artwork
-    //filepath = "data/objects/foosmen_yellow/";
-    //filename = "yellow_top_";
     filepath = "data/objects/lsuTigers/";
     filename = "tiger_";
     for(int i = 0; i < 360; i += rotateInc)
@@ -323,7 +320,7 @@ class PlayState extends GameState
     ballLauncher_top.setParentClass(this);
     ballLauncher_top.faceDown();
 
-    boosterManager = new BoosterManager(1, fieldDimensions); // 1 = Easy, 2 - Medium, 3 - Hard
+    boosterManager = new BoosterManager(FIELD_MODE, fieldDimensions); // 1 = Easy, 2 - Medium, 3 - Hard
 
     endLoad( );
   }// load()
@@ -345,9 +342,9 @@ class PlayState extends GameState
       if(decoyBalls[i] == null)
         decoyBalls[i] = new Ball( -100, -100, 50, i, balls, screenDimensions, ballImages);
     }
-
+    
     Booster[] boosters = boosterManager.getBoosters();
-  
+    
     // ADD FORCES
     for(int i = 0; i < nBalls; i++ ){
       balls[i].clearForces( );
@@ -358,6 +355,7 @@ class PlayState extends GameState
       // STEP FORWARD
       balls[i].step( dt );
       barManager.step( dt );
+      //bar.step( dt );
      
       // DO BALL/WALL COLLISIONS
       balls[i].clearWallContacts( );
@@ -368,31 +366,12 @@ class PlayState extends GameState
      
       // DO FOOSBAR/BALL COLLISIONS
       barManager.collide( balls[i] );
+      //bar.collide( balls[0] );
    }// for nBalls
    // DO FOOSBAR/WALL COLLISIONS
    barManager.collide( horzWalls );
-     
-     /*
-    // ADD FORCES
-    balls[0].clearForces( );
-    for ( int i = 0; i < boosters.length; i++ )
-      if ( boosters[i].contains( balls[0].getPosition( ) ) )
-        balls[0].addForce( boosters[i].getForce( ) );
-    // STEP FORWARD
-    balls[0].step( dt );
-    bar.step( dt );
-    // DO BALL/WALL COLLISIONS
-    balls[0].clearWallContacts( );
-    for( int i = 0; i < horzWalls.length; i++ )
-      balls[0].collide( horzWalls[i] );
-    for( int i = 0; i < vertWalls.length; i++ )
-       balls[0].collide( vertWalls[i] );
-    // DO FOOSBAR/WALL COLLISIONS
-    bar.collide( horzWalls[0] );
-    bar.collide( horzWalls[1] );
-    // DO FOOSBAR/BALL COLLISIONS
-    bar.collide(  balls[0] );  
-  */  
+   //bar.collide( horzWalls[0] );
+   //bar.collide( horzWalls[1] );   
   }// step
 
   public void enter(){
@@ -445,7 +424,8 @@ class PlayState extends GameState
     ballLauncher_bottom.process(timer.getSecondsActive()); 
     ballLauncher_top.process(timer.getSecondsActive()); 
 
-    drawDebugText();
+    if(demoMode)
+      demoMode();
 
     if(debugText){
       drawStadiumDebug( );
@@ -470,16 +450,18 @@ class PlayState extends GameState
         text("Ball 0 Angle: "+degrees(atan2(balls[0].yVel,balls[0].xVel)), 16, 16*9);
       }
       particleManager.displayDebug(debugColor, font);
-      barManager.displayHitbox();
+      //barManager.displayHitbox();
       boosterManager.displayDebug();
       barManager.displayDebug(debugColor, font);
-      //bar.displayDebug(debugColor, font);
+
       for( int i = 0; i < nBalls; i++ ){
         balls[i].displayDebug(debugColor, font);
         decoyBalls[i].displayDebug(debugColor,font);
       }
     }
 
+    drawDebugText();
+    
     if( timer.isActive() )
       checkWinningConditions();
   }// draw()
@@ -651,78 +633,74 @@ class PlayState extends GameState
   }// coinToss
 
   public void demoMode(){
-    tutorialText = loadStrings("data/tutorialText.txt");
-
-    //fill(0,0,0, 150);
-    //rect( 
+    fill(0,0,0, 150);
+    rect( game.getWidth()/2 + 300, game.getHeight()/2, 500, 400 );
+    
+    textFont(font,18);
+    fill(255,255,255);
+    noStroke();
+    tutorialText = new String[50];
+    //tutorialText = loadStrings("data/tutorialText.txt");
+    int delay_0 = 5;
+    tutorialText[0] = "Welcome to the Zooball Tutorial";
+    int delay_1 = 6;
+    tutorialText[1] = "Move the foosbar by pressing on a touch zone on\n    your side of the table";
+    int delay_2 = 7;
+    tutorialText[2] = "You can also rotate the bar by moving left\n     and right";
+    int delay_3 = 8;
+    tutorialText[3] = "Each bar will only respond to touches in its own zone";
+    int delay_4 = 9;
+    tutorialText[4] = "To launch a ball, press on the ball launcher.\n     It will be green when ready";    
+    int delay_5 = 10;
+    tutorialText[5] = "Like a slingshot pull back in the opposite\n     direction you want the ball to fire";    
+    int delay_6 = 11;
+    tutorialText[6] = "To catch a ball angle the foosmen back. Keep your\n     finger in the touch zone to hold the ball";    
+    int delay_7 = 12;
+    tutorialText[7] = "To throw a ball, flick and release in the desired\n     direction. Now go play Zooball!";    
+    int delay_8 = 13;
+    
+    previousText = tutorialText[0];
+    if( timer.getSecondsActive() > delay_0 ){
+      if( timer.getSecondsActive() < delay_1 )
+        fill(50,255,50);
+      text( tutorialText[0] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 );
+    }
+    if( timer.getSecondsActive() > delay_1 ){
+      if( timer.getSecondsActive() < delay_2 )
+        fill(50,255,50);
+      text( tutorialText[1] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*1 );
+    }
+    if( timer.getSecondsActive() > delay_2 ){
+      if( timer.getSecondsActive() < delay_3 )
+        fill(50,255,50);
+      text( tutorialText[2] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*3 );
+    }
+    if( timer.getSecondsActive() > delay_3 ){
+      if( timer.getSecondsActive() < delay_4 )
+        fill(50,255,50);
+      text( tutorialText[3] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*5 );
+    }
+    if( timer.getSecondsActive() > delay_4 ){
+      if( timer.getSecondsActive() < delay_5 )
+        fill(50,255,50);
+      text( tutorialText[4] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*6 );
+    }
+    if( timer.getSecondsActive() > delay_5 ){
+      if( timer.getSecondsActive() < delay_6 )
+        fill(50,255,50);
+      text( tutorialText[5] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*8 );
+    }
+    if( timer.getSecondsActive() > delay_6 ){
+      if( timer.getSecondsActive() < delay_7 )
+        fill(50,255,50);
+      text( tutorialText[6] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*10 );
+    }
+    if( timer.getSecondsActive() > delay_7 ){
+      if( timer.getSecondsActive() < delay_8 )
+        fill(50,255,50);
+      text( tutorialText[7] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*12 );
+    }
   }// demoMode
-
-  public void test1( ) {
-    // Front on ball/bar collision -- with boosters and two "goals"
-    balls[0].setPosition( 1920*0.5+350, 1080*0.5 - 400 );
-    balls[0].setVelocity( -350, 50 );
-    //barManager.bars[3].setPosition( 1920*0.5, 1080*0.5 - 275 );
-    barManager.bars[3].setVelocity( -3, 300 );
-    barManager.bars[3].setRotation( Math.PI*0.6 );
-    //bar.setVelocity( -3, 300 );
-    //bar.setRotation( Math.PI*0.6 );
-  }
-
-  public void test2( ) {
-    // Corner on ball/bar collision
-    balls[0].setPosition( 1920*0.5+75, 1080-180 );
-    balls[0].setVelocity( 0, 0 );
-    //barManager.bars[3].setPosition( 1920*0.5, 1080*0.5 );
-    barManager.bars[3].setVelocity( -0.9, 250 );
-    barManager.bars[3].setRotation( 0 );
-    //bar.setVelocity( -0.9, 250 );
-    //bar.setRotation( 0 );
-  }
-
-  public void test3( ) {
-    // Bar/Ball/Wall - Ball Between Players
-    balls[0].setPosition( 1920*0.5, 1080-450 );
-    balls[0].setVelocity( 0, 0 );
-    //barManager.bars[2].setPosition( 1920*0.5, 1080*0.5 );
-    barManager.bars[2].setVelocity( 0, 500 );
-    barManager.bars[2].setRotation( 0 );
-    //bar.setVelocity( 0, 500 );
-    //bar.setRotation( 0 );
-  }
-
-  public void test4( ) {
-    // Bar/Ball/Wall - Bar Side
-    balls[0].setPosition( 1920*0.5, 1080-50 );
-    balls[0].setVelocity( 0, 0 );
-    //barManager.bars[0].setPosition( 1920*0.5, 1080*0.5 );
-    barManager.bars[0].setVelocity( 0, 800 );
-    barManager.bars[0].setRotation( 0 );
-    //bar.setVelocity( 0, 800 );
-    //bar.setRotation( 0 );
-  }
-
-  public void test5( ) {
-    // Bar/Ball/Wall - Bar Corner
-    balls[0].setPosition( 1920*0.5+80, 1080-50 );
-    balls[0].setVelocity( 0, 0 );
-    //bar.setPosition( 1920*0.5, 1080*0.5 );
-    barManager.bars[0].setVelocity( -1.3, 555 );
-    barManager.bars[0].setRotation( 0 );
-    //bar.setVelocity( -1.3, 555 );
-    //bar.setRotation( 0 );
-  }
-
-  public void test6( ) {
-    // Corner Test
-    balls[0].setPosition( 1920-300, 100 );
-    balls[0].setVelocity( 100, -40 );
-  }
-
-  public void test7( ) {
-    // Ball Between Two Boosters
-    balls[0].setPosition( 1920*0.5 + 200, 150 );
-    balls[0].setVelocity( 0, 40 );
-  }
 
 }// class PlayState
 

@@ -6,9 +6,13 @@
  */
 class MenuState extends GameState
 {
+  private Image selectTeam, selectField, aboutBackground;
   private CircularButton zooballLogo, zooballLogo_dragon, zooballLogo_tiger, zooballLogo_start;
   private Button bottomDragon, bottomTiger, topDragon, topTiger;
-  private Button temp_screen;
+  private Button topAbout, topTutorial, topQuit, topControls;
+  private Button bottomAbout, bottomTutorial, bottomQuit, bottomControls;
+  private Button bottomBack, topBack;
+  private Button easyButton, normalButton, hardButton;
   
   boolean topChosen = false;
   boolean bottomChosen = false;
@@ -20,6 +24,8 @@ class MenuState extends GameState
   
   final private static int MENU = 1;
   final private static int FIELD_SELECT = 2;
+  final private static int ABOUT = 3;
+  
   int state = MENU;
   double menuTransitionDelay;
   
@@ -35,6 +41,10 @@ class MenuState extends GameState
     for ( int i = 0; i < max; i++ )
       r.nextDouble( );   
 
+    selectTeam = new Image("data/ui/text/selectTeam.png");
+    selectField = new Image("data/ui/text/selectPlayMode.png");
+    aboutBackground = new Image("data/ui/logos/about.png");
+    
     zooballLogo = new CircularButton("data/ui/logos/zooball.png");
     zooballLogo.setPosition( game.getWidth()/2, game.getHeight()/2 );
     zooballLogo.setRadius( 393/2 );
@@ -51,22 +61,61 @@ class MenuState extends GameState
     zooballLogo_start.setPosition( game.getWidth()/2, game.getHeight()/2 );
     zooballLogo_start.setRadius( 393/2 );  
     
-    bottomDragon = new Button( 50 + 469, (int)game.getHeight() - 161, "data/ui/buttons/dragons/disabled.png");
+    bottomDragon = new Button( 50 + 469, (int)game.getHeight() - 100, "data/ui/buttons/dragons/disabled.png");
     bottomDragon.setLitImage( loadImage("data/ui/buttons/dragons/enabled.png") );
-    bottomTiger = new Button( (int)game.getWidth() - 50 - 469, (int)game.getHeight() - 161, "data/ui/buttons/tigers/disabled.png");
+    bottomTiger = new Button( (int)game.getWidth() - 50 - 469, (int)game.getHeight() - 100, "data/ui/buttons/tigers/disabled.png");
     bottomTiger.setLitImage( loadImage("data/ui/buttons/tigers/enabled.png") );
  
-    topDragon = new Button( (int)game.getWidth() - 50 - 469, 161, "data/ui/buttons/dragons/disabled.png");
+    topDragon = new Button( (int)game.getWidth() - 50 - 469, 100, "data/ui/buttons/dragons/disabled.png");
     topDragon.setLitImage( loadImage("data/ui/buttons/dragons/enabled.png") );
     topDragon.setRotation( PI );
-    topTiger = new Button( 50 + 469, 161, "data/ui/buttons/tigers/disabled.png");
+    topTiger = new Button( 50 + 469, 100, "data/ui/buttons/tigers/disabled.png");
     topTiger.setLitImage( loadImage("data/ui/buttons/tigers/enabled.png") );
     topTiger.setRotation( PI );
     
-    temp_screen = new Button( (int)game.getWidth()/2 , (int)game.getHeight()/2, "data/ui/logos/4b_menu_screen_Joan.png");
-    temp_screen.setButtonText("PLACEHOLDER IMAGE");
-    temp_screen.setButtonTextColor(color(255,255,255));
-    temp_screen.setButtonTextSize(64);
+    bottomAbout = new Button( (int)game.getWidth()/2 - 200 , (int)game.getHeight() - 250, "data/ui/buttons/greenGlow/enabled.png");
+    bottomAbout.setButtonText("About");
+    bottomAbout.setDoubleSidedText(false);
+    topAbout = new Button( (int)game.getWidth()/2 + 200 , 250, "data/ui/buttons/greenGlow/enabled.png");
+    topAbout.setButtonText("About");
+    topAbout.setDoubleSidedText(false);
+    topAbout.setRotation(PI);
+    
+    bottomTutorial = new Button( (int)game.getWidth()/2 + 000, (int)game.getHeight() - 250, "data/ui/buttons/greenGlow/enabled.png");
+    bottomTutorial.setButtonText("Tutorial");
+    bottomTutorial.setDoubleSidedText(false);
+    topTutorial = new Button( (int)game.getWidth()/2 - 000, 250, "data/ui/buttons/greenGlow/enabled.png");
+    topTutorial.setButtonText("Tutorial");
+    topTutorial.setDoubleSidedText(false);
+    topTutorial.setRotation(PI);
+
+    bottomQuit = new Button( (int)game.getWidth()/2 + 200, (int)game.getHeight() - 250, "data/ui/buttons/greenGlow/enabled.png");
+    bottomQuit.setButtonText("Quit");
+    bottomQuit.setDoubleSidedText(false);
+    topQuit = new Button( (int)game.getWidth()/2 - 200, 250, "data/ui/buttons/greenGlow/enabled.png");
+    topQuit.setButtonText("Quit");
+    topQuit.setDoubleSidedText(false);
+    topQuit.setRotation(PI);
+    
+    bottomBack = new Button( (int)game.getWidth() - 100, (int)game.getHeight() - 70, "data/ui/buttons/greenGlow/enabled.png");
+    bottomBack.setButtonText("Back");
+    bottomBack.setDoubleSidedText(false);
+    topBack = new Button( 100,  70, "data/ui/buttons/greenGlow/enabled.png");
+    topBack.setButtonText("Back");
+    topBack.setDoubleSidedText(false);
+    topBack.setRotation(PI);
+    
+    bottomControls = new Button( (int)game.getWidth() - 100, (int)game.getHeight() - 70, "data/ui/buttons/greenGlow/enabled.png");
+    bottomControls.setButtonText("Controls");
+    bottomControls.setDoubleSidedText(false);
+    topControls = new Button( 100,  70, "data/ui/buttons/greenGlow/enabled.png");
+    topControls.setButtonText("Controls");
+    topControls.setDoubleSidedText(false);
+    topControls.setRotation(PI);
+    
+    easyButton = new Button( (int)game.getWidth()/2 - 500, (int)game.getHeight()/2, "data/ui/buttons/easy_field.png");
+    normalButton = new Button( (int)game.getWidth()/2, (int)game.getHeight()/2, "data/ui/buttons/normal_field.png");
+    hardButton = new Button( (int)game.getWidth()/2 + 500, (int)game.getHeight()/2, "data/ui/buttons/hard_field.png");
     
     endLoad( );
   }// load
@@ -74,6 +123,7 @@ class MenuState extends GameState
   public void enter( ) {
     timer.setActive( true );
     soundManager.playJungle();
+    state = MENU;
   }// enter
   
   public void update( ) {
@@ -86,10 +136,13 @@ class MenuState extends GameState
     drawBackground( );
     switch(state){
       case(MENU):
-        drawButtons();
+        drawMenuButtons();
         break;
       case(FIELD_SELECT):
-        temp_screen.process(font, timer.getSecondsActive());
+        drawFieldSelect();
+        break;
+      case(ABOUT):
+        drawAbout();
         break;
       default:
         println("Warning: Unknown sub-state "+state+"called in MenuState.");
@@ -106,7 +159,31 @@ class MenuState extends GameState
     rect( 0, 0, game.getWidth( ), game.getHeight( ) );
   }// drawBackground
   
-  private void drawButtons(){
+  private void drawFieldSelect(){
+    selectField.draw();
+    bottomBack.process(font, timer.getSecondsActive());
+    topBack.process(font, timer.getSecondsActive()); 
+    easyButton.process(font, timer.getSecondsActive());
+    normalButton.process(font, timer.getSecondsActive());
+    hardButton.process(font, timer.getSecondsActive());
+  }// drawFieldSelect
+  
+  private void drawAbout(){
+    aboutBackground.draw();
+    bottomBack.process(font, timer.getSecondsActive());
+    topBack.process(font, timer.getSecondsActive());
+  }// drawAboutButtons
+  
+  private void drawMenuButtons(){
+    selectTeam.draw();
+    bottomAbout.process(font, timer.getSecondsActive());
+    bottomTutorial.process(font, timer.getSecondsActive());
+    bottomQuit.process(font, timer.getSecondsActive());
+    
+    topAbout.process(font, timer.getSecondsActive());
+    topTutorial.process(font, timer.getSecondsActive());
+    topQuit.process(font, timer.getSecondsActive());
+    
     bottomTiger.process(font, timer.getSecondsActive());
     bottomTiger.setLit( (bottomChosen && bottomTigerTeam) );
     bottomDragon.process(font, timer.getSecondsActive());
@@ -138,7 +215,6 @@ class MenuState extends GameState
       zooballLogo.draw();
       playEnabled = false;
     }
-    
   }// drawButtons
   
   private void drawDebugText( ) {
@@ -178,9 +254,33 @@ class MenuState extends GameState
           topDragonTeam = false;
           soundManager.playTiger();
         }
+        if( topAbout.isHit(x,y) || bottomAbout.isHit(x,y) ){
+          state = ABOUT;
+        }
+        if( topQuit.isHit(x,y) || bottomQuit.isHit(x,y) ){
+          game.setState( game.getLeavingState() );
+        }
+        
+        break;
+      case(ABOUT):
+        if( topBack.isHit(x,y) || bottomBack.isHit(x,y) )
+          state = MENU;
         break;
       case(FIELD_SELECT):
-        if( temp_screen.isHit(x,y) && menuTransitionDelay < timer.getSecondsActive() ){
+        if( topBack.isHit(x,y) || bottomBack.isHit(x,y) )
+          state = MENU;
+        if( easyButton.isHit(x,y) && menuTransitionDelay < timer.getSecondsActive() ){
+          FIELD_MODE = 1;
+          game.reloadState( game.getPlayState() );
+          game.setState( game.getPlayState() );
+        }
+        if( normalButton.isHit(x,y) && menuTransitionDelay < timer.getSecondsActive() ){
+          FIELD_MODE = 2;
+          game.reloadState( game.getPlayState() );
+          game.setState( game.getPlayState() );
+        }
+        if( hardButton.isHit(x,y) && menuTransitionDelay < timer.getSecondsActive() ){
+          FIELD_MODE = 3;
           game.reloadState( game.getPlayState() );
           game.setState( game.getPlayState() );
         }

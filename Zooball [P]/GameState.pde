@@ -56,7 +56,7 @@ abstract class GameState
       //Draw mouse
       fill( #000000 );
       noStroke();
-      ellipse( xCoord, yCoord, 20, 20 );
+      //ellipse( xCoord, yCoord, 20, 20 );
     }
     
     if(!mousePressed && usingMouse && recordingMouse)

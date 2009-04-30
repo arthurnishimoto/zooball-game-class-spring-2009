@@ -80,10 +80,10 @@ class OverState extends GameState
 
     if( redTeamWins ){
       fill(255,0,0);
-      text("Red Team Wins", game.getWidth()/2, game.getHeight()/2 + 64*4);
+      text("Dragon Team Wins", game.getWidth()/2, game.getHeight()/2 + 64*4);
     }else if( yellowTeamWins ){
       fill(255,255,0);
-      text("Yellow Team Wins", game.getWidth()/2, game.getHeight()/2 + 64*4);      
+      text("Tiger Team Wins", game.getWidth()/2, game.getHeight()/2 + 64*4);      
     }else{
       fill(0,255,0);
       text("DRAW", game.getWidth()/2, game.getHeight()/2 + 64*4);
@@ -97,10 +97,10 @@ class OverState extends GameState
    
     if( redTeamWins ){
       fill(255,0,0);
-      text("Red Team Wins", 0, 0 + 64*2);
+      text("Dragon Team Wins", 0, 0 + 64*2);
     }else if( yellowTeamWins ){
       fill(255,255,0);
-      text("Yellow Team Wins", 0, 0 + 64*2);      
+      text("Tiger Team Wins", 0, 0 + 64*2);      
     }else{
       fill(0,255,0);
       text("DRAW", 0, 0 + 64*2);            

@@ -14,6 +14,8 @@ String[] mousePlayback;
 String mouseRecorder = "";
 int playbackItr = 0;
 
+Boolean quit = false;
+
 //Touch API
 TouchAPI tacTile;
 
@@ -60,6 +62,9 @@ void draw( ) {
     fill(0,255,0);
     ellipse(10,10,10,10);
   }
+  
+  if(quit)
+    exit();
 }// draw
 
 void keyPressed( KeyEvent e ) {
@@ -87,22 +92,7 @@ void keyPressed( KeyEvent e ) {
       }
       
     }// else-if recording
-    
-    // Physics demo
-    else if ( e.getKeyChar( ) == '1' )
-      game.getPlayState( ).test1( );
-    else if ( e.getKeyChar( ) == '2' )
-      game.getPlayState( ).test2( );
-    else if ( e.getKeyChar( ) == '3' )
-      game.getPlayState( ).test3( );
-    else if ( e.getKeyChar( ) == '4' )
-      game.getPlayState( ).test4( );
-    else if ( e.getKeyChar( ) == '5' )
-      game.getPlayState( ).test5( );
-    else if ( e.getKeyChar( ) == '6' )
-      game.getPlayState( ).test6( );
-    else if ( e.getKeyChar( ) == '7' )
-      game.getPlayState( ).test7( );
+ 
   }// if game != null
   super.keyPressed( e ); // Pass event up the chain so ESC still works
 }// keyPressed

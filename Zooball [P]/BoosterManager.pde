@@ -37,8 +37,22 @@ class BoosterManager{
         boosters[11] = new BoosterCorner( FIELD_RIGHT, FIELD_BOTTOM, -90, -250, new Vector2D( -80, -80 ) );
         break;
       case(MEDIUM):
+        boosters = new Booster[0];
         break;
       case(HARD):
+        boosters = new Booster[12];
+        boosters[0] = new BoosterStrip( FIELD_LEFT + 3*ZONE_WIDTH, FIELD_TOP+150, new Vector2D( 0, -1500 ) );
+        boosters[1] = new BoosterStrip( FIELD_RIGHT - 3*ZONE_WIDTH, FIELD_TOP+150, new Vector2D( 0, -1500 ) );
+        boosters[2] = new BoosterStrip( FIELD_LEFT + 3*ZONE_WIDTH, FIELD_BOTTOM-150, new Vector2D( 0, 1500 ) );
+        boosters[3] = new BoosterStrip( FIELD_RIGHT - 3*ZONE_WIDTH, FIELD_BOTTOM-150, new Vector2D( 0, 1500 ) );
+        boosters[4] = new BoosterStrip( FIELD_LEFT + 1.5*ZONE_WIDTH, FIELD_TOP+315, new Vector2D( 1200, -900 ) );
+        boosters[5] = new BoosterStrip( FIELD_RIGHT - 1.5*ZONE_WIDTH, FIELD_TOP+315, new Vector2D( -1200, -900 ) );
+        boosters[6] = new BoosterStrip( FIELD_LEFT + 1.5*ZONE_WIDTH, FIELD_BOTTOM-315, new Vector2D( 1200, 900 ) );
+        boosters[7] = new BoosterStrip( FIELD_RIGHT - 1.5*ZONE_WIDTH, FIELD_BOTTOM-315, new Vector2D( -1200, 900 ) );
+        boosters[8] = new BoosterCorner( FIELD_LEFT, FIELD_TOP, 90, 250, new Vector2D( 80, 80 ) );
+        boosters[9] = new BoosterCorner( FIELD_LEFT, FIELD_BOTTOM, 90, -250, new Vector2D( 80, -80 ) );
+        boosters[10] = new BoosterCorner( FIELD_RIGHT, FIELD_TOP, -90, 250, new Vector2D( -80, 80 ) );
+        boosters[11] = new BoosterCorner( FIELD_RIGHT, FIELD_BOTTOM, -90, -250, new Vector2D( -80, -80 ) );
         break;
       default:
         println("Warning: Invalid booster difficulty specified - Level:"+difficultyLevel+".");
