@@ -85,76 +85,6 @@ class Foosmen{
     }else
       confused = false;
     
-    // Maintains Hitbox shile moving
-    if( parent.zoneFlag == 0 ){
-      if( parent.barRotation >= 0 && parent.barRotation < 15 ) 
-        hit_horz_shift = 0;
-      else if( parent.barRotation >= 15  && parent.barRotation < 30 ) 
-        hit_horz_shift = 25 * 1;
-      else if( parent.barRotation >= 30  && parent.barRotation < 45 ) 
-        hit_horz_shift = 25 * 2;
-      else if( parent.barRotation >= 45 && parent.barRotation < 60 ) 
-        hit_horz_shift = 25 * 3 - 5;
-      else if( parent.barRotation >= 60  && parent.barRotation < 75 ) 
-        hit_horz_shift = 25 * 4 - 15;
-          
-      else if( parent.barRotation >= 345  && parent.barRotation < 360 ) 
-        hit_horz_shift = -25 * 1;
-      else if( parent.barRotation >= 330  && parent.barRotation < 375 ) 
-        hit_horz_shift = -25 * 2;
-      else if( parent.barRotation >= 315 && parent.barRotation < 330 ) 
-        hit_horz_shift = -25 * 3 + 5;
-      else if( parent.barRotation >= 300  && parent.barRotation < 315 ) 
-        hit_horz_shift = -25 * 4 + 15;
-      else
-        hit_horz_shift = 720;
-    }else if( parent.zoneFlag == 1 ){
-      if( parent.barRotation >= 0 && parent.barRotation < 15 ) 
-        hit_horz_shift = 0;
-      else if( parent.barRotation >= 15  && parent.barRotation < 30 ) 
-        hit_horz_shift = -25 * 1;
-      else if( parent.barRotation >= 30  && parent.barRotation < 45 ) 
-        hit_horz_shift = -25 * 2;
-      else if( parent.barRotation >= 45 && parent.barRotation < 60 ) 
-        hit_horz_shift = -25 * 3 + 5;
-      else if( parent.barRotation >= 60  && parent.barRotation < 75 ) 
-        hit_horz_shift = -25 * 4 + 15;
-          
-      else if( parent.barRotation >= 345  && parent.barRotation < 360 ) 
-        hit_horz_shift = 25 * 1;
-      else if( parent.barRotation >= 330  && parent.barRotation < 375 ) 
-        hit_horz_shift = 25 * 2;
-      else if( parent.barRotation >= 315 && parent.barRotation < 330 ) 
-        hit_horz_shift = 25 * 3 - 5;
-      else if( parent.barRotation >= 300  && parent.barRotation < 315 ) 
-        hit_horz_shift = 25 * 4 - 15;
-      else
-        hit_horz_shift = 720;      
-    }
-    hit_xPos = (xPos-hit_width/2) + hit_horz_shift;
-    hit_yPos = yPos - 4;
-    
-    if( yPos+playerHeight > screenHeight-borderHeight ){
-      atBottomEdge = true;
-      parent.atBottomEdge = true;
-    }else{
-      atBottomEdge = false;
-      parent.atBottomEdge = false;
-    }
-    
-    if( yPos < borderHeight ){
-      atTopEdge = true;
-      parent.atTopEdge = true;
-    }else{
-      parent.atTopEdge = false;
-      atTopEdge = false;
-    }
-    
-    // Player Width
-    playerWidth = 0;
-    fill( #000000 );
-    rect(xPos, yPos, playerWidth, playerHeight);
-
     if( !displayArt ){
     // Team Color
     fill( parent.teamColor );
@@ -334,8 +264,8 @@ class Foosmen{
         if( balls[i].yPos + balls[i].diameter/2 > hit_yPos && balls[i].yPos - balls[i].diameter/2 < hit_yPos + hit_height/2 ) // Ball center is between bottom hit buffer and center
         { 
           topHit = true;
-          ballsRecentlyHit[i] = 1;  // Flag collision has occured
-          balls[i].kickBall( 2 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          //ballsRecentlyHit[i] = 1;  // Flag collision has occured
+          //balls[i].kickBall( 2 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
           specialCollision(i);
           parent.statistics[2] += 1; // Ball hit
           continue;
@@ -343,8 +273,8 @@ class Foosmen{
         else if(balls[i].yPos - balls[i].diameter/2 < hit_yPos + hit_height && balls[i].yPos + balls[i].diameter/2 > hit_yPos + hit_height/2)
         {
           bottomHit = true;
-          ballsRecentlyHit[i] = 1;  // Flag collision has occured
-          balls[i].kickBall( 2 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          //ballsRecentlyHit[i] = 1;  // Flag collision has occured
+          //balls[i].kickBall( 2 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
           specialCollision(i);
           if( balls[i].getSpeed() > 0 )
             parent.statistics[2] += 1; // Ball hit
@@ -371,8 +301,8 @@ class Foosmen{
             if( balls[i].getSpeed() > 1 )
               catchBall(i);
               
-          ballsRecentlyHit[i] = 1;  // Flag collision has occured
-          balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          //ballsRecentlyHit[i] = 1;  // Flag collision has occured
+          //balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
           specialCollision(i);
           if( balls[i].getSpeed() > 0 )
             parent.statistics[2] += 1; // Ball hit
@@ -389,8 +319,8 @@ class Foosmen{
             if( balls[i].getSpeed() > 1 )
               catchBall(i);
               
-          ballsRecentlyHit[i] = 1;  // Flag collision has occured
-          balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
+          //ballsRecentlyHit[i] = 1;  // Flag collision has occured
+          //balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert yVel ) + add bar speed
           if( balls[i].getSpeed() > 0 )
             parent.statistics[2] += 1; // Ball hit
           specialCollision(i);
@@ -411,8 +341,8 @@ class Foosmen{
               if( balls[i].getSpeed() > 1 )
                 balls[i].stopBall();
             }
-            ballsRecentlyHit[i] = 1;
-            balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert xVel ) + add bar speed
+            //ballsRecentlyHit[i] = 1;
+            //balls[i].kickBall( 1 , parent.xMove, parent.yMove); // Bounce ball back ( invert xVel ) + add bar speed
             continue;            
           }// if ball hits left side of Foosmen
 
@@ -500,6 +430,11 @@ class Foosmen{
       balls[ballID].specialSource.statistics[5] += 1; // Dragons confused
     }
   }//specialCollision()
+  
+  void setPosition( float x, float y ){
+    xPos = x;
+    yPos = y;
+  }// setPosition
   
   void setGameTimer( double timer_g ){
     gameTimer = timer_g;

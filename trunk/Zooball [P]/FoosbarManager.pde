@@ -134,7 +134,7 @@ class FoosbarManager{
         bars[x].display();
         if( parent.timer.isActive() ){
           bars[x].ballInArea(balls);
-          //bars[x].collide(balls);
+          bars[x].collide(balls);
           bars[x].setGameTimer(timer_g);
         }
       }// for

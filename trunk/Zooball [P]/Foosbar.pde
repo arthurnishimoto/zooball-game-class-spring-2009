@@ -164,50 +164,6 @@ class Foosbar{
     record = loadBytes("data/records/"+this.getFoosbarID()+".dat");  
   }// CTOR
   
-  public Foosbar( double x, double y, int foosmen ) throws IllegalArgumentException {
-    // Geometry
-    FOOSMAN_WIDTH = 53;
-    FOOSMAN_HALF_WIDTH = 26.5;
-    BALL_RADIUS = 25;
-    BALL_DIAMETER = 50;
-    A = new Vector2D( -16, 40 );
-    B = new Vector2D( -7, -106 );
-    C = new Vector2D( 7, -106 );
-    D = new Vector2D( 16, 40 );
-    //PLAY_FIELD_Z = -73; // This seemed more accurate based on the renders
-    PLAY_FIELD_Z = -68; // This allows for a wider cross-section
-    double a = -PLAY_FIELD_Z;
-    double h = C.magnitude( );
-    MIN_ROTATION = -Math.acos( a/h );
-    MAX_OFFSET = Math.sqrt( h*h - a*a );
-    h = B.magnitude( );
-    MAX_ROTATION = Math.acos( a/h );
-    MIN_OFFSET = -Math.sqrt( h*h - a*a );
-
-    // instance variables
-    if ( foosmen == 1 )
-      foosmenPositions = new double[] { 0 };
-    else if ( foosmen == 2)
-      foosmenPositions = new double[] { -(FOOSMAN_WIDTH + 100), FOOSMAN_WIDTH + 100 };
-    else if ( foosmen == 3 )
-      foosmenPositions = new double[] { -(FOOSMAN_WIDTH + 165), 0, (FOOSMAN_WIDTH + 165) };
-    else if ( foosmen == 5 )
-      foosmenPositions = new double[] { -2*(FOOSMAN_WIDTH + 90), -(FOOSMAN_WIDTH + 90), 0, (FOOSMAN_WIDTH + 90), 2*(FOOSMAN_WIDTH + 90) };
-    else
-      throw new IllegalArgumentException("Invalid number of foosmen - " + foosmen + ". Number must be 1, 2, 3, or 5.");
-    radius = 0.5 * (foosmenPositions[foosmenPositions.length-1] - foosmenPositions[0] + FOOSMAN_WIDTH);
-    position = new Vector2D[] { new Vector2D( x, y ), new Vector2D( x, y ) };
-    velocity = new Vector2D[] { new Vector2D( 0, 0 ), new Vector2D( 0, 0 ) };
-    rotation = new double[] { 0, 0 };
-    forces = new Vector2D( 0, 0 );
-    mass = 35 + foosmen * 5; // mass of bar plus mass of each foosman
-    friction = new Vector2D( -2 * mass * 500, -0.5 * mass * 500 ); // gravity ~9.8m/s^2 what is that in px/s^2
-
-    double height = 0.5 * ( (A.y - B.y) + (D.y - C.y) );
-    double width = 0.5 * ( (D.x - A.x) + (C.x - B.x) );
-    momentOfInertia = mass * ( height*height + width*width ) / 12;
-  }// CTOR
-  
   public void step( double dt ) {
     // Runge-Kutta Order 4
     Vector2D p1 = new Vector2D( rotation[current], position[current].y );
@@ -301,16 +257,25 @@ class Foosbar{
     }
     
     foosPlayers = new Foosmen[nPlayers];
-    //FoosPlayer( int x, int y, int newWidth, int newHeight)
+    //FoosPlayer( int x, int y, int newWidth, int newHeight, int nBalls, Foosbar parent)
     for( int i = 0; i < nPlayers; i++ ){
-      foosPlayers[i] = new Foosmen( xPos, (i+1)*barHeight/(nPlayers+1), playerWidth, playerHeight, ballArray.length , this);
+      foosPlayers[i] = new Foosmen( xPos, (float)(position[current].y + foosmenPositions[i]), playerWidth, playerHeight, ballArray.length , this);
     }
   }// ScrollBar CTOR
   
   void display(){
-    //for( int i = 0; i < nPlayers; i++ ){
-    //  foosPlayers[i].display();
-    //}
+    // Converts physics rotation angle (radians -PI to PI) to Foosmen angle (degrees 0 - 360 );
+    if( zoneFlag == 0 )
+      barRotation = degrees( -(float)this.getRotation() );
+    else if( zoneFlag == 1 )
+      barRotation = degrees( (float)this.getRotation() );
+    if( barRotation < 0 )
+      barRotation += 360;
+      
+    for( int i = 0; i < nPlayers; i++ ){
+      foosPlayers[i].display();
+      foosPlayers[i].setPosition( xPos, (float)(position[current].y + foosmenPositions[i]) );
+    }
     active = true;
     
     if(debuffed){
@@ -324,25 +289,10 @@ class Foosbar{
       sliderMultiplier = orig_sliderMultiplier;
       rotateMultiplier = orig_rotateMultiplier;
     }
-    
-    // Swipe
-    if( abs(xMove) <= swipeThreshold ){
-      xSwipe = true;
-      //shoot(4);
-    }else{
-      xSwipe = false;
-    }// if xSwipe
-
-    if( abs(yMove) <= swipeThreshold ){
-      ySwipe = true;
-      //shoot(5);
-    }else{
-      ySwipe = false;
-    }// if xSwipe
-       
+           
     // Gets xMove directly from finer to also stop spinning
     if( centerZonePressed && fingerTest.xMove == 0 && !pressed ){ // Resets to neutral position if center zone tapped
-      barRotation = 0;
+      this.setRotation(0);
       rotateVel = 0;
       xMove = 0; // Stops spinning on release
     }
@@ -396,45 +346,10 @@ class Foosbar{
     
     // Bar rotation
     if(rotationEnabled){
-      if( zoneFlag == 0 ){
-        if( xMove > 1 ){
-          if( !hasBall )
-            barRotation += xMove * rotateMultiplier;
-          xMove -= barFriction;
-          rotateVel = xMove * rotateMultiplier;
-        }else if( xMove < -1 ){
-          if( !hasBall )
-            barRotation += xMove * rotateMultiplier;
-          xMove += barFriction;
-          rotateVel = xMove * rotateMultiplier;
-        }else{
-          xMove = 0;
-          rotateVel = 0;
-        }
-      }else if( zoneFlag == 1 ){
-        if( xMove > 1 ){
-          if( !hasBall )
-            barRotation -= xMove * rotateMultiplier;
-          xMove -= barFriction;
-          rotateVel = xMove * rotateMultiplier;
-        }else if( xMove < -1 ){
-          if( !hasBall )
-            barRotation -= xMove * rotateMultiplier;
-          xMove += barFriction;
-          rotateVel = xMove * rotateMultiplier;
-        }else{
-          xMove = 0;
-          rotateVel = 0;
-        }
-      }
-      
-      if( barRotation >= 360 )
-        barRotation = 0;
-      else if( barRotation < 0 )
-        barRotation = 359;
+
     }// if rotationEnabled
     if( hasBall )
-      barRotation = 0; // Locks bar rotation if hasBall
+      this.setRotation(0); // Locks bar rotation if hasBall
   }// display
 
   void displayStats(){
@@ -879,6 +794,15 @@ class Foosbar{
           
           // TODO: If ball is not touching a wall, move it to touch at point at p. If the ball
           // is touching the wall, move the player to touch at point p.
+          
+          ball.lastBarHit = this; // Ball records it hit this foosbar
+          
+          // Stops ball when "wedged" by Foosmen at a certain angle (opposite of catching angle)
+          if( barRotation > 300 && barRotation < 315 ){
+            if( ball.getSpeed() > 1 )
+              ball.stopBall();
+          }// stops ball when wedged
+          
           return true;
         }
       }
@@ -1022,8 +946,6 @@ class Foosbar{
       
       this.setVelocity( -xMove * rotateMultiplier , yMove * sensitivityAdjust * sliderMultiplier );
 
-      //this.setRotation( radians(rotateVelocity) );
-      println( "xMove: "+xMove+" Angle: "+degrees( (float)this.getRotation() ) );
       pressed = true;
       return true;
     }// if x, y in area
@@ -1302,5 +1224,6 @@ class Foosbar{
     }// switch
     return output;
   }//toString()
+ 
 }// class Foosbar
 
