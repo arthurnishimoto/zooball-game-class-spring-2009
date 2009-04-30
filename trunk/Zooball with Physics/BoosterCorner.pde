@@ -36,8 +36,7 @@ public class BoosterCorner extends Booster
   }
   
   public void drawDebug( ) {
-    super.draw( );
-    // DEBUG
+    super.drawDebug( );
     fill( 255 );
     ellipse( (float)center.x, (float)center.y, 5, 5 );
     stroke( 0 );
@@ -48,6 +47,5 @@ public class BoosterCorner extends Booster
     diameter += diameter;
     ellipse( (float)center.x, (float)center.y, diameter, diameter );
     noStroke( );
-    // END DEBUG
   }
 }

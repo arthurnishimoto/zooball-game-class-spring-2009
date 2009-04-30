@@ -9,105 +9,118 @@ class PlayState extends GameState
   private float SCREEN_LEFT=0, SCREEN_RIGHT=1920, SCREEN_TOP=0, SCREEN_BOTTOM=1080,
   FIELD_LEFT=SCREEN_LEFT+75, FIELD_RIGHT=SCREEN_RIGHT-75, FIELD_TOP=SCREEN_TOP+25, FIELD_BOTTOM=SCREEN_BOTTOM-25,
   GOAL_SIZE=275, GOAL_TOP=FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), GOAL_BOTTOM=FIELD_BOTTOM-0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE),
-  ZONE_COUNT=8, ZONE_WIDTH=(FIELD_RIGHT-FIELD_LEFT)/ZONE_COUNT;
+  ZONE_COUNT=8, ZONE_WIDTH=(FIELD_RIGHT-FIELD_LEFT)/ZONE_COUNT, GOAL_BOX_SIZE=GOAL_SIZE+150, GOAL_BOX_TOP=GOAL_TOP-0.5*(GOAL_BOX_SIZE-GOAL_SIZE),
+  GOAL_BOX_BOTTOM=GOAL_BOTTOM+0.5*(GOAL_BOX_SIZE-GOAL_SIZE);
   private long lastUpdate = 0;
   private Image imgChalk, imgStadiumTop, imgStadiumBottom, imgStadiumLeft, imgStadiumRight, imgEnabledLED, imgDisabledLED;
   private CircularButton btnPauseTop, btnPauseBottom;
   private Ball ball;
   private Booster[] boosters;
   private Line[] horzWalls, vertWalls, goalWalls;
-  private FoosBar bar;
+  private FoosBar[] bars;
 
-  public PlayState( Game game ) {
-    super( game );
+  public PlayState( Game game, TouchAPI tacTile ) {
+    super( game, tacTile );
+    //println( "ZONE WIDTH = " + ZONE_WIDTH);
   }
-
+  
+  private void resetBars( ) {
+    for ( int i = 0; i < bars.length; i++ ) {
+      bars[i].setPosition( bars[i].getPosition( ).x, 1080*0.5 );
+      bars[i].setRotation( 0 );
+      bars[i].setVelocity( 0, 0 );
+    }
+  }
+  
   public void test1( ) {
-    // Front on ball/bar collision -- with boosters and two "goals"
-    ball.setPosition( 1920*0.5+350, 1080*0.5 - 400 );
-    ball.setVelocity( -350, 50 );
-    bar.setPosition( 1920*0.5, 1080*0.5 - 275 );
-    bar.setVelocity( -3, 300 );
-    bar.setRotation( Math.PI*0.6 );
+    resetBars( );
+    bars[3].setPosition( bars[3].getPosition( ).x, 1080*0.5 - 150 );
+    bars[3].setVelocity( -3, 375 );
+    bars[3].setRotation( Math.PI*0.6 );
+    ball.setPosition( 1920*0.5+50, 1080*0.5 - 200 );
+    ball.setVelocity( -350, 135 );
   }
-
+  
   public void test2( ) {
-    // Corner on ball/bar collision
-    ball.setPosition( 1920*0.5+75, 1080-180 );
+    resetBars( );
+    bars[3].setPosition( bars[3].getPosition( ).x, 1080*0.5 );
+    bars[3].setVelocity( -3, 275 );
+    bars[3].setRotation( Math.PI*0.6 );
+    ball.setPosition( 1920*0.5-75, 1080-50 );
     ball.setVelocity( 0, 0 );
-    bar.setPosition( 1920*0.5, 1080*0.5 );
-    bar.setVelocity( -1.1, 250 );
-    bar.setRotation( 0 );
   }
 
   public void test3( ) {
-    // Bar/Ball/Wall - Ball Between Players
-    ball.setPosition( 1920*0.5, 1080-450 );
+    resetBars( );
+    bars[2].setPosition( bars[2].getPosition( ).x, 1080*0.5 );
+    bars[2].setVelocity( 0, 600 );
+    ball.setPosition( bars[2].getPosition( ).x, 1080*0.5 + 130 );
     ball.setVelocity( 0, 0 );
-    bar.setPosition( 1920*0.5, 1080*0.5 );
-    bar.setVelocity( 0, 500 );
-    bar.setRotation( 0 );
   }
+  
 
   public void test4( ) {
-    // Bar/Ball/Wall - Bar Side
-    ball.setPosition( 1920*0.5, 1080-50 );
+    resetBars( );
+    bars[6].setPosition( bars[6].getPosition( ).x, 1080*0.5+75 );
+    bars[6].setVelocity( 0, 600 );
+    ball.setPosition( bars[6].getPosition( ).x, 1080-50 );
     ball.setVelocity( 0, 0 );
-    bar.setPosition( 1920*0.5, 1080*0.5 );
-    bar.setVelocity( 0, 800 );
-    bar.setRotation( 0 );
   }
-
+  
   public void test5( ) {
-    // Bar/Ball/Wall - Bar Corner
-    ball.setPosition( 1920*0.5+80, 1080-50 );
+    resetBars( );
+    bars[0].setPosition( bars[0].getPosition( ).x, 1080*0.5 );
+    bars[0].setVelocity( -4, 0 );
+    //bars[0].setRotation( PI );
+    ball.setPosition( FIELD_LEFT+25, 1080*0.5 );
     ball.setVelocity( 0, 0 );
-    bar.setPosition( 1920*0.5, 1080*0.5 );
-    bar.setVelocity( -1.45, 555 );
-    bar.setRotation( 0 );
   }
-
+  
   public void test6( ) {
-    ball.setPosition( FIELD_RIGHT-ball.getRadius( ), 1080*0.5+130 );
+    resetBars( );
+    bars[7].setPosition( bars[7].getPosition( ).x, 1080*0.5+200 );
+    bars[7].setVelocity( -3, 0 );
+    bars[7].setRotation( HALF_PI );
+    ball.setPosition( FIELD_RIGHT-25, 1080*0.5+200 );
     ball.setVelocity( 0, 0 );
-    bar.setPosition( FIELD_RIGHT-0.5*ZONE_WIDTH, 1080*0.5+130 );
-    bar.setVelocity( 4, 0 );
-    bar.setRotation( Math.PI*0.5 );
   }
-
+  
   public void test7( ) {
-    ball.setPosition( FIELD_RIGHT-ball.getRadius( ), 1080*0.5+150 );
-    ball.setVelocity( 0, 0 );
-    bar.setPosition( FIELD_RIGHT-0.5*ZONE_WIDTH, 1080*0.5+150 );
-    bar.setVelocity( -4, 0 );
-    bar.setRotation( Math.PI*0.5 );
-  }
-
-  public void test8( ) {
     // Corner Test
+    resetBars( );
     ball.setPosition( 1920-300, 100 );
     ball.setVelocity( 100, -40 );
   }
   
-  public void test9( ) {
+  public void test8( ) {
     // Ball Between Two Boosters
-    ball.setPosition( 1920*0.5 + 200, 100 );
+    resetBars( );
+    ball.setPosition( 1920*0.5 + 210, 100 );
     ball.setVelocity( 0, 175 );
   }
 
   public void load( ) {
     Vector2D center = new Vector2D( game.getWidth()*0.5, game.getHeight()*0.5 );
-    bar = new FoosBar( 1920*0.5, 1080*0.5, 3 );
-    // example: redirected to goal
-    //ball = new Ball( new Vector2D( center.x - 200, 220 - 50 ), new Vector2D( 250, 0 ), 2.5, 27.5, 0.1 );
-    // example: stuck between two boosters
-    //ball = new Ball( 1920-665-(75*0.5), 75 );
-    //ball.setVelocity( 8.5, 55 );
-    // example: won't get stuck in corner
-    //ball = new Ball( new Vector2D( 1920-400, 170 ), new Vector2D( 78, -32 ), 2.5, 27.5, 0.1 );
-    //ball = new Ball( 1920-400, 170 );
-    //ball.setVelocity( 78, -32 );
+    bars = new FoosBar[8];
+    bars[0] = new FoosBar( FIELD_LEFT+0.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 1, "tigers" );
+    bars[1] = new FoosBar( FIELD_LEFT+1.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 2, "tigers" );
+    bars[2] = new FoosBar( FIELD_LEFT+2.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 3, "dragons" );
+    bars[3] = new FoosBar( FIELD_LEFT+3.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 5, "tigers" );
+    bars[4] = new FoosBar( FIELD_LEFT+4.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 5, "dragons" );
+    bars[5] = new FoosBar( FIELD_LEFT+5.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 3, "tigers" );
+    bars[6] = new FoosBar( FIELD_LEFT+6.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 2, "dragons" );
+    bars[7] = new FoosBar( FIELD_LEFT+7.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 1, "dragons" );
+    touchables = new Touchable[8];
+    touchables[0] = new TouchZone( FIELD_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), ZONE_WIDTH, 0.5*(SCREEN_BOTTOM-SCREEN_TOP) ); // bottom
+    touchables[1] = new TouchZone( FIELD_LEFT+ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), ZONE_WIDTH, 0.5*(SCREEN_BOTTOM-SCREEN_TOP) ); // bottom
+    touchables[2] = new TouchZone( FIELD_LEFT+2*ZONE_WIDTH, FIELD_TOP, ZONE_WIDTH, 0.5*(SCREEN_BOTTOM-SCREEN_TOP) ); // top
+    touchables[3] = new TouchZone( FIELD_LEFT+3*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), ZONE_WIDTH, 0.5*(SCREEN_BOTTOM-SCREEN_TOP) ); // bottom
+    touchables[4] = new TouchZone( FIELD_LEFT+4*ZONE_WIDTH, FIELD_TOP, ZONE_WIDTH, 0.5*(SCREEN_BOTTOM-SCREEN_TOP) ); // top
+    touchables[5] = new TouchZone( FIELD_LEFT+5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), ZONE_WIDTH, 0.5*(SCREEN_BOTTOM-SCREEN_TOP) ); // bottom
+    touchables[6] = new TouchZone( FIELD_LEFT+6*ZONE_WIDTH, FIELD_TOP, ZONE_WIDTH, 0.5*(SCREEN_BOTTOM-SCREEN_TOP) ); // top
+    touchables[7] = new TouchZone( FIELD_LEFT+7*ZONE_WIDTH, FIELD_TOP, ZONE_WIDTH, 0.5*(SCREEN_BOTTOM-SCREEN_TOP) ); // top
     ball = new Ball( 100, 600 );
+    ball.setPosition( 1920*0.5+350, 1080*0.5 - 400 );
     // HORIZONTAL "WALLS"
     horzWalls = new Line[6];
     // top and bottom of field
@@ -169,46 +182,62 @@ class PlayState extends GameState
   public void update( ) {
     super.update( );
     long time = timer.getMicrosecondsActive( );
-    int samples = 50;
-    double dt = (time - lastUpdate) / 1000000.0 / samples;
-    for ( int i = 0; i < samples; i++ ) 
-      step( dt );
-    lastUpdate = time;
+    while ( lastUpdate < time ) {
+      step( 0.005 );
+      lastUpdate += 5000;
+    }
   }
 
   private void step( double dt ) {
-    // ADD FORCES
+    // ADD BOOSTER FORCES
     ball.clearForces( );
     for ( int i = 0; i < boosters.length; i++ )
       if ( boosters[i].contains( ball.getPosition( ) ) )
         ball.addForce( boosters[i].getForce( ) );
     // STEP FORWARD
     ball.step( dt );
-    bar.step( dt );
+    for ( int i = 0; i < bars.length; i++ ) {
+      Vector2D velocity = ( (TouchZone)touchables[i] ).getVelocity( timer.getMicrosecondsActive( ) );
+      if ( velocity != null )
+        bars[i].setVelocity( velocity.x, velocity.y );
+      bars[i].step( dt );
+    }
     // DO BALL/WALL COLLISIONS
     ball.clearWallContacts( );
     for( int i = 0; i < horzWalls.length; i++ )
-      ball.collide( horzWalls[i] );
+      if ( ball.collide( horzWalls[i] ) )
+        break; // only one horizontal wall can be hit at a time
     for( int i = 0; i < vertWalls.length; i++ )
-      ball.collide( vertWalls[i] );
+      if ( ball.collide( vertWalls[i] ) )
+        break; // only one vertical wall can be hit at a time
     // DO FOOSBAR/WALL COLLISIONS
-    bar.collide( horzWalls[0] );
-    bar.collide( horzWalls[1] );
+    for ( int i = 0; i < bars.length; i++ )
+      if ( !bars[i].collide( horzWalls[0] ) )
+        bars[i].collide( horzWalls[1] ); // only one wall can be hit at a time
     // DO FOOSBAR/BALL COLLISIONS
-    bar.collide( ball );
+    for ( int i = 0; i < bars.length; i++ )
+      if( bars[i].collide( ball ) )
+        break; // only one foosbar can be hit at a time, just stop
   }
 
   public void draw( ) {
     drawBackground( );
     drawPitch( );
-    for ( int i = 0; i < boosters.length; i++ )
+    for ( int i = 0; i < boosters.length; i++ ) {
       boosters[i].draw( );
+      if ( game.isDebugMode( ) )
+        boosters[i].drawDebug( );
+    }
     drawChalk( );
     ball.draw( );
-    bar.drawDebug( );
+    if ( game.isDebugMode( ) )
+      ball.drawDebug( );
+    for ( int i = 0; i < bars.length; i++ ) {
+      bars[i].draw( );
+      if ( game.isDebugMode( ) )
+        bars[i].drawDebug( );
+    }
     drawStadiumDebug( );
-    //drawScore( );
-    //drawButtons( );
     drawDebugText( );
   }
 
@@ -235,7 +264,7 @@ class PlayState extends GameState
   }
   
   private void drawChalk( ) {
-    float px = 3;
+    float px = 5;
     fill( 255 );
     // outline
     rect( FIELD_LEFT, FIELD_TOP, px, FIELD_BOTTOM-FIELD_TOP );
@@ -245,12 +274,19 @@ class PlayState extends GameState
     // center line
     rect( FIELD_LEFT+0.5*(FIELD_RIGHT-FIELD_LEFT-px), FIELD_TOP, px, FIELD_BOTTOM-FIELD_TOP );
     // goalie box
-    
+    rect( FIELD_LEFT, GOAL_BOX_TOP, ZONE_WIDTH, px );
+    rect( FIELD_LEFT, GOAL_BOX_BOTTOM, ZONE_WIDTH, -px );
+    rect( FIELD_LEFT+ZONE_WIDTH, GOAL_BOX_TOP, -px, GOAL_BOX_SIZE );
+    rect( FIELD_RIGHT, GOAL_BOX_TOP, -ZONE_WIDTH, px );
+    rect( FIELD_RIGHT, GOAL_BOX_BOTTOM, -ZONE_WIDTH, -px );
+    rect( FIELD_RIGHT-ZONE_WIDTH, GOAL_BOX_TOP, px, GOAL_BOX_SIZE );
     // center circle
     fill( 0, 0 );
     strokeWeight( px );
     stroke( 255 );
     ellipse( FIELD_LEFT+0.5*(FIELD_RIGHT-FIELD_LEFT), FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 1.5*ZONE_WIDTH, 1.5*ZONE_WIDTH );
+    //arc( FIELD_LEFT+ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), GOAL_SIZE, GOAL_SIZE, -HALF_PI, HALF_PI );
+    //arc( FIELD_RIGHT-ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), GOAL_SIZE, GOAL_SIZE, HALF_PI, PI+HALF_PI );
     strokeWeight( 1 );
     noStroke( );
   }
@@ -266,11 +302,11 @@ class PlayState extends GameState
     // UIC
     fill( 0xCC, 0, 0 );
     rect( FIELD_LEFT, SCREEN_TOP+5, FIELD_RIGHT-FIELD_LEFT, FIELD_TOP-SCREEN_TOP-10 ); // Side Marker
-    rect( SCREEN_RIGHT, GOAL_TOP, (FIELD_RIGHT-SCREEN_RIGHT)*0.5, GOAL_SIZE ); // Goal
+    rect( SCREEN_RIGHT, GOAL_TOP, (FIELD_RIGHT-SCREEN_RIGHT)*0.66, GOAL_SIZE ); // Goal
     // LSU
     fill( 0xFD, 0xD0, 0x23 );
     rect( FIELD_LEFT, FIELD_BOTTOM+5, FIELD_RIGHT-FIELD_LEFT, SCREEN_BOTTOM-FIELD_BOTTOM-10 ); // Side Marker
-    rect( SCREEN_LEFT, GOAL_TOP, (FIELD_LEFT-SCREEN_LEFT)*0.5, GOAL_SIZE ); // Goal
+    rect( SCREEN_LEFT, GOAL_TOP, (FIELD_LEFT-SCREEN_LEFT)*0.66, GOAL_SIZE ); // Goal
   }
 
   private void drawStadium( ) {

@@ -8,8 +8,8 @@ class PausedState extends GameState
 {
   private CircularButton btnResumeBottom, btnResumeTop, btnReplayBottom, btnReplayTop, btnQuitBottom, btnQuitTop;
   
-  public PausedState( Game game ) {
-    super( game );
+  public PausedState( Game game, TouchAPI tacTile ) {
+    super( game, tacTile );
   }
   
   public boolean isLoading( ) { return super.isLoading( ) || game.getPlayState( ).isLoading( ); }
