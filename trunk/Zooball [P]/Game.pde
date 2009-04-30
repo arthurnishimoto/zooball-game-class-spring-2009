@@ -14,7 +14,7 @@ class Game
   private PausedState pausedState;
   
   private OverState overState;
-  //private LeavingState leavingState;
+  private LeavingState leavingState;
   
   private PFont debugFont;
   private boolean debugMode = false;
@@ -34,14 +34,16 @@ class Game
     playState = new PlayState( this );
     pausedState = new PausedState( this );
     overState = new OverState( this );
-        
+    leavingState = new LeavingState( this );
+    
     introState.beginLoad( );
     menuState.beginLoad( );
     playState.beginLoad( );
     pausedState.beginLoad( );
     overState.beginLoad( );
+    leavingState.beginLoad( );
     
-    setState( playState );
+    setState( introState );
     
     calculateScreenTransformation( );
     noStroke( );
@@ -127,7 +129,7 @@ class Game
   public PausedState getPausedState( ) { return pausedState; }
   
   public OverState getOverState( ) { return overState; }
-  //public LeavingState getLeavingState( ) { return leavingState; }
+  public LeavingState getLeavingState( ) { return leavingState; }
   
   public float getWidth( ) { return DEFAULT_WIDTH; }
   public float getHeight( ) { return DEFAULT_HEIGHT; }
