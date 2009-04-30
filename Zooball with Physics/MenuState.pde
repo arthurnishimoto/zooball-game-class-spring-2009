@@ -6,8 +6,8 @@
  */
 class MenuState extends GameState
 {
-  public MenuState( Game game ) {
-    super( game );
+  public MenuState( Game game, TouchAPI tacTile ) {
+    super( game, tacTile );
   }
   
   public void load( ) {

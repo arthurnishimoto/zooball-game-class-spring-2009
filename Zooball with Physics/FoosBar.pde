@@ -14,21 +14,21 @@ public class FoosBar
   private Vector2D friction; // Although this is probalby technically incorrect, allow for different friction in different directions
   private double mass, momentOfInertia;
   // Foosmen Instances
+  private Image[] images;
   private double[] foosmenPositions;
   private double radius;
 
-  public FoosBar( double x, double y, int foosmen ) throws IllegalArgumentException {
+  public FoosBar( double x, double y, int foosmen, String team ) throws IllegalArgumentException {
     // Geometry
     FOOSMAN_WIDTH = 53;
     FOOSMAN_HALF_WIDTH = 26.5;
     BALL_RADIUS = 25;
     BALL_DIAMETER = 50;
     A = new Vector2D( -16, 40 );
-    B = new Vector2D( -7, -106 );
-    C = new Vector2D( 7, -106 );
+    B = new Vector2D( -7, -109 );
+    C = new Vector2D( 7, -109 );
     D = new Vector2D( 16, 40 );
-    //PLAY_FIELD_Z = -73; // This seemed more accurate based on the renders
-    PLAY_FIELD_Z = -68; // This allows for a wider cross-section
+    PLAY_FIELD_Z = -68;
     double a = -PLAY_FIELD_Z;
     double h = C.magnitude( );
     MIN_ROTATION = -Math.acos( a/h );
@@ -45,7 +45,7 @@ public class FoosBar
     else if ( foosmen == 3 )
       foosmenPositions = new double[] { -(FOOSMAN_WIDTH + 165), 0, (FOOSMAN_WIDTH + 165) };
     else if ( foosmen == 5 )
-      foosmenPositions = new double[] { -2*(FOOSMAN_WIDTH + 90), -(FOOSMAN_WIDTH + 90), 0, (FOOSMAN_WIDTH + 90), 2*(FOOSMAN_WIDTH + 90) };
+      foosmenPositions = new double[] { -2*(FOOSMAN_WIDTH + 105), -(FOOSMAN_WIDTH + 105), 0, (FOOSMAN_WIDTH + 105), 2*(FOOSMAN_WIDTH + 105) };
     else
       throw new IllegalArgumentException("Invalid number of foosmen - " + foosmen + ". Number must be 1, 2, 3, or 5.");
     radius = 0.5 * (foosmenPositions[foosmenPositions.length-1] - foosmenPositions[0] + FOOSMAN_WIDTH);
@@ -59,6 +59,16 @@ public class FoosBar
     double height = 0.5 * ( (A.y - B.y) + (D.y - C.y) );
     double width = 0.5 * ( (D.x - A.x) + (C.x - B.x) );
     momentOfInertia = mass * ( height*height + width*width ) / 12;
+    
+    //println( "FOOSBAR REACH = " + (MAX_OFFSET-MIN_OFFSET+BALL_DIAMETER) );
+    
+    images = new Image[25];
+    for ( int i = 0; i < 25; i++ ) {
+      images[i] = new Image( "objects/" + team + "/" + i + ".gif" );
+      float scale = (float)((MAX_OFFSET-MIN_OFFSET+BALL_DIAMETER) / images[i].getWidth( ));
+      images[i].setWidth( images[i].getWidth( ) * scale );
+      images[i].setHeight( images[i].getHeight( ) * scale );
+    }
   }
 
   public void step( double dt ) {
@@ -117,6 +127,25 @@ public class FoosBar
     return new Vector2D( direction.x * friction.x / momentOfInertia, direction.y * friction.y / mass );
   }
   
+  public void draw( ) {
+    int r;
+    if ( rotation[current] <= 0 )
+      r = (int)(map( (float)rotation[current], 0, -PI, 24, 12 ) + 0.5 ) ;
+    else
+      r = (int)(map( (float)rotation[current], 0, PI, 0, 12 ) + 0.5 );
+    fill( 120 );
+    rect( (float)position[current].x-5, 0, 10, 1080 );
+    pushMatrix( );
+    translate( (float)position[current].x, (float)position[current].y );
+    for ( int i = 0; i < foosmenPositions.length; i++ ) {
+      pushMatrix( );
+      translate( -0.5 * images[r].getWidth( ), (float)foosmenPositions[i] - 0.5*images[r].getHeight( ) );
+      images[r].draw( );
+      popMatrix( );
+    }
+    popMatrix( );
+  }
+  
   public void drawDebug( ) {
     // This jumble of code is for debugging... to be able to see what's
     // going on with the physics model behind the foosman sprites.
@@ -129,9 +158,9 @@ public class FoosBar
     pushMatrix( );
     translate( (float)position[current].x, (float)position[current].y );
     fill( 0, 0 );
-    //*
+    /*
     stroke( 255, 225, 0 );
-    ellipse( 0, 0, (float)(radius+radius), (float)(radius+radius) );
+    //ellipse( 0, 0, (float)(radius+radius), (float)(radius+radius) );
     stroke( 255, 0, 0 );
     rect( (float)MIN_OFFSET, (float)(foosmenPositions[0]-FOOSMAN_HALF_WIDTH), (float)(MAX_OFFSET-MIN_OFFSET), (float)(foosmenPositions[foosmenPositions.length-1]-foosmenPositions[0]+FOOSMAN_WIDTH) );
     stroke( 255, 255, 0 );
@@ -184,8 +213,8 @@ public class FoosBar
         line( (float)(x[0]-position[current].x), (float)FOOSMAN_HALF_WIDTH, (float)(x[1]-position[current].x), (float)FOOSMAN_HALF_WIDTH );
         line( (float)(x[0]-position[current].x), (float)-FOOSMAN_HALF_WIDTH, (float)(x[1]-position[current].x), (float)-FOOSMAN_HALF_WIDTH );
         line( (float)(x[1]-position[current].x), (float)-FOOSMAN_HALF_WIDTH, (float)(x[1]-position[current].x), (float)FOOSMAN_HALF_WIDTH );
-        stroke( 255, 255, 0 );
-        rect( (float)(x[0]-position[current].x-BALL_RADIUS), (float)(-FOOSMAN_HALF_WIDTH-BALL_RADIUS), (float)((x[1]-position[current].x)-(x[0]-position[current].x)+BALL_DIAMETER), (float)(FOOSMAN_WIDTH+BALL_DIAMETER) );
+        //stroke( 255, 255, 0 );
+        //rect( (float)(x[0]-position[current].x-BALL_RADIUS), (float)(-FOOSMAN_HALF_WIDTH-BALL_RADIUS), (float)((x[1]-position[current].x)-(x[0]-position[current].x)+BALL_DIAMETER), (float)(FOOSMAN_WIDTH+BALL_DIAMETER) );
       }
       popMatrix( );
     }

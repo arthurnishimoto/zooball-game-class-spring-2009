@@ -1,4 +1,7 @@
+import processing.net.*;
+
 import processing.opengl.*;
+import tacTile.net.*;
 
 Game game;
 
@@ -6,7 +9,8 @@ void setup( ) {
   Image.setPApplet( this ); // Image stores a static instance of this PApplet to call Processing methods. This must be set before creating any Image objects.
   //size( screen.width, screen.height, OPENGL );
   size( 960, 540, OPENGL );
-  game = new Game( );
+  game = new Game( null );
+  //game = new Game( new TouchAPI( this, 7000, 7340, "localhost" ) );
 }
 
 void draw( ) {
@@ -17,8 +21,6 @@ void keyPressed( KeyEvent e ) {
   if ( game != null ) {
     if ( e.getKeyChar( ) == 'd' || e.getKeyChar( ) == 'D' )
       game.toggleDebugMode(  );
-    else if ( e.getKeyChar( ) == 's' || e.getKeyChar( ) == 'S' )
-      game.toggleStrokeMode( );
     else if ( e.getKeyChar( ) == '1' )
       game.getPlayState( ).test1( );
     else if ( e.getKeyChar( ) == '2' )
@@ -35,8 +37,6 @@ void keyPressed( KeyEvent e ) {
       game.getPlayState( ).test7( );
     else if ( e.getKeyChar( ) == '8' )
       game.getPlayState( ).test8( );
-    else if ( e.getKeyChar( ) == '9' )
-      game.getPlayState( ).test9( );
   }
   super.keyPressed( e ); // Pass event up the chain so ESC still works
 }

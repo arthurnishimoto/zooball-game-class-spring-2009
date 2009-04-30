@@ -9,8 +9,8 @@ class LoadingState extends GameState
   private GameState nextState;
   private Image logo;
   
-  public LoadingState( Game game ) {
-    super( game );
+  public LoadingState( Game game, TouchAPI tacTile ) {
+    super( game, tacTile );
     logo = new Image( "ui\\logos\\infinity.png" );
     logo.setX( ( game.getWidth( ) - logo.getWidth( ) ) * 0.5 );
     logo.setY( ( game.getHeight( ) - logo.getHeight( ) ) * 0.5 );

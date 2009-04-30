@@ -6,7 +6,7 @@ public class Ball
   private double direction[];
   private double rotation[];
   private Vector2D forces, wallContacts;
-  private double mass, inverseMass, radius, fC;
+  private double mass, inverseMass, radius, friction;
   
   public Ball( double x, double y ) {
     current = 0;
@@ -20,16 +20,18 @@ public class Ball
     inverseMass = 1 / mass;
     radius = 25;
     // Friction = -mu * mass * gravity * (velocity / |velocity|)
-    // fC = -mu * mass * gravity;
-    fC = -0.05 * mass * 500; // gravity ~9.8m/s^2 what is that in px/s^2
+    // friction = -mu * mass * gravity;
+    friction = -0.05 * mass * 500; // gravity ~9.8m/s^2 what is that in px/s^2
+  }
+  
+  public void draw( ) {
+    fill( 255 );
+    ellipse( (float)position[current].x, (float)position[current].y, (float)(radius+radius), (float)(radius+radius) );
   }
 
-  public void draw( ) {
-    // DEBUG
-    fill( 255 );
+  public void drawDebug( ) {
     pushMatrix( );
     translate( (float)position[current].x, (float)position[current].y);
-    ellipse( 0, 0, (float)(radius+radius), (float)(radius+radius) );
     stroke( 255, 0, 0 );
     line( 0, 0, (float)velocity[current].x, (float)velocity[current].y );
     rotateZ( HALF_PI - (float)direction[current] );
@@ -40,16 +42,15 @@ public class Ball
     line(0, 0, (float)-radius, 0);
     noStroke();
     popMatrix();
-    // END DEBUG
   }
   
-  public void collide( Line wall ) {
+  public boolean collide( Line wall ) {
     Vector2D p = wall.closestPoint( position[current] );
     Vector2D n = Vector2D.sub( position[current], p ); // normal pointing towards the ball
     
     // check for interpenetration
     if ( n.magnitudeSquared( ) > radius*radius )
-      return;
+      return false;
     
     // the ball is touching the wall
     wallContacts.add( n ); // keep track of this to use in collisions with foosbar collisions
@@ -57,7 +58,7 @@ public class Ball
     // "A collision occurs when a point on one body touches a point on another body with a
     //  negative relative normal velocity."
     if ( velocity[current].dot( n ) >= 0 ) // relative normal velocity, the wall isn't moving
-       return;
+       return false;
      
     double elasticity = 0.8; // 1 = elastic, 0 = plastic
     //      -(1 + e) * v . n
@@ -68,12 +69,14 @@ public class Ball
     //  vB2 = vB1 + - * n
     //              M
     velocity[current].add( Vector2D.scale( n, impulse / mass ) );
-    // TODO: move ball to touch exactly at p
+    // move ball to touch exactly at p
     n.norm( );
     n.scale( radius );
     p.add( n );
     position[current].x = p.x;
     position[current].y = p.y;
+    
+    return true;
   }
   
   public void clearWallContacts( ) {
@@ -144,15 +147,14 @@ public class Ball
   // And if it was off the booster before the step, it assumes it stays off the booster througout the step
   private Vector2D acceleration( Vector2D position, Vector2D velocity ) {
     // sliding friction
-    Vector2D fF = new Vector2D( velocity );
-    fF.norm( );
-    fF.scale( fC );
-    // add to existing forces
-    Vector2D a = new Vector2D( forces );
-    a.add( fF );
+    Vector2D forces = new Vector2D( velocity );
+    forces.norm( );
+    forces.scale( friction );
+    // add existing forces
+    forces.add( this.forces );
     // divide by mass
-    a.scale( inverseMass ); // a = F/m
-    return a;
+    forces.scale( inverseMass ); // a = F/m
+    return forces;
   }
   public void clearForces( ) {
     forces.x = 0;
@@ -176,11 +178,16 @@ public class Ball
   public void setPosition( double x, double y ) {
     this.position[current].x = x;
     this.position[current].y = y;
+    this.position[current^1].x = x;
+    this.position[current^1].y = y;
   }
   public Vector2D getVelocity( ) { return velocity[current]; }
   public void setVelocity( double x, double y ) {
     velocity[current].x = x;
     velocity[current].y = y;
     direction[current] = Math.atan2( velocity[current].x, velocity[current].y );
+    velocity[current^1].x = x;
+    velocity[current^1].y = y;
+    direction[current^1] = direction[current];
   }
 }

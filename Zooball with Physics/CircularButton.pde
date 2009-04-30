@@ -11,8 +11,8 @@ public class CircularButton
   private boolean enabled, selected;
   
   public CircularButton( String name ) {
-    imgEnabled = new Image( "ui\\buttons\\" + name + "\\enabled.png" );
-    imgDisabled = new Image( "ui\\buttons\\" + name + "\\disabled.png" );
+    imgEnabled = new Image( "ui/buttons/" + name + "/enabled.png" );
+    imgDisabled = new Image( "ui/buttons/" + name + "/disabled.png" );
     setRadius( ( imgEnabled.getWidth( ) + imgEnabled.getHeight( ) ) * 0.25 ); // diameter = average of width and height
     enabled = true;
     selected = false;
