@@ -53,7 +53,8 @@ public class FoosBar
     velocity = new Vector2D[] { new Vector2D( 0, 0 ), new Vector2D( 0, 0 ) };
     rotation = new double[] { 0, 0 };
     forces = new Vector2D( 0, 0 );
-    mass = 35 + foosmen * 5; // mass of bar plus mass of each foosman
+    //mass = 35 + foosmen * 5; // mass of bar plus mass of each foosman
+    mass = 100 + foosmen * 20;
     friction = new Vector2D( -2 * mass * 500, -0.5 * mass * 500 ); // gravity ~9.8m/s^2 what is that in px/s^2
 
     double height = 0.5 * ( (A.y - B.y) + (D.y - C.y) );
@@ -134,7 +135,7 @@ public class FoosBar
     else
       r = (int)(map( (float)rotation[current], 0, PI, 0, 12 ) + 0.5 );
     fill( 120 );
-    rect( (float)position[current].x-5, 0, 10, 1080 );
+    rect( (float)position[current].x-6, 0, 14, 1080 );
     pushMatrix( );
     translate( (float)position[current].x, (float)position[current].y );
     for ( int i = 0; i < foosmenPositions.length; i++ ) {
@@ -147,6 +148,7 @@ public class FoosBar
   }
   
   public void drawDebug( ) {
+    strokeWeight( 2 );
     // This jumble of code is for debugging... to be able to see what's
     // going on with the physics model behind the foosman sprites.
     double sinTheta = Math.sin( rotation[current] );
@@ -477,7 +479,7 @@ public class FoosBar
               // The ball is touching the wall in the direction we're trying to hit it. We need to apply some trickery.
               // Trickery 1: Lower the elasticity for the ball collision.
               // impulse = vBF.x * -( 1 + elasticity ) * n.x / ( n.x * n.x / ball.getMass( ) + ( rFPdotN * rFPdotN / momentOfInertia ) );
-              impulse = vBF.y * -( 1 + 0 ) * n.y / ( n.y * n.y * ( 1/mass + 1/ball.getMass( ) ) );
+              impulse = vBF.y * -( 1 - 0.1 ) * n.y / ( n.y * n.y * ( 1/mass + 1/ball.getMass( ) ) );
               ballVelocity.y = ballVelocity.y + n.y * impulse / ball.getMass( );
               // Trickery 2: Have the foosman hit a horizontal "wall" at the point on the ball that it really.
               double nY = n.y == 0 ? 0 : n.y > 0 ? 1 : -1; // normalize nY
@@ -507,7 +509,7 @@ public class FoosBar
             else {
               // The ball is touching the wall in the direction we're trying to hit it. We need to apply some trickery.
               // Trickery 1: Lower the elasticity for the ball collision.
-              impulse = vBF.x * -( 1 + -0.3 ) * n.x / ( n.x * n.x / ball.getMass( ) + ( rFPdotN * rFPdotN / momentOfInertia ) );
+              impulse = vBF.x * -( 1 - 0.5 ) * n.x / ( n.x * n.x / ball.getMass( ) + ( rFPdotN * rFPdotN / momentOfInertia ) );
               ballVelocity.x = ballVelocity.x + n.x * impulse / ball.getMass( );
               // Trickery 2: Just flip the velocity of the foosman and dampen it until I can figure out something better.
               velocity[current].x = -velocity[current].x*0.5;
