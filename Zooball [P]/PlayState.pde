@@ -182,11 +182,15 @@ class PlayState extends GameState
   int lastScored = -1; // 0 = top, 1 = bottom
   double goalTimeDelay = 0;
   
+  Elephant leftElephant;
+  
   public PlayState( Game game ) {
     super( game );
   }// CTOR
 
   public void load( ) {
+    leftElephant = new Elephant( 50, 800 );
+    
     lastUpdate = 0; // physics time in microseconds
     Vector2D center = new Vector2D( game.getWidth()*0.5, game.getHeight()*0.5 );
     // HORIZONTAL "WALLS"
@@ -247,10 +251,10 @@ class PlayState extends GameState
     decoyBalls = new Ball[nBalls];
 
     // Loads Ball artwork
-    filepath = "data/objects/ball/";
-    filename = "ball_";
-    for(int i = 0; i < 360; i += rotateInc)
-      ballImages[i] = loadImage(filepath + filename + i + extention);
+    //filepath = "data/objects/ball/";
+    //filename = "ball_";
+    //for(int i = 0; i < 360; i += rotateInc)
+    //  ballImages[i] = loadImage(filepath + filename + i + extention);
 
     for( int i = 0; i < nBalls; i++ ){
       balls[i] = new Ball( -100, -100, 50, i, balls, screenDimensions, ballImages);
@@ -459,8 +463,10 @@ class PlayState extends GameState
         decoyBalls[i].displayDebug(debugColor,font);
       }
     }
-
     drawDebugText();
+    
+    if( topGoal.isOnFire() || bottomGoal.isOnFire() )
+      spawnElephant();
     
     if( timer.isActive() )
       checkWinningConditions();
@@ -524,7 +530,7 @@ class PlayState extends GameState
       else if( balls[i].isFireball() ){
         balls[i].process( timer.getSecondsActive() );
         balls[i].setFriction(tableFriction);
-        particleManager.explodeParticles( 5, balls[i].diameter, balls[i].xPos, balls[i].yPos, -balls[i].xVel/2, -balls[i].yVel/2, 2 );
+        particleManager.explodeParticles( 5, balls[i].diameter, balls[i].xPos, balls[i].yPos, -balls[i].xVel/10, -balls[i].yVel/10, 2 );
       }// else if ball fireball
 
       if( decoyBalls[i].isDecoyball() ){
@@ -719,7 +725,10 @@ class PlayState extends GameState
       text( tutorialText[7] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*12 );
     }
   }// demoMode
-
+  
+  private void spawnElephant(){
+    leftElephant.display();
+  }// spawnElephant
 }// class PlayState
 
 

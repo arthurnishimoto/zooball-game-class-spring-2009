@@ -80,6 +80,7 @@ class Goal{
       particleManager2.fireParticles( 5, 30, fireX, fireY, 0, 0, 0, 5);
       particleManager2.fireParticles( 5, 30, fireX, fireY, 0, 0, 0, 5);
       particleManager2.smokeParticles( 5, 10, fireX, fireY, 0, (int)random(-1,2), 3 , -1 ); // Fast Smoke
+      parent.leftElephant.setPosition( fireX - 50, fireY + 100 );
     }else
       onFire = false;
   }// display
@@ -194,7 +195,13 @@ class Goal{
     fireX = x;
     fireY = y;
     fireTimer = fireDuration + (float)parent.timer.getSecondsActive();
+    soundManager.playSizzle();
+    soundManager.playElephant();
   }// setOnFire
+  
+  boolean isOnFire(){
+    return onFire;
+  }//isonFire
   
   int getScore(){
     return points;

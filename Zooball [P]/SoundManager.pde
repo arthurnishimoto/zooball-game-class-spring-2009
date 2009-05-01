@@ -27,7 +27,7 @@ class SoundManager{
   
   // Sample Names
   AudioPlayer goal, gameplay, postgame, jungle;
-  AudioSample aPlayer, kick, bounce, decoyDeath, launchBall, fire, sizzle, tiger;
+  AudioSample aPlayer, kick, bounce, decoyDeath, launchBall, fire, sizzle, tiger, launch, swoosh, elephant;
   AudioSample logoMusic;
 
   // parent type must match main class 
@@ -43,6 +43,9 @@ class SoundManager{
     fire = minim.loadSample("data/sounds/fire.wav");
     sizzle = minim.loadSample("data/sounds/sizzle.wav");
     tiger = minim.loadSample("data/sounds/tiger.wav");
+    launch = minim.loadSample("data/sounds/launch.wav");
+    swoosh = minim.loadSample("data/sounds/swoosh.wav");
+    elephant = minim.loadSample("data/sounds/elephant.wav");
     
     // Load Player - Longer sounds like music
     goal = minim.loadFile("data/sounds/goal.wav");
@@ -83,6 +86,9 @@ class SoundManager{
     sizzle.mute();
     tiger.mute();
     jungle.mute();
+    launch.mute();
+    swoosh.mute();
+    elephant.mute();
     muted = true;
   }// mute
   
@@ -99,6 +105,9 @@ class SoundManager{
     sizzle.unmute();
     tiger.unmute();
     jungle.unmute();
+    launch.unmute();
+    swoosh.unmute();
+    elephant.unmute();
     muted = false;
   }// unmute  
 
@@ -119,6 +128,9 @@ class SoundManager{
     sizzle.setGain(gain);
     tiger.setGain(gain);
     jungle.setGain(gain);
+    launch.setGain(gain);
+    swoosh.setGain(gain);
+    elephant.setGain(gain);
     return true;
   }// setGain
   
@@ -201,6 +213,18 @@ class SoundManager{
   void playTiger(){
     tiger.trigger();
   }// playTiger
+  
+  void playLaunch(){
+    launch.trigger();
+  }// playLaunch
+  
+  void playSwoosh(){
+    swoosh.trigger();
+  }// playSwoosh
+  
+  void playElephant(){
+    elephant.trigger();
+  }// playElephant
   
   void playGameplay(){
     if( gameplay.isPlaying() ){

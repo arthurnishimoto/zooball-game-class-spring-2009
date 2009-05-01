@@ -149,7 +149,7 @@ class ParticleManager{
         particles[i].diameter = newDia;
       particles[i].xPos = xPos;
       particles[i].yPos = yPos;
-      particles[i].xVel = xVel + random(5)-random(5);
+      particles[i].xVel = xVel + random(1)-random(1);
       particles[i].yVel = yVel;
       
       particles[i].gravity = true;
