@@ -7,6 +7,8 @@ public class Ball
   private double rotation[];
   private Vector2D forces, wallContacts;
   private double mass, inverseMass, radius, friction;
+  private Image[] images;
+  private Image shadow;
   
   public Ball( double x, double y ) {
     current = 0;
@@ -22,16 +24,36 @@ public class Ball
     // Friction = -mu * mass * gravity * (velocity / |velocity|)
     // friction = -mu * mass * gravity;
     friction = -0.05 * mass * 500; // gravity ~9.8m/s^2 what is that in px/s^2
+    
+    images = new Image[25];
+    for ( int i = 0; i < 25; i++ ) {
+      images[i] = new Image( "objects/ball/" + i + ".gif" );
+      images[i].setSize( 50, 50 );
+      images[i].setPosition( -25, -25 );
+    }
+    shadow = new Image( "objects/ball/shadow.png" );
+    shadow.setSize( 50, 50 );
+    shadow.setPosition( -25, -25 );
   }
   
   public void draw( ) {
-    fill( 255 );
-    ellipse( (float)position[current].x, (float)position[current].y, (float)(radius+radius), (float)(radius+radius) );
+    pushMatrix( );
+    translate( (float)position[current].x, (float)position[current].y);
+    pushMatrix( );
+    rotate( PI - (float)direction[current] );
+    images[(int)(map( (float)rotation[current], 0, TWO_PI, 24, 0 ) + 0.5 )].draw( );
+    popMatrix( );
+    shadow.draw( );
+    popMatrix();
   }
 
   public void drawDebug( ) {
+    strokeWeight( 2 );
     pushMatrix( );
     translate( (float)position[current].x, (float)position[current].y);
+    fill( 0, 0 );
+    stroke( 255, 255, 255 );
+    ellipse( 0, 0, (float)(radius+radius), (float)(radius+radius) );
     stroke( 255, 0, 0 );
     line( 0, 0, (float)velocity[current].x, (float)velocity[current].y );
     rotateZ( HALF_PI - (float)direction[current] );
@@ -136,7 +158,7 @@ public class Ball
       // circumfrence = 2*pi * r;
       // revolutions = distance / circumfrence
       // rotation = revolutions * 2*pi = (distance / (2*pi * r)) * 2*pi = distance / r
-      rotation[next] = rotation[current] + v4.magnitude( ) / radius;
+      rotation[next] = normalizeRotation( rotation[current] + v4.magnitude( ) / radius );
     }
     
     current = next;
@@ -169,6 +191,14 @@ public class Ball
   public void undoStep( ) {
     current ^= 1;
   }
+  
+  private double normalizeRotation( double r ) {
+    while ( r < 0 )
+      r += Math.PI + Math.PI;
+    while ( r >= Math.PI + Math.PI )
+      r -= Math.PI + Math.PI;
+    return r;
+  }
  
   public double getMass( ) { return mass; }
   public double getRadius( ) { return radius; }
@@ -189,5 +219,10 @@ public class Ball
     velocity[current^1].x = x;
     velocity[current^1].y = y;
     direction[current^1] = direction[current];
+  }
+  public double getRotation( ) { return rotation[current]; }
+  public void setRotation( double rotation ) {
+    this.rotation[current] = normalizeRotation( rotation );
+    this.rotation[current^1] = this.rotation[current];
   }
 }

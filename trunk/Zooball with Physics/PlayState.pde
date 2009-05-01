@@ -6,14 +6,13 @@
  */
 class PlayState extends GameState
 {
+  private boolean wireframeMode = false;
   private float SCREEN_LEFT=0, SCREEN_RIGHT=1920, SCREEN_TOP=0, SCREEN_BOTTOM=1080,
   FIELD_LEFT=SCREEN_LEFT+75, FIELD_RIGHT=SCREEN_RIGHT-75, FIELD_TOP=SCREEN_TOP+25, FIELD_BOTTOM=SCREEN_BOTTOM-25,
   GOAL_SIZE=275, GOAL_TOP=FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE), GOAL_BOTTOM=FIELD_BOTTOM-0.5*(FIELD_BOTTOM-FIELD_TOP-GOAL_SIZE),
   ZONE_COUNT=8, ZONE_WIDTH=(FIELD_RIGHT-FIELD_LEFT)/ZONE_COUNT, GOAL_BOX_SIZE=GOAL_SIZE+150, GOAL_BOX_TOP=GOAL_TOP-0.5*(GOAL_BOX_SIZE-GOAL_SIZE),
   GOAL_BOX_BOTTOM=GOAL_BOTTOM+0.5*(GOAL_BOX_SIZE-GOAL_SIZE);
   private long lastUpdate = 0;
-  private Image imgChalk, imgStadiumTop, imgStadiumBottom, imgStadiumLeft, imgStadiumRight, imgEnabledLED, imgDisabledLED;
-  private CircularButton btnPauseTop, btnPauseBottom;
   private Ball ball;
   private Booster[] boosters;
   private Line[] horzWalls, vertWalls, goalWalls;
@@ -24,7 +23,13 @@ class PlayState extends GameState
     //println( "ZONE WIDTH = " + ZONE_WIDTH);
   }
   
-  private void resetBars( ) {
+  public void toggleWireframeMode( ) {
+    wireframeMode = !wireframeMode;
+  }
+  
+  private void resetObjects( ) {
+    ball.setPosition( 1920*0.5, 1080*0.5 );
+    ball.setRotation( 0 );
     for ( int i = 0; i < bars.length; i++ ) {
       bars[i].setPosition( bars[i].getPosition( ).x, 1080*0.5 );
       bars[i].setRotation( 0 );
@@ -33,7 +38,7 @@ class PlayState extends GameState
   }
   
   public void test1( ) {
-    resetBars( );
+    resetObjects( );
     bars[3].setPosition( bars[3].getPosition( ).x, 1080*0.5 - 150 );
     bars[3].setVelocity( -3, 375 );
     bars[3].setRotation( Math.PI*0.6 );
@@ -42,16 +47,16 @@ class PlayState extends GameState
   }
   
   public void test2( ) {
-    resetBars( );
+    resetObjects( );
     bars[3].setPosition( bars[3].getPosition( ).x, 1080*0.5 );
-    bars[3].setVelocity( -3, 275 );
+    bars[3].setVelocity( -3, 273 );
     bars[3].setRotation( Math.PI*0.6 );
     ball.setPosition( 1920*0.5-75, 1080-50 );
     ball.setVelocity( 0, 0 );
   }
 
   public void test3( ) {
-    resetBars( );
+    resetObjects( );
     bars[2].setPosition( bars[2].getPosition( ).x, 1080*0.5 );
     bars[2].setVelocity( 0, 600 );
     ball.setPosition( bars[2].getPosition( ).x, 1080*0.5 + 130 );
@@ -60,7 +65,7 @@ class PlayState extends GameState
   
 
   public void test4( ) {
-    resetBars( );
+    resetObjects( );
     bars[6].setPosition( bars[6].getPosition( ).x, 1080*0.5+75 );
     bars[6].setVelocity( 0, 600 );
     ball.setPosition( bars[6].getPosition( ).x, 1080-50 );
@@ -68,7 +73,7 @@ class PlayState extends GameState
   }
   
   public void test5( ) {
-    resetBars( );
+    resetObjects( );
     bars[0].setPosition( bars[0].getPosition( ).x, 1080*0.5 );
     bars[0].setVelocity( -4, 0 );
     //bars[0].setRotation( PI );
@@ -77,9 +82,9 @@ class PlayState extends GameState
   }
   
   public void test6( ) {
-    resetBars( );
+    resetObjects( );
     bars[7].setPosition( bars[7].getPosition( ).x, 1080*0.5+200 );
-    bars[7].setVelocity( -3, 0 );
+    bars[7].setVelocity( -4, 0 );
     bars[7].setRotation( HALF_PI );
     ball.setPosition( FIELD_RIGHT-25, 1080*0.5+200 );
     ball.setVelocity( 0, 0 );
@@ -87,14 +92,14 @@ class PlayState extends GameState
   
   public void test7( ) {
     // Corner Test
-    resetBars( );
+    resetObjects( );
     ball.setPosition( 1920-300, 100 );
     ball.setVelocity( 100, -40 );
   }
   
   public void test8( ) {
     // Ball Between Two Boosters
-    resetBars( );
+    resetObjects( );
     ball.setPosition( 1920*0.5 + 210, 100 );
     ball.setVelocity( 0, 175 );
   }
@@ -102,14 +107,14 @@ class PlayState extends GameState
   public void load( ) {
     Vector2D center = new Vector2D( game.getWidth()*0.5, game.getHeight()*0.5 );
     bars = new FoosBar[8];
-    bars[0] = new FoosBar( FIELD_LEFT+0.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 1, "tigers" );
+    bars[0] = new FoosBar( FIELD_LEFT+0.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 3, "tigers" );
     bars[1] = new FoosBar( FIELD_LEFT+1.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 2, "tigers" );
     bars[2] = new FoosBar( FIELD_LEFT+2.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 3, "dragons" );
     bars[3] = new FoosBar( FIELD_LEFT+3.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 5, "tigers" );
     bars[4] = new FoosBar( FIELD_LEFT+4.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 5, "dragons" );
     bars[5] = new FoosBar( FIELD_LEFT+5.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 3, "tigers" );
     bars[6] = new FoosBar( FIELD_LEFT+6.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 2, "dragons" );
-    bars[7] = new FoosBar( FIELD_LEFT+7.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 1, "dragons" );
+    bars[7] = new FoosBar( FIELD_LEFT+7.5*ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), 3, "dragons" );
     touchables = new Touchable[8];
     touchables[0] = new TouchZone( FIELD_LEFT, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), ZONE_WIDTH, 0.5*(SCREEN_BOTTOM-SCREEN_TOP) ); // bottom
     touchables[1] = new TouchZone( FIELD_LEFT+ZONE_WIDTH, FIELD_TOP+0.5*(FIELD_BOTTOM-FIELD_TOP), ZONE_WIDTH, 0.5*(SCREEN_BOTTOM-SCREEN_TOP) ); // bottom
@@ -154,28 +159,6 @@ class PlayState extends GameState
     boosters[9] = new BoosterCorner( FIELD_LEFT, FIELD_BOTTOM, 90, -250, new Vector2D( 80, -80 ) );
     boosters[10] = new BoosterCorner( FIELD_RIGHT, FIELD_TOP, -90, 250, new Vector2D( -80, 80 ) );
     boosters[11] = new BoosterCorner( FIELD_RIGHT, FIELD_BOTTOM, -90, -250, new Vector2D( -80, -80 ) );
-    imgEnabledLED = new Image( "ui/led/white/enabled.png" );
-    imgEnabledLED.setSize( 25, 25 );
-    imgDisabledLED = new Image( "ui/led/white/disabled.png" );
-    imgDisabledLED.setSize( 25, 25 );
-    imgChalk = new Image( "objects/stadium/chalk.gif" );
-    imgChalk.setPosition( FIELD_LEFT, FIELD_TOP );
-    imgChalk.setSize( FIELD_RIGHT-FIELD_LEFT, FIELD_BOTTOM-FIELD_TOP );
-    imgStadiumTop = new Image( "objects/stadium/top.png" );
-    imgStadiumTop.setPosition( 0, 0 );
-    imgStadiumBottom = new Image( "objects/stadium/bottom.png" );
-    imgStadiumBottom.setPosition( 0, 1055 );
-    imgStadiumLeft = new Image( "objects/stadium/left.png" );
-    imgStadiumLeft.setPosition( 0, 25 );
-    imgStadiumRight = new Image( "objects/stadium/right.png" );
-    imgStadiumRight.setPosition( 1845, 25 );
-    btnPauseBottom = new CircularButton( "pause" );
-    btnPauseBottom.setPosition( 1882.5, 1027.5 );
-    btnPauseBottom.setRadius( 27.5 );
-    btnPauseTop = new CircularButton( "pause" );
-    btnPauseTop.setPosition( 37.5, 52.5 );
-    btnPauseTop.setRadius( 27.5 );
-    btnPauseTop.setRotation( PI );
     endLoad( );
   }
 
@@ -222,6 +205,7 @@ class PlayState extends GameState
 
   public void draw( ) {
     drawBackground( );
+    // PITCH
     drawPitch( );
     for ( int i = 0; i < boosters.length; i++ ) {
       boosters[i].draw( );
@@ -229,15 +213,26 @@ class PlayState extends GameState
         boosters[i].drawDebug( );
     }
     drawChalk( );
-    ball.draw( );
-    if ( game.isDebugMode( ) )
+    // BALL
+    if( wireframeMode )
       ball.drawDebug( );
-    for ( int i = 0; i < bars.length; i++ ) {
-      bars[i].draw( );
+    else {
+      ball.draw( );
       if ( game.isDebugMode( ) )
-        bars[i].drawDebug( );
+        ball.drawDebug( );
     }
-    drawStadiumDebug( );
+    // FOOSMEN
+    for ( int i = 0; i < bars.length; i++ ) {
+      if( wireframeMode )
+        bars[i].drawDebug( );
+      else {
+        bars[i].draw( );
+        if ( game.isDebugMode( ) )
+          bars[i].drawDebug( );
+      }
+    }
+    // STADIUM
+    drawStadium( );
     drawDebugText( );
   }
 
@@ -291,7 +286,7 @@ class PlayState extends GameState
     noStroke( );
   }
 
-  private void drawStadiumDebug( ) {
+  private void drawStadium( ) {
     fill( 0x72, 0x21, 0x11 );
     quad( SCREEN_LEFT, SCREEN_TOP, FIELD_LEFT, FIELD_TOP, FIELD_RIGHT, FIELD_TOP, SCREEN_RIGHT, SCREEN_TOP );
     quad( SCREEN_LEFT, SCREEN_BOTTOM, FIELD_LEFT, FIELD_BOTTOM, FIELD_RIGHT, FIELD_BOTTOM, SCREEN_RIGHT, SCREEN_BOTTOM );
@@ -307,18 +302,6 @@ class PlayState extends GameState
     fill( 0xFD, 0xD0, 0x23 );
     rect( FIELD_LEFT, FIELD_BOTTOM+5, FIELD_RIGHT-FIELD_LEFT, SCREEN_BOTTOM-FIELD_BOTTOM-10 ); // Side Marker
     rect( SCREEN_LEFT, GOAL_TOP, (FIELD_LEFT-SCREEN_LEFT)*0.66, GOAL_SIZE ); // Goal
-  }
-
-  private void drawStadium( ) {
-    imgStadiumTop.draw( );
-    imgStadiumBottom.draw( );
-    imgStadiumLeft.draw( );
-    imgStadiumRight.draw( );
-  }
-
-  private void drawButtons( ) {
-    btnPauseBottom.draw( );
-    btnPauseTop.draw( );
   }
 
   private void drawDebugText( ) {
