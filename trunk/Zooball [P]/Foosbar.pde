@@ -50,8 +50,8 @@ class Foosbar{
   float centerZoneWidth = 50;
   float xMove, yMove;
   float swipeThreshold = 30.0;
-  float sliderMultiplier = 3;
-  float rotateMultiplier = 1;
+  float sliderMultiplier = 2;
+  float rotateMultiplier = 2;
   int nPlayers, zoneFlag;
   MTFinger fingerTest;
   Foosmen[] foosPlayers;

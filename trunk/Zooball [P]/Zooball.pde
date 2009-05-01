@@ -4,7 +4,7 @@ import tacTile.net.*;
 
 Game game;
 
-Boolean connectToTacTile = false;
+Boolean connectToTacTile = true;
 Boolean usingMouse = true;
 Boolean scaleScreen = true; // All input is off-centered when scaled
 
