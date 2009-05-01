@@ -40,8 +40,7 @@ class Foosbar{
   // Foosmen Instances
   private double[] foosmenPositions;
   private double radius;  
-  
-  
+
   float xPos, yPos, barWidth, barHeight, yMinTouchArea, yMaxTouchArea;
   color teamColor;
   float buttonPos;
@@ -58,10 +57,16 @@ class Foosbar{
   Foosmen[] foosPlayers;
   Ball[] ballArray;
   float spring = 0.01;
+  
+  int minThrowSpeed = 10; // Minimum x velocity needed to throw ball
+  
+  // bar Rotation
   float barRotation = 0;
-  float rotateVel;
+  float rotateVelocity;
+  float maxRotateVelocity = 10;
   float barFriction = 0.15;
   
+  // On Fire Debuff
   float orig_sliderMultiplier = sliderMultiplier;
   float orig_rotateMultiplier = rotateMultiplier;
   float debuffDuration = 7;
@@ -122,7 +127,7 @@ class Foosbar{
     h = B.magnitude( );
     MAX_ROTATION = Math.acos( a/h );
     MIN_OFFSET = -Math.sqrt( h*h - a*a );
-
+  
     // instance variables
     if ( foosmen == 1 )
       foosmenPositions = new double[] { 0 };
@@ -271,7 +276,8 @@ class Foosbar{
       barRotation = degrees( (float)this.getRotation() );
     if( barRotation < 0 )
       barRotation += 360;
-      
+    
+    // Anchors foosmen to position specified by Foosbar
     for( int i = 0; i < nPlayers; i++ ){
       foosPlayers[i].display();
       foosPlayers[i].setPosition( xPos, (float)(position[current].y + foosmenPositions[i]) );
@@ -290,64 +296,17 @@ class Foosbar{
       rotateMultiplier = orig_rotateMultiplier;
     }
            
-    // Gets xMove directly from finer to also stop spinning
+    // Gets xMove directly from finger to also stop spinning
     if( centerZonePressed && fingerTest.xMove == 0 && !pressed ){ // Resets to neutral position if center zone tapped
       this.setRotation(0);
-      rotateVel = 0;
+      rotateVelocity = 0;
       xMove = 0; // Stops spinning on release
     }
     
-    if( hasBall && !pressed)
+    if( hasBall && abs(xMove) > minThrowSpeed )
       for(int i = 0; i < foosPlayers.length; i++)
         foosPlayers[i].releaseBall();
 
-    // If spring == true, bar will "spring" back to down position
-    if( springEnabled ){
-      /*
-      if( rotation < 0 ){
-        if( zoneFlag == 1 ){
-          rotation += spring * 10;
-          if(!pressed) // Applies velocity on press release
-            rotateVel = barRotation/4;
-          barRotation = abs(rotation*100);
-        }else if( zoneFlag == 0 ){
-          rotation += spring * 10;
-          if(!pressed) // Applies velocity on press release
-            rotateVel = (360 - barRotation)/4;
-          barRotation = 360 + rotation*100;
-        }
-        
-      }else if( rotation > 0 ){
-        if( zoneFlag == 1 ){
-          rotation -= spring * 10;
-          if(!pressed) // Applies velocity on press release
-            rotateVel = (360 - barRotation)/4;
-          barRotation = 360 - rotation*100;
-        }else if( zoneFlag == 0 ){
-          rotation -= spring * 10;
-          if(!pressed) // Applies velocity on press release
-            rotateVel = barRotation/4;
-          barRotation = rotation*100;          
-        }
-        
-      }else if( rotation == 0 )
-        barRotation = 0;
-        
-      xMove = rotateVel*100;
-      
-      // Stops spring
-      if( rotation < 0.1 && rotation > -0.1 ){
-        rotateVel = 0;
-        rotation = 0;
-      }
-      return;
-      */
-    }// if spring enabled
-    
-    // Bar rotation
-    if(rotationEnabled){
-
-    }// if rotationEnabled
     if( hasBall )
       this.setRotation(0); // Locks bar rotation if hasBall
   }// display
@@ -474,11 +433,14 @@ class Foosbar{
     if( debuffTimer - gameTimer > 0)
       text("Debuff Time Remaining "+(debuffTimer - gameTimer), xPos, yPos+barHeight/2-16*10);
     text("Bar Rotation: "+barRotation, xPos, yPos+barHeight/2-16*9);
-    text("Rotate Velocity: "+rotateVel, xPos, yPos+barHeight/2-16*8);
+    text("Rotate Velocity: "+ rotateVelocity, xPos, yPos+barHeight/2-16*8);
     text("Active: "+pressed, xPos, yPos+barHeight/2-16*7);
     text("Y Position: "+buttonValue, xPos, yPos+barHeight/2-16*6);
     text("Movement: "+xMove+" , "+yMove, xPos, yPos+barHeight/2-16*5);
-    //text("Rotation: "+rotation*100, xPos, yPos+barHeight/2-16*4);
+    if( barRotation > foosPlayers[0].minStopAngle && barRotation < foosPlayers[0].maxStopAngle )
+      text(" CATCHING ", xPos, yPos+barHeight/2-16*4);
+    else if( barRotation < 375-foosPlayers[0].minStopAngle && barRotation > 375-foosPlayers[0].maxStopAngle )
+      text(" CATCHING ", xPos, yPos+barHeight/2-16*4);
     text("Players: "+nPlayers, xPos, yPos+barHeight/2-16*3);
     if(atTopEdge)
       text("atTopEdge", xPos, yPos+barHeight/2-16*2);
@@ -803,6 +765,19 @@ class Foosbar{
               ball.stopBall();
           }// stops ball when wedged
           
+          // Stops ball when "wedged" by Foosmen at a certain angle
+          if( barRotation > foosPlayers[0].minStopAngle && barRotation < foosPlayers[0].maxStopAngle )
+            if( ball.getSpeed() > 1 )
+              foosPlayers[i].catchBall( ball.getID() );
+          if( barRotation < 375-foosPlayers[0].minStopAngle && barRotation > 375-foosPlayers[0].maxStopAngle )
+            if( ball.getSpeed() > 1 )
+              foosPlayers[i].catchBall( ball.getID() );          
+          
+          foosPlayers[i].specialCollision( ball.getID() );
+          
+          if( ball.getSpeed() > 0 )
+            statistics[2] += 1; // Ball hit
+            
           return true;
         }
       }
@@ -944,7 +919,18 @@ class Foosbar{
         return false;
       }
       
-      this.setVelocity( -xMove * rotateMultiplier , yMove * sensitivityAdjust * sliderMultiplier );
+      if( springEnabled ){
+
+        return true;
+      }// if spring enabled
+    
+      if( rotationEnabled )
+        rotateVelocity = -(xMove) * rotateMultiplier;
+      else{
+        this.setRotation(0);
+        rotateVelocity = 0;
+      }
+      this.setVelocity( rotateVelocity , yMove * sensitivityAdjust * sliderMultiplier );
 
       pressed = true;
       return true;
@@ -1148,7 +1134,7 @@ class Foosbar{
     String output = "";
     
     output += this;    
-    output += "Statistics\n";
+    output += "\nThis Game Statistics\n";
     output += "Goals scored: " + statistics[0];
     if( statistics[0] > record[0] )
       output += " NEW!";
@@ -1175,8 +1161,8 @@ class Foosbar{
     output += "\nBoosters used: " + statistics[7];
     if( statistics[7] > record[7] )
       output += " NEW!";
-      
-    output += "\n\n\nRecord\n\n";
+    
+    output += "\n\n\n\n\nAll-Time Records\n\n";
     output += "Goals scored: " + record[0] + "\n";
     output += "Goals scored on own team: " + record[1] + "\n";
     output += "Ball hits: " + record[2] + "\n";

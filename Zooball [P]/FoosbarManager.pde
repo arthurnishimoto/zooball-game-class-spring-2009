@@ -133,8 +133,8 @@ class FoosbarManager{
       for( int x = 0 ; x < nBars ; x++ ){
         bars[x].display();
         if( parent.timer.isActive() ){
-          bars[x].ballInArea(balls);
-          bars[x].collide(balls);
+          //bars[x].ballInArea(balls);
+          //bars[x].collide(balls); // No longer used for collision detection, but still used for stats and special hits
           bars[x].setGameTimer(timer_g);
         }
       }// for
