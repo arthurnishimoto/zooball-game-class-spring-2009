@@ -43,7 +43,7 @@ class MenuState extends GameState
 
     selectTeam = new Image("data/ui/text/selectTeam.png");
     selectField = new Image("data/ui/text/selectPlayMode.png");
-    aboutBackground = new Image("data/ui/logos/about.png");
+    aboutBackground = new Image("data/ui/logos/about2.png");
     
     zooballLogo = new CircularButton("data/ui/logos/zooball.png");
     zooballLogo.setPosition( game.getWidth()/2, game.getHeight()/2 );
@@ -63,15 +63,19 @@ class MenuState extends GameState
     
     bottomDragon = new Button( 50 + 469, (int)game.getHeight() - 100, "data/ui/buttons/dragons/disabled.png");
     bottomDragon.setLitImage( loadImage("data/ui/buttons/dragons/enabled.png") );
+    bottomDragon.setDelay(1);
     bottomTiger = new Button( (int)game.getWidth() - 50 - 469, (int)game.getHeight() - 100, "data/ui/buttons/tigers/disabled.png");
     bottomTiger.setLitImage( loadImage("data/ui/buttons/tigers/enabled.png") );
- 
+    bottomTiger.setDelay(1);
+    
     topDragon = new Button( (int)game.getWidth() - 50 - 469, 100, "data/ui/buttons/dragons/disabled.png");
     topDragon.setLitImage( loadImage("data/ui/buttons/dragons/enabled.png") );
     topDragon.setRotation( PI );
+    topDragon.setDelay(1);
     topTiger = new Button( 50 + 469, 100, "data/ui/buttons/tigers/disabled.png");
     topTiger.setLitImage( loadImage("data/ui/buttons/tigers/enabled.png") );
     topTiger.setRotation( PI );
+    topTiger.setDelay(1);
     
     bottomAbout = new Button( (int)game.getWidth()/2 - 200 , (int)game.getHeight() - 250, "data/ui/buttons/greenGlow/enabled.png");
     bottomAbout.setButtonText("About");

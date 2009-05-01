@@ -312,7 +312,6 @@ class Ball{
     //xVel = xVeloc;
     //yVel = yVeloc;
     setFireball();
-    fireballTimer = (float)gameTimer + fireballDuration;
   }//launchFireball
   
   /** 
@@ -680,6 +679,7 @@ class Ball{
   
   void setFireball(){
     state = FIREBALL;
+    fireballTimer = (float)gameTimer + fireballDuration;
   }// setFireball
 
   void setDecoyball(){

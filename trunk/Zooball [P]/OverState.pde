@@ -7,7 +7,7 @@
 class OverState extends GameState
 {
   private CircularButton btnReplayBottom, btnReplayTop, btnQuitBottom, btnQuitTop;
-  private Image gameOver;
+  private Image gameOver_dragonWin, gameOver_tigerWin;
   
   public OverState( Game game ) {
     super( game );
@@ -32,8 +32,10 @@ class OverState extends GameState
     btnQuitTop.setPosition( 897.5, 100 );
     btnQuitTop.setRadius( 50 );
     btnQuitTop.setRotation( PI );
-    gameOver = new Image("data/ui/text/GameOver2.png");
-    gameOver.setPosition(0,0);
+    gameOver_dragonWin = new Image("data/ui/text/GameOver_TopDragonWin.png");
+    gameOver_dragonWin.setPosition(0, 0);
+    gameOver_tigerWin = new Image("data/ui/text/GameOver_BottomTigersWin.png");
+    gameOver_tigerWin.setPosition(0, 0);
     endLoad( );
   }
   
@@ -50,7 +52,7 @@ class OverState extends GameState
     drawDebugText( );
     drawGameOverText( );
     
-    if( timer.getSecondsActive() > 5 )
+    if( timer.getSecondsActive() > 7 )
       barManager.displayStats();
     drawButtons( );
   }// draw()
@@ -75,39 +77,22 @@ class OverState extends GameState
   }
   
   private void drawGameOverText(){
-    textFont(font,64);
-    textAlign(CENTER);
-
-    if( redTeamWins ){
-      fill(255,0,0);
-      text("Dragon Team Wins", game.getWidth()/2, game.getHeight()/2 + 64*4);
-    }else if( yellowTeamWins ){
-      fill(255,255,0);
-      text("Tiger Team Wins", game.getWidth()/2, game.getHeight()/2 + 64*4);      
-    }else{
-      fill(0,255,0);
-      text("DRAW", game.getWidth()/2, game.getHeight()/2 + 64*4);
-    }
-
-    gameOver.draw();
-
     pushMatrix();
-    translate(game.getWidth()/2, game.getHeight()/2 - 64*3);
-    rotate(radians(180));
-   
-    if( redTeamWins ){
-      fill(255,0,0);
-      text("Dragon Team Wins", 0, 0 + 64*2);
-    }else if( yellowTeamWins ){
-      fill(255,255,0);
-      text("Tiger Team Wins", 0, 0 + 64*2);      
-    }else{
-      fill(0,255,0);
-      text("DRAW", 0, 0 + 64*2);            
+    if( redTeamTop && redTeamWins )
+      gameOver_dragonWin.draw();
+    else if( !redTeamTop && redTeamWins ){
+      translate(game.getWidth(), game.getHeight());
+      rotate(radians(180));
+      gameOver_dragonWin.draw();
+    }else if( redTeamTop && yellowTeamWins )
+      gameOver_tigerWin.draw();
+    else if( !redTeamTop && yellowTeamWins ){
+      translate(game.getWidth(), game.getHeight());
+      rotate(radians(180));
+      gameOver_tigerWin.draw();
     }
-    
     popMatrix();
-    textAlign(LEFT);    
+ 
   }// drawGameOverText()
   
   private void drawDebugText( ) {

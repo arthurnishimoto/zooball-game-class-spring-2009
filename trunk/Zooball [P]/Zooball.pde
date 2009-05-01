@@ -6,7 +6,7 @@ Game game;
 
 Boolean connectToTacTile = false;
 Boolean usingMouse = true;
-Boolean scaleScreen = false; // All input is off-centered when scaled
+Boolean scaleScreen = true; // All input is off-centered when scaled
 
 Boolean recordingMouse = false;
 Boolean playbackMouse = false;

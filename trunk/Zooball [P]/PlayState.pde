@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 0.9.7
+ * Version: 1.0
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -89,6 +89,8 @@
  *              - Version 0.9.7
  *              - Physics engine implementation - Phase Two - Boosters and Bars (Partial)
  * 4/30/09      - Physics engine implementation - Phase Two - Boosters and Bars (Complete) - Need to fix images
+ * 5/1/09       - Version 1.0 (Alpha)
+ *              - Foosbar catch/throw and special balls re-implemented. Fixes with resetting physics.
  *
  * Notes:
  *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?
@@ -109,7 +111,7 @@ Boolean redTeamTop = false;
 Boolean yellowTeamWins = false;
 Boolean redTeamWins = false;
 
-Boolean debugText = true; // TEMP
+Boolean debugText = false; // TEMP
 Boolean debug2Text = false; // TEMP
 color debugColor = color(255,255,255); // TEMP
 
@@ -178,23 +180,15 @@ class PlayState extends GameState
   int topQueue = 0;
   int bottomQueue = 0;
   int lastScored = -1; // 0 = top, 1 = bottom
-
+  double goalTimeDelay = 0;
+  
   public PlayState( Game game ) {
     super( game );
   }// CTOR
 
   public void load( ) {
+    lastUpdate = 0; // physics time in microseconds
     Vector2D center = new Vector2D( game.getWidth()*0.5, game.getHeight()*0.5 );
-    // example: redirected to goal
-    //ball = new Ball( new Vector2D( center.x - 200, 220 - 50 ), new Vector2D( 250, 0 ), 2.5, 27.5, 0.1 );
-    // example: stuck between two boosters
-    //ball = new Ball( 1920-665-(75*0.5), 75 );
-    //ball.setVelocity( 8.5, 55 );
-    // example: won't get stuck in corner
-    //ball = new Ball( new Vector2D( 1920-400, 170 ), new Vector2D( 78, -32 ), 2.5, 27.5, 0.1 );
-    //ball = new Ball( 1920-400, 170 );
-    //ball.setVelocity( 78, -32 );
-    //ball = new Ball( 100, 600 );
     // HORIZONTAL "WALLS"
     horzWalls = new Line[6];
     // top and bottom of field
@@ -226,6 +220,7 @@ class PlayState extends GameState
     topQueue = 0;
     bottomQueue = 0;
     lastScored = -1;
+    timer_g = 0;
 
     imgPitch = new Image( "data/objects/stadium/gamefield_grass.gif" );
     imgPitch.setPosition( 0, 0 );
@@ -238,15 +233,6 @@ class PlayState extends GameState
     logo = new Image( "data/objects/stadium/gamefield_logo.png" );
     //logo = new Image( "data/objects/stadium/blank.png" );
     logo.setPosition( 0, 0 );    
-
-    // spin a while to test the loading screen
-    int max = Integer.MAX_VALUE >> 5;
-    Random r = new Random( );
-
-    for ( int i = 0; i < max; i++ )
-      r.nextDouble( ); 
-
-
 
     yellowTeamWins = false;
     redTeamWins = false;
@@ -353,24 +339,33 @@ class PlayState extends GameState
     // ADD FORCES
     for(int i = 0; i < nBalls; i++ ){
       balls[i].clearForces( );
+      decoyBalls[i].clearForces( );
+      
       for ( int j = 0; j < boosters.length; j++ )
-        if ( boosters[j].contains( balls[i].getPosition( ) ) )
+        if ( boosters[j].contains( balls[i].getPosition( ) ) ){
           balls[i].addForce( boosters[j].getForce( ) );
-     
+          decoyBalls[i].addForce( boosters[j].getForce( ) );
+        }
       // STEP FORWARD
       balls[i].step( dt );
+      decoyBalls[i].step( dt );
       barManager.step( dt );
       //bar.step( dt );
      
       // DO BALL/WALL COLLISIONS
       balls[i].clearWallContacts( );
-      for( int j = 0; j < horzWalls.length; j++ )
+      decoyBalls[i].clearWallContacts( );
+      for( int j = 0; j < horzWalls.length; j++ ){
         balls[i].collide( horzWalls[j] );
-      for( int j = 0; j < vertWalls.length; j++ )
+        decoyBalls[i].collide( horzWalls[j] );
+      }
+      for( int j = 0; j < vertWalls.length; j++ ){
         balls[i].collide( vertWalls[j] );
-     
+        decoyBalls[i].collide( vertWalls[j] );
+      }
       // DO FOOSBAR/BALL COLLISIONS
       barManager.collide( balls[i] );
+      barManager.collide( decoyBalls[i] );
       //bar.collide( balls[0] );
    }// for nBalls
    // DO FOOSBAR/WALL COLLISIONS
@@ -421,7 +416,7 @@ class PlayState extends GameState
 
     topGoal.display();
     bottomGoal.display();
-
+        
     drawBorders();
     particleManager2.display();
     drawButtons();
@@ -563,7 +558,21 @@ class PlayState extends GameState
   }// drawBorders()
 
   private void checkWinningConditions(){
-    if( topGoal.getScore() >= maxScore ){
+    if( topGoal.getScore() < maxScore && bottomGoal.getScore() < maxScore ){ // Delay between winning goal and win screen
+      goalTimeDelay = timer.getSecondsActive() + 2;
+    }
+    
+    if( topGoal.getScore() >= maxScore || bottomGoal.getScore() >= maxScore ){ // Stops game play between winning goal and next screen
+      ballLauncher_bottom.disable();
+      ballLauncher_top.disable();
+      for(int i = 0; i < nBalls; i++)
+        balls[i].stopBall();
+    }
+    
+    if( goalTimeDelay > timer.getSecondsActive() )
+      return;
+    
+    if( topGoal.getScore() >= maxScore){
       if( !redTeamTop ){
         redTeamWins = true;
         game.setState( game.getOverState() );
@@ -599,6 +608,10 @@ class PlayState extends GameState
         balls[0].launchBall(mouseX, mouseY, 0, -150);
       else if( key == 'k' || key == 'K' )
         balls[0].launchBall(mouseX, mouseY, 0, 150);
+      else if( key == 'u' || key == 'U' )
+        balls[0].setFireball();
+      else if( key == 'o' || key == 'O' )
+        balls[0].setDecoyball();
     }// if keypressed
 
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
