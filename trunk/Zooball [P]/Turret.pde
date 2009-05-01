@@ -211,7 +211,7 @@ class Turret{
   }// isHit
   
   void shoot(){
-    soundManager.playKick();
+    soundManager.playLaunch();
         
     currentRecoil = recoil;
     

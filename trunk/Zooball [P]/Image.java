@@ -12,7 +12,7 @@ import processing.core.PImage;
  * the same underlying PImage object when drawing.
  * 
  * Author: Andy Bursavich
- * Version: 0.2
+ * Version: 0.3
  */
 public class Image
 {
@@ -72,10 +72,16 @@ public class Image
   public void setX( float x ) { this.x = x; }
   public float getY( ) { return y; }
   public void setY( float y ) { this.y = y; }
-  public float getRotation( ) { return rotation; }
-  public void setRotation( float rotation ) { this.rotation = rotation; }
+  
+  public void setSize( float width, float height ) {
+    this.width = width;
+    this.height = height;
+  }
   public float getWidth( ) { return width; }
   public void setWidth( float width ) { this.width = width; }
   public float getHeight( ) { return height; }
   public void setHeight( float height ) { this.height = height; }
+  
+  public float getRotation( ) { return rotation; }
+  public void setRotation( float rotation ) { this.rotation = rotation; }
 }

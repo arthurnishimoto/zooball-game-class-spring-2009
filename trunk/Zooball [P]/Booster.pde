@@ -32,6 +32,7 @@ public class Booster
   public void draw( ) { }
   
   public void drawDebug( ) {
+    strokeWeight( 2 );
     fill( c );
     beginShape( );
     for (int i = 0; i < points.length; i++ )

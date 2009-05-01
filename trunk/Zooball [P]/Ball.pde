@@ -24,8 +24,6 @@
  */
  
 class Ball{
-  PImage rotateImages[] = new PImage[360];
-  int imageRotation = 0;
   boolean hasArtwork = false;
   
   int state;
@@ -58,6 +56,8 @@ class Ball{
   private double rotation[];
   private Vector2D forces, wallContacts;
   private double mass, inverseMass, radius, fC;  
+  private Image[] images;
+  private Image shadow;
   
   /**
    * Creates a new Ball object.
@@ -128,10 +128,19 @@ class Ball{
     diameter = newDiameter;
     ID_no = ID;
     others = otr;
-    rotateImages = newImages;
     hasArtwork = true;
     lastBarHit = null;
     specialSource = null;
+    
+    images = new Image[25];
+    for ( int i = 0; i < 25; i++ ) {
+      images[i] = new Image( "objects/ball/" + i + ".gif" );
+      images[i].setSize( 50, 50 );
+      images[i].setPosition( -25, -25 );
+    }
+    shadow = new Image( "objects/ball/shadow.png" );
+    shadow.setSize( 50, 50 );
+    shadow.setPosition( -25, -25 );
     
     current = 0;
     position = new Vector2D[] { new Vector2D( newX, newY ), new Vector2D( newX, newY ) };
@@ -188,34 +197,22 @@ class Ball{
     ellipse(xPos, yPos, diameter, diameter);
 
     }else if( displayArt && hasArtwork){
-      
-    imageMode(CENTER);
-    pushMatrix();
-    translate(xPos, yPos);
-    
-    if( getSpeed() > 1 || getSpeed() < -1 ) // Prevents stopped ball from showing incorrect image
-      rotate(atan2(yVel,xVel)+radians(270));
-    
-    if( imageRotation >= 360 - rotateInc && imageRotation < 0 + rotateInc )
-      image(rotateImages[0], 0, 0);
-    else{
-      for( int i = 0;  i < 360; i += rotateInc ){
-        if( imageRotation >= i - rotateInc && imageRotation < i + rotateInc ){
-          image(rotateImages[i], 0, 0);
-          break;
-        }
-      }// for
-    }// else
-    popMatrix();
-    
+      pushMatrix( );
+      translate( (float)position[current].x, (float)position[current].y);
+      pushMatrix( );
+      rotate( PI - (float)direction[current] );
+      images[(int)(map( (float)rotation[current], 0, TWO_PI, 24, 0 ) + 0.5 )].draw( );
+      popMatrix( );
+      shadow.draw( );
+      popMatrix();
+    }// if displayArt
+  
     if( state == FIREBALL ){
       fill(255, random(255), 0, random(100) + 150);
       noStroke();
       ellipse(xPos, yPos, diameter + 10, diameter + 10);
     }
-    
-    }// if displayArt
-  
+      
   }// display
   
   /**
@@ -490,7 +487,7 @@ class Ball{
       // circumfrence = 2*pi * r;
       // revolutions = distance / circumfrence
       // rotation = revolutions * 2*pi = (distance / (2*pi * r)) * 2*pi = distance / r
-      rotation[next] = rotation[current] + v4.magnitude( ) / radius;
+      rotation[next] = normalizeRotation( rotation[current] + v4.magnitude( ) / radius );
     }
     
     current = next;
@@ -524,7 +521,15 @@ class Ball{
   public void undoStep( ) {
     current ^= 1;
   }
- 
+  
+  private double normalizeRotation( double r ) {
+    while ( r < 0 )
+      r += Math.PI + Math.PI;
+    while ( r >= Math.PI + Math.PI )
+      r -= Math.PI + Math.PI;
+    return r;
+  }// normalizeRotation
+  
   public double getMass( ) { return mass; }
   public double getRadius( ) { return radius; }
   public double getX( ) { return position[current].x; }
@@ -541,6 +546,12 @@ class Ball{
     direction[current] = Math.atan2( velocity[current].x, velocity[current].y );
   }
   
+  public double getRotation( ) { return rotation[current]; }
+  public void setRotation( double rotation ) {
+    this.rotation[current] = normalizeRotation( rotation );
+    this.rotation[current^1] = this.rotation[current];
+  }
+  
   /**
    * Moves the position of the ball based on its velocity
    */
@@ -549,19 +560,7 @@ class Ball{
     yVel = (float)getVelocity().y;
     
     vel = sqrt(abs(sq(xVel))+abs(sq(yVel)));
-    
-    imageRotation = (int)degrees((float)rotation[current])%360;
-
-    if(imageRotation >= 360 )
-      imageRotation = 0;
-      
-    // Prevents bouncing ball when velocity is almost 0
-    // Also stops ball before "sliding" occurs due to animation frames
-    //if( vel < 1 && vel > -1 ){
-    //  xVel = 0;
-    //  yVel = 0;
-    //}
-    
+        
     if( isFireball() ){
       if( fireballTimer < gameTimer )
         setActive();
@@ -577,40 +576,8 @@ class Ball{
       xVel = -1*maxVel;
     if( -1*yVel > maxVel )
       yVel = -1*maxVel;
-    
-    //xPos += xVel;
-    //yPos += yVel;
+
     this.setVelocity(xVel, yVel);
-    /*
-    if( xVel > 0 )
-      xVel -= friction;
-    else if( xVel < 0 )
-      xVel += friction;
-    if( yVel > 0 )
-      yVel -= friction;
-    else if( yVel < 0 )
-      yVel += friction;
-      
-    // Checks if object reaches edge of border/screen, bounce
-    if ( xPos+diameter/2 > screenWidth-borderWidth){ // Right side
-      xVel *= -1;
-      xPos --; // Push out of wall
-      soundManager.playBounce();
-    }else if ( xPos-diameter/2 < borderWidth){ // Left Side
-      xVel *= -1;
-      xPos ++; // Push out of wall
-      soundManager.playBounce();
-    }
-    if ( yPos+diameter/2 > screenHeight-borderHeight){ // Bottom side
-      yVel *= -1;
-      yPos --; // Push out of wall
-      soundManager.playBounce();
-    }else if ( yPos-diameter/2 < borderHeight ){ // Top side
-      yVel *= -1;
-      yPos ++; // Push out of wall
-      soundManager.playBounce();
-    }
-    */
   }// move
 
   /**

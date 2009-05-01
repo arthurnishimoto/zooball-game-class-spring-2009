@@ -77,14 +77,7 @@ class Foosmen{
   
   void display(){
     active = true;
-    
-    if(confusedTimer > gameTimer){
-      fill(255,255,255);
-      textFont(font,64);
-      text("?", xPos - playerWidth/2, yPos);    
-    }else
-      confused = false;
-    
+        
     if( !displayArt ){
     // Team Color
     fill( parent.teamColor );
@@ -146,10 +139,17 @@ class Foosmen{
     popMatrix();
     
     if( parent.debuffed ){
-      particleManager2.fireParticles( 5, 30, xPos, yPos + playerHeight/2, 0, 0, 0, 5);
-      particleManager2.fireParticles( 5, 30, xPos+playerWidth, yPos + playerHeight/2, 0, 0, 0, 5);
-      //particleManager2.smokeParticles( 5, 10, xPos+playerWidth/2, yPos+playerHeight/2, 0, 0, 3, -1); // Fast Smoke
+      particleManager2.fireParticles( 5, 30, xPos+playerWidth/2, yPos, 0, 0, 0, 5);
+      particleManager2.fireParticles( 5, 30, xPos-playerWidth/2, yPos, 0, 0, 0, 5);
+      //particleManager2.smokeParticles( 5, 10, xPos, yPos, 0, 0, 3, -1); // Fast Smoke
     }
+    if(confusedTimer > gameTimer){
+      fill(255,255,255);
+      textFont(font,64);
+      text("?", xPos - playerWidth/2, yPos);    
+    }else
+      confused = false;
+      
   }// display
   
   void displayDebug(color debugColor, PFont font){
@@ -358,7 +358,7 @@ class Foosmen{
   
   void catchBall(int ballID){
     specialCollision(ballID);
-    if( parent.debuffed )
+    if( parent.debuffed || !parent.pressed )
       return;
       
     if( parent.barRotation > minStopAngle && parent.barRotation < maxStopAngle ){
@@ -428,12 +428,14 @@ class Foosmen{
       parent.setDebuff();
       if( balls[ballID].specialSource != null )
         balls[ballID].specialSource.statistics[6] += 1; // Tigers set on fire
+      soundManager.playSizzle();
     }
     if( decoyBalls[ballID].isDecoyball() && parent.dragons ){
       this.setConfused();
       if( decoyBalls[ballID].specialSource != null )
         decoyBalls[ballID].specialSource.statistics[5] += 1; // Dragons confused
       decoyBalls[ballID].setInactive();
+      soundManager.playSwoosh();
     }
   }//specialCollision()
   
@@ -460,7 +462,7 @@ class Foosmen{
   void setConfused(){
     confusedTimer = confusedDuration + (float)gameTimer;
     confused = true;
-    soundManager.playDecoyDeath();
+    //soundManager.playDecoyDeath();
   }// setConfused()
   
   void setMinStopAngle(int newVal){
