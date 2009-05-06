@@ -572,10 +572,10 @@ class Ball{
       xVel = maxVel;
     if( yVel > maxVel )
       yVel = maxVel;
-    if( -1*xVel > maxVel )
-      xVel = -1*maxVel;
-    if( -1*yVel > maxVel )
-      yVel = -1*maxVel;
+    if( xVel < -maxVel )
+      xVel = -maxVel;
+    if( yVel < -maxVel )
+      yVel = -maxVel;
 
     this.setVelocity(xVel, yVel);
   }// move

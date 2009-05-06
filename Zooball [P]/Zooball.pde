@@ -10,9 +10,12 @@ Boolean scaleScreen = true; // All input is off-centered when scaled
 
 Boolean recordingMouse = false;
 Boolean playbackMouse = false;
+Boolean playbackDemo = false;
 String[] mousePlayback;
+String[] demoPlayback;
 String mouseRecorder = "";
 int playbackItr = 0;
+int demoPlaybackItr = 0;
 
 Boolean quit = false;
 
@@ -49,6 +52,7 @@ void setup( ) {
   
   soundManager = new SoundManager(this);
   debugConsole = new DebugConsole();
+  demoPlayback = loadStrings("data/tutorial.txt");
   game = new Game( );
 }
 
@@ -69,7 +73,13 @@ void draw( ) {
 
 void keyPressed( KeyEvent e ) {
   if ( game != null ) {
-    if ( e.getKeyChar( ) == 'd' || e.getKeyChar( ) == 'D' )
+    if ( e.getKeyChar( ) == 'q'){
+      if(debugConsoleBool)
+        debugConsoleBool = false;
+      else
+        debugConsoleBool = true;
+    }
+    else if ( e.getKeyChar( ) == 'd' || e.getKeyChar( ) == 'D' )
       game.toggleDebugMode(  );
     else if ( e.getKeyChar( ) == 's' || e.getKeyChar( ) == 'S' )
       game.toggleStrokeMode( );

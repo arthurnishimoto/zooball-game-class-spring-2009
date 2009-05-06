@@ -43,7 +43,7 @@ class Game
     overState.beginLoad( );
     leavingState.beginLoad( );
     
-    setState( playState );
+    setState( menuState );
     
     calculateScreenTransformation( );
     noStroke( );

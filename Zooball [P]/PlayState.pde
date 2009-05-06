@@ -91,6 +91,8 @@
  * 4/30/09      - Physics engine implementation - Phase Two - Boosters and Bars (Complete) - Need to fix images
  * 5/1/09       - Version 1.0 (Alpha)
  *              - Foosbar catch/throw and special balls re-implemented. Fixes with resetting physics.
+ * 5/5/09       - Version 1.1
+ *              - Tutorial fully implemented, ball/bar velocity collision fixes. Stressed tested.
  *
  * Notes:
  *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?
@@ -121,7 +123,7 @@ boolean demoMode = false;
 int nBalls = 1;
 int maxScore = 5;
 float tableFriction = 0.01; // Default = 0.01
-int maxBallSpeed = 400;
+int maxBallSpeed = 300;
 int rotateInc = 15; // Global rotation increment for artwork
 
 int borderWidth = 0;
@@ -384,6 +386,7 @@ class PlayState extends GameState
   }// enter()  
 
   public void draw( ) {
+    try{
     frameRate(30); // Framerate must be below 60 to allow bar spin gesture.
 
     if( (ballsInPlay + topQueue + bottomQueue) < nBalls && lastScored == -1 )
@@ -470,6 +473,9 @@ class PlayState extends GameState
     
     if( timer.isActive() )
       checkWinningConditions();
+    }catch(NullPointerException e){
+      println("Un-oh another null pointer exception");
+    }
   }// draw()
 
   private void drawBackground( ) {
@@ -622,7 +628,7 @@ class PlayState extends GameState
 
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
       game.setState( game.getPausedState() );
-
+    //if( !demoMode ){
     barManager.barsPressed(x,y);
 
     ballLauncher_top.isHit(x,y);
@@ -635,7 +641,8 @@ class PlayState extends GameState
       if( balls[i] == null )
         continue;
       balls[i].isHit(x,y);
-    }// for nBalls     
+    }// for nBalls
+    //}
   }// checkButtonHit
 
   void reloadBall(){
@@ -657,6 +664,9 @@ class PlayState extends GameState
   }// coinToss
 
   public void demoMode(){
+    mousePlayback = loadStrings("data/tutorial.txt");
+    playbackMouse = true;
+    
     fill(0,0,0, 150);
     rect( game.getWidth()/2 + 300, game.getHeight()/2, 500, 400 );
     
@@ -664,65 +674,129 @@ class PlayState extends GameState
     fill(255,255,255);
     noStroke();
     tutorialText = new String[50];
-    //tutorialText = loadStrings("data/tutorialText.txt");
-    int delay_0 = 5;
+    int delay_0 = 0;
     tutorialText[0] = "Welcome to the Zooball Tutorial";
-    int delay_1 = 6;
+    int delay_1 = 3;
     tutorialText[1] = "Move the foosbar by pressing on a touch zone on\n    your side of the table";
-    int delay_2 = 7;
+    int delay_2 = 6;
     tutorialText[2] = "You can also rotate the bar by moving left\n     and right";
-    int delay_3 = 8;
-    tutorialText[3] = "Each bar will only respond to touches in its own zone";
-    int delay_4 = 9;
+    int delay_3 = 12;
+    tutorialText[3] = "Each bar will only respond to touches in its own zone.\nPress the blue center of the bar to reset its position.";
+    int delay_4 = 20;
     tutorialText[4] = "To launch a ball, press on the ball launcher.\n     It will be green when ready";    
-    int delay_5 = 10;
+    int delay_5 = 22;
     tutorialText[5] = "Like a slingshot pull back in the opposite\n     direction you want the ball to fire";    
-    int delay_6 = 11;
+    int delay_6 = 28;
     tutorialText[6] = "To catch a ball angle the foosmen back. Keep your\n     finger in the touch zone to hold the ball";    
-    int delay_7 = 12;
-    tutorialText[7] = "To throw a ball, flick and release in the desired\n     direction. Now go play Zooball!";    
-    int delay_8 = 13;
+    int delay_7 = 32;
+    tutorialText[7] = "To throw a ball, flick and release in the desired\n     direction. Now go back to the menu and\n     PLAY ZOOBALL!";    
+    int delay_8 = 40;
+    
+    if( timer_g > 29.8 && timer_g < 30 ){
+      barManager.bars[4].foosPlayers[0].catchBall2(0);
+    }    
     
     previousText = tutorialText[0];
-    if( timer.getSecondsActive() > delay_0 ){
-      if( timer.getSecondsActive() < delay_1 )
+    if( timer_g > delay_0 ){
+      if( timer_g < delay_1 )
         fill(50,255,50);
       text( tutorialText[0] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 );
     }
-    if( timer.getSecondsActive() > delay_1 ){
-      if( timer.getSecondsActive() < delay_2 )
+    if( timer_g > delay_1 ){
+      if( timer_g < delay_2 )
         fill(50,255,50);
       text( tutorialText[1] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*1 );
     }
-    if( timer.getSecondsActive() > delay_2 ){
-      if( timer.getSecondsActive() < delay_3 )
+    if( timer_g > delay_2 ){
+      if( timer_g < delay_3 )
         fill(50,255,50);
       text( tutorialText[2] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*3 );
     }
-    if( timer.getSecondsActive() > delay_3 ){
-      if( timer.getSecondsActive() < delay_4 )
+    if( timer_g > delay_3 ){
+      if( timer_g < delay_4 )
         fill(50,255,50);
       text( tutorialText[3] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*5 );
     }
-    if( timer.getSecondsActive() > delay_4 ){
-      if( timer.getSecondsActive() < delay_5 )
+    if( timer_g > delay_4 ){
+      if( timer_g < delay_5 )
         fill(50,255,50);
-      text( tutorialText[4] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*6 );
+      text( tutorialText[4] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*7 );
     }
-    if( timer.getSecondsActive() > delay_5 ){
-      if( timer.getSecondsActive() < delay_6 )
+    if( timer_g > delay_5 ){
+      if( timer_g < delay_6 )
         fill(50,255,50);
-      text( tutorialText[5] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*8 );
+      text( tutorialText[5] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*9 );
     }
-    if( timer.getSecondsActive() > delay_6 ){
-      if( timer.getSecondsActive() < delay_7 )
+    if( timer_g > delay_6 ){
+      if( timer_g < delay_7 )
         fill(50,255,50);
-      text( tutorialText[6] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*10 );
+      text( tutorialText[6] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*11 );
+      if( timer_g < delay_6 + 1 )
+        balls[0].launchBall(725, 390, 150, 0);
     }
-    if( timer.getSecondsActive() > delay_7 ){
-      if( timer.getSecondsActive() < delay_8 )
+    if( timer_g > delay_7 ){
+      if( timer_g < delay_8 )
         fill(50,255,50);
-      text( tutorialText[7] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*12 );
+      text( tutorialText[7] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*13 );
+    }
+
+    pushMatrix();
+    translate( game.getWidth()/2, game.getHeight()/2 );
+    rotate( PI );
+    fill(0,0,0, 150);
+    rect( 0 + 300, 0, 500, 400 );
+    
+    fill(255,255,255);
+    noStroke();
+    
+    if( timer_g > delay_0 ){
+      if( timer_g < delay_1 )
+        fill(50,255,50);
+      text( tutorialText[0] , 0 + 320, 0 + 30 );
+    }
+    if( timer_g > delay_1 ){
+      if( timer_g < delay_2 )
+        fill(50,255,50);
+      text( tutorialText[1] , 0+ 320, 0 + 30 + 24*1 );
+    }
+    if( timer_g > delay_2 ){
+      if( timer_g < delay_3 )
+        fill(50,255,50);
+      text( tutorialText[2] , 0 + 320, 0 + 30 + 24*3 );
+    }
+    if( timer_g > delay_3 ){
+      if( timer_g < delay_4 )
+        fill(50,255,50);
+      text( tutorialText[3] , 0 + 320, 0 + 30 + 24*5 );
+    }
+    if( timer_g > delay_4 ){
+      if( timer_g < delay_5 )
+        fill(50,255,50);
+      text( tutorialText[4] , 0 + 320, 0 + 30 + 24*7 );
+    }
+    if( timer_g > delay_5 ){
+      if( timer_g < delay_6 )
+        fill(50,255,50);
+      text( tutorialText[5] , 0 + 320, 0 + 30 + 24*9 );
+    }
+    if( timer_g > delay_6 ){
+      if( timer_g < delay_7 )
+        fill(50,255,50);
+      text( tutorialText[6] , 0 + 320, 0 + 30 + 24*11 );
+      if( timer_g < delay_6 + 0.1 )
+        balls[0].launchBall(725, 390, 150, 0);
+    }
+    if( timer_g > delay_7 ){
+      if( timer_g < delay_8 )
+        fill(50,255,50);
+      text( tutorialText[7] , 0 + 320, 0 + 30 + 24*13 );
+    }
+
+    popMatrix();    
+    
+    if( timer_g > delay_8 ){
+      playbackMouse = false;
+      demoMode = false;
     }
   }// demoMode
   

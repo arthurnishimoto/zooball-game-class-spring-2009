@@ -90,8 +90,30 @@ abstract class GameState
       }
     }// if playbackMouse
     
+    if( playbackDemo ){
+      if( demoPlayback[demoPlaybackItr].length() > 0 ){
+        float xCoord = Float.valueOf(demoPlayback[demoPlaybackItr].trim()).floatValue();
+        float yCoord = Float.valueOf(demoPlayback[demoPlaybackItr].trim()).floatValue();
+        if( demoPlayback[demoPlaybackItr+2].equals("TRUE") ){
+  	  fill( #FF0000 );
+  	  noStroke();
+  	  ellipse( xCoord, yCoord, 20, 20 );          
+          checkButtonHit(xCoord,yCoord, 1);
+        }else{
+   	  fill( #000000 );
+  	  noStroke();
+  	  ellipse( xCoord, yCoord, 20, 20 );              
+        }
+        demoPlaybackItr += 3;
+      }// if
+      else{
+        playbackDemo = false;
+        demoPlaybackItr = 0;
+      }
+    }// if playbackMouse
+    
     // Process mouse if clicked
-    if(mousePressed && usingMouse){
+    if(mousePressed && usingMouse && !demoMode){
       float xCoord = mouseX;    
       float yCoord = mouseY;
   		
@@ -109,7 +131,7 @@ abstract class GameState
     }// else if usingMouse
     
     //Process touches off the managedList if there are any touches.
-    if ( ! tacTile.managedListIsEmpty()  ){
+    if ( ! tacTile.managedListIsEmpty() && !demoMode ){
       // Grab the managedList
   	touchList = tacTile.getManagedList();
       // Cycle though the touches 

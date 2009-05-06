@@ -264,7 +264,11 @@ class MenuState extends GameState
         if( topQuit.isHit(x,y) || bottomQuit.isHit(x,y) ){
           game.setState( game.getLeavingState() );
         }
-        
+        if( topTutorial.isHit(x,y) || bottomTutorial.isHit(x,y) ){
+          demoMode = true;
+          game.reloadState( game.getPlayState() );
+          game.setState( game.getPlayState() );
+        }        
         break;
       case(ABOUT):
         if( topBack.isHit(x,y) || bottomBack.isHit(x,y) )
@@ -275,16 +279,19 @@ class MenuState extends GameState
           state = MENU;
         if( easyButton.isHit(x,y) && menuTransitionDelay < timer.getSecondsActive() ){
           FIELD_MODE = 1;
+          demoMode = false;
           game.reloadState( game.getPlayState() );
           game.setState( game.getPlayState() );
         }
         if( normalButton.isHit(x,y) && menuTransitionDelay < timer.getSecondsActive() ){
           FIELD_MODE = 2;
+          demoMode = false;
           game.reloadState( game.getPlayState() );
           game.setState( game.getPlayState() );
         }
         if( hardButton.isHit(x,y) && menuTransitionDelay < timer.getSecondsActive() ){
           FIELD_MODE = 3;
+          demoMode = false;
           game.reloadState( game.getPlayState() );
           game.setState( game.getPlayState() );
         }
