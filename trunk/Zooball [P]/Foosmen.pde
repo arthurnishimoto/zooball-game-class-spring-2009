@@ -380,9 +380,16 @@ class Foosmen{
       parent.statistics[3] += 1;  // Balls stopped
       return;
     }
-
-
   }// catchBall
+
+  void catchBall2(int ballID){
+    parent.statistics[4] += 1;
+    balls[ballID].setInactive();
+    hasBall = true;
+    parent.hasBall = true;
+    ballCaught[ballID] = 1;
+    ballsRecentlyHit[ballID] = 0;
+  }// catchBall2
   
   void releaseBall(){
     for( int i = 0; i < ballCaught.length; i++ ){

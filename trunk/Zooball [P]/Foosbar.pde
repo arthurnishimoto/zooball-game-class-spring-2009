@@ -33,6 +33,8 @@ class Foosbar{
   private int current;
   private Vector2D position[]; // x doesn't change
   private Vector2D velocity[]; // x=angular, y=linear
+  private float maxAngularVelocity = 200;
+  private float maxLinearVelocity = 20000;
   private double rotation[]; // angular rotation, normalized from -pi to pi
   private Vector2D forces; // I don't think this will actually be used
   private Vector2D friction; // Although this is probalby technically incorrect, allow for different friction in different directions
@@ -216,7 +218,6 @@ class Foosbar{
     // Velocity might converge to something like, 0.038590812... px/s so just kill it.
     if ( velocity[current].y == velocity[next].y && Math.abs( velocity[next].y ) < 2 )
       velocity[next].y = 0;
-
     current = next;
   }// step
 
@@ -270,6 +271,9 @@ class Foosbar{
   }// ScrollBar CTOR
   
   void display(){
+    if( position[current].y < 0 || position[current].y > game.getHeight() )
+      position[current].y = game.getHeight()/2;    
+    
     // Converts physics rotation angle (radians -PI to PI) to Foosmen angle (degrees 0 - 360 );
     if( zoneFlag == 0 )
       barRotation = degrees( -(float)this.getRotation() );
@@ -436,7 +440,7 @@ class Foosbar{
     text("Bar Rotation: "+barRotation, xPos, yPos+barHeight/2-16*9);
     text("Rotate Velocity: "+ rotateVelocity, xPos, yPos+barHeight/2-16*8);
     text("Active: "+pressed, xPos, yPos+barHeight/2-16*7);
-    text("Y Position: "+buttonValue, xPos, yPos+barHeight/2-16*6);
+    text("Y Position: "+position[current].y, xPos, yPos+barHeight/2-16*6);
     text("Movement: "+xMove+" , "+yMove, xPos, yPos+barHeight/2-16*5);
     if( barRotation > foosPlayers[0].minStopAngle && barRotation < foosPlayers[0].maxStopAngle )
       text(" CATCHING ", xPos, yPos+barHeight/2-16*4);
@@ -872,6 +876,15 @@ class Foosbar{
   }
   public Vector2D getVelocity( ) { return velocity[current]; }
   public void setVelocity( double angular, double linear ) {
+    if( angular > maxAngularVelocity )
+      angular = maxAngularVelocity;
+    else if( angular < -maxAngularVelocity )
+      angular = -maxAngularVelocity;
+    if( linear > maxLinearVelocity )
+      linear = maxLinearVelocity;
+    else if( linear < -maxLinearVelocity )
+      linear = -maxLinearVelocity;
+      
     int previous = current^1;
     velocity[previous].x = angular;
     velocity[previous].y = linear;
@@ -1135,7 +1148,7 @@ class Foosbar{
     String output = "";
     
     output += this;    
-    output += "\nThis Game Statistics\n";
+    output += "\nCurrent Game Statistics\n";
     output += "Goals scored: " + statistics[0];
     if( statistics[0] > record[0] )
       output += " NEW!";
@@ -1163,7 +1176,7 @@ class Foosbar{
     if( statistics[7] > record[7] )
       output += " NEW!";
     
-    output += "\n\n\n\n\nAll-Time Records\n\n";
+    output += "\n\n\n\nAll-Time Records\n\n";
     output += "Goals scored: " + record[0] + "\n";
     output += "Goals scored on own team: " + record[1] + "\n";
     output += "Ball hits: " + record[2] + "\n";

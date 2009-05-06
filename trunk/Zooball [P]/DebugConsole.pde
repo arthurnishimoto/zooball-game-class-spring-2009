@@ -11,6 +11,8 @@
  * panel 2 - (Foosbar Controls) Slide, rotation, friction, stoping angles, Bar control modes (fixed, spring, 360)
  *
  */
+Boolean debugConsoleBool = false;
+ 
 class DebugConsole{
   Button debugButton;
   
@@ -25,7 +27,7 @@ class DebugConsole{
   
   Button round1, round2, round3, round4;
   
-  Boolean debugConsole = false;
+  
   Boolean debugPanel2 = false;
   int screenHeight = screen.height;
   int new_nBalls, newFieldLines;
@@ -49,15 +51,15 @@ class DebugConsole{
     else if( frameRate <= 30 )
       timerIncrementer = 0.015;
       
-    if(debugConsole && game.getPlayState().isLoaded() )
+    if(debugConsoleBool && game.getPlayState().isLoaded() )
       displayPanel_1();
-    if(debugPanel2 && game.getPlayState().isLoaded() )
+    else if(debugPanel2 && game.getPlayState().isLoaded() )
       displayPanel_2();
-    if(debugConsole && !(game.getPlayState().isLoaded()) )
+    else if(debugConsoleBool && !(game.getPlayState().isLoaded()) )
       displayPanel_0();
       
     debugButton.process(font, timer_g);
-    debugButton.setLit( debugConsole || debugPanel2 );
+    debugButton.setLit( debugConsoleBool || debugPanel2 );
           
     textAlign(LEFT); // Default
     timer_g += timerIncrementer; //Used for debug since console is indepentent of state
@@ -65,21 +67,21 @@ class DebugConsole{
   
   public void input(float x, float y, int finger){
     if( debugButton.isHit(x,y) ){
-      if(debugConsole || debugPanel2 ){
-        debugConsole = false;
+      if(debugConsoleBool || debugPanel2 ){
+        debugConsoleBool = false;
         debugPanel2 = false;
       }else{
         new_nBalls = nBalls;
         newFieldLines = fieldLines;
-        debugConsole = true;
+        debugConsoleBool = true;
       }
     }// if debugButton
     
-    if( debugConsole && game.getPlayState().isLoaded() )
+    if( debugConsoleBool && game.getPlayState().isLoaded() )
       panel_1_input(x,y,finger);
     else if(debugPanel2 && game.getPlayState().isLoaded() )
       panel_2_input(x,y,finger);
-    if(debugConsole && !(game.getPlayState().isLoaded()) )
+    else if(debugConsoleBool && !(game.getPlayState().isLoaded()) )
       panel_0_input(x,y,finger);
   }// input()
   
@@ -393,7 +395,7 @@ class DebugConsole{
     
     if( round3.isHit(x,y) ){
       debugPanel2 = true;
-      debugConsole = false;
+      debugConsoleBool = false;
     }// if round3
     
     if( round4.isHit(x,y) ){
@@ -529,7 +531,7 @@ class DebugConsole{
     
     if( round3.isHit(x,y) ){
       debugPanel2 = false;
-      debugConsole = true;
+      debugConsoleBool = true;
     }// if round3
     
     if( round4.isHit(x,y) ){
