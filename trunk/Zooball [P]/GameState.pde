@@ -113,7 +113,7 @@ abstract class GameState
     }// if playbackMouse
     
     // Process mouse if clicked
-    if(mousePressed && usingMouse && !demoMode){
+    if(mousePressed && usingMouse && !demoMode ){
       float xCoord = mouseX;    
       float yCoord = mouseY;
   		

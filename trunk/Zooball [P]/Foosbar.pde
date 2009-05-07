@@ -773,12 +773,12 @@ class Foosbar{
           // Stops ball when "wedged" by Foosmen at a certain angle
           if( barRotation > foosPlayers[0].minStopAngle && barRotation < foosPlayers[0].maxStopAngle )
             if( ball.getSpeed() > 1 )
-              foosPlayers[i].catchBall( ball.getID() );
+              foosPlayers[i].catchBall( ball );
           if( barRotation < 375-foosPlayers[0].minStopAngle && barRotation > 375-foosPlayers[0].maxStopAngle )
             if( ball.getSpeed() > 1 )
-              foosPlayers[i].catchBall( ball.getID() );          
+              foosPlayers[i].catchBall( ball );          
           
-          foosPlayers[i].specialCollision( ball.getID() );
+          foosPlayers[i].specialCollision( ball );
           
           if( ball.getSpeed() > 0 )
             statistics[2] += 1; // Ball hit

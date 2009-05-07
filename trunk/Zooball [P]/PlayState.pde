@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 1.0
+ * Version: 1.1
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -783,8 +783,6 @@ class PlayState extends GameState
       if( timer_g < delay_7 )
         fill(50,255,50);
       text( tutorialText[6] , 0 + 320, 0 + 30 + 24*11 );
-      if( timer_g < delay_6 + 0.1 )
-        balls[0].launchBall(725, 390, 150, 0);
     }
     if( timer_g > delay_7 ){
       if( timer_g < delay_8 )
