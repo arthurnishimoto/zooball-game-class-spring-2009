@@ -24,9 +24,11 @@ class Game
   private float screenScale;
   private float screenOffsetX;
   private float screenOffsetY;
+  protected PApplet parent;
   
-  public Game( ) {
+  public Game( PApplet p ) {
     debugFont = loadFont( "data/ui/fonts/Arial Bold-14.vlw" );
+    parent = p;
     
     introState = new IntroState( this );
     loadingState = new LoadingState( this );

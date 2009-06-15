@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 1.1
+ * Version: 1.1.2
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -93,8 +93,10 @@
  *              - Foosbar catch/throw and special balls re-implemented. Fixes with resetting physics.
  * 5/5/09       - Version 1.1
  *              - Tutorial fully implemented, ball/bar velocity collision fixes. Stressed tested.
- * 6/5/09       - Version 1.0.1
+ * 6/5/09       - Version 1.1.1
  *              - Implements echoClient to communicate with Processing launcher. Exit button enabled on tutorial.
+ * 6/15/09      - Version 1.1.2
+ *              - Button class replaced with MTButton library
  *
  * Notes:
  *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?

@@ -16,16 +16,16 @@ Boolean debugConsoleBool = false;
 class DebugConsole{
   MTButton debugButton;
   
-  Button muteButton;
-  Button applyChanges;
+  MTButton muteButton;
+  MTButton applyChanges;
   
-  Button plus1, minus1;
-  Button plus2, minus2;
-  Button plus3, minus3;
-  Button plus4, minus4;
-  Button plus5, minus5;
+  MTButton plus1, minus1;
+  MTButton plus2, minus2;
+  MTButton plus3, minus3;
+  MTButton plus4, minus4;
+  MTButton plus5, minus5;
   
-  Button round1, round2, round3, round4;
+  MTButton round1, round2, round3, round4;
   
   
   Boolean debugPanel2 = false;
@@ -92,68 +92,68 @@ class DebugConsole{
   }// input()
   
   private void setupPanel(){
-    muteButton = new Button( 300 + 75, screenHeight - borderHeight/2 - 65*5, 100, 50 );
+    muteButton = new MTButton( 300 + 75, screenHeight - borderHeight/2 - 65*5, 100, 50 );
     muteButton.setIdleColor(color(60,10,10));
     muteButton.setLitColor(color(255, 0, 0));
     muteButton.setButtonText("MUTE");
     muteButton.setDoubleSidedText(false);
     
-    minus1 = new Button( 75, screenHeight - borderHeight/2 - 65*5, 50, 50 );
+    minus1 = new MTButton( 75, screenHeight - borderHeight/2 - 65*5, 50, 50 );
     minus1.setIdleColor(color(250,250,250));
     minus1.setDoubleSidedText(false);
     minus1.setButtonText("-");
-    minus2 = new Button( 75, screenHeight - borderHeight/2 - 65*4, 50, 50 );
+    minus2 = new MTButton( 75, screenHeight - borderHeight/2 - 65*4, 50, 50 );
     minus2.setIdleColor(color(250,250,250));
     minus2.setDoubleSidedText(false);
     minus2.setButtonText("-");
-    minus3 = new Button( 75, screenHeight - borderHeight/2 - 65*3, 50, 50 );
+    minus3 = new MTButton( 75, screenHeight - borderHeight/2 - 65*3, 50, 50 );
     minus3.setIdleColor(color(250,250,250));
     minus3.setDoubleSidedText(false);
     minus3.setButtonText("-");
-    minus4 = new Button( 75, screenHeight - borderHeight/2 - 65*2, 50, 50 );
+    minus4 = new MTButton( 75, screenHeight - borderHeight/2 - 65*2, 50, 50 );
     minus4.setIdleColor(color(250,250,250));
     minus4.setDoubleSidedText(false);
     minus4.setButtonText("-");
-    minus5 = new Button( 75, screenHeight - borderHeight/2 - 65*1, 50, 50 );
+    minus5 = new MTButton( 75, screenHeight - borderHeight/2 - 65*1, 50, 50 );
     minus5.setIdleColor(color(250,250,250));
     minus5.setDoubleSidedText(false);
     minus5.setButtonText("-");
     
-    plus1 = new Button( 275, screenHeight - borderHeight/2 - 65*5, 50, 50 );
+    plus1 = new MTButton( 275, screenHeight - borderHeight/2 - 65*5, 50, 50 );
     plus1.setIdleColor(color(250,250,250));
     plus1.setDoubleSidedText(false);
     plus1.setButtonText("+");
-    plus2 = new Button( 275, screenHeight - borderHeight/2 - 65*4, 50, 50 );
+    plus2 = new MTButton( 275, screenHeight - borderHeight/2 - 65*4, 50, 50 );
     plus2.setIdleColor(color(250,250,250));
     plus2.setDoubleSidedText(false);
     plus2.setButtonText("+");
-    plus3 = new Button( 275, screenHeight - borderHeight/2 - 65*3, 50, 50 );
+    plus3 = new MTButton( 275, screenHeight - borderHeight/2 - 65*3, 50, 50 );
     plus3.setIdleColor(color(250,250,250));
     plus3.setDoubleSidedText(false);
     plus3.setButtonText("+");
-    plus4 = new Button( 275, screenHeight - borderHeight/2 - 65*2, 50, 50 );
+    plus4 = new MTButton( 275, screenHeight - borderHeight/2 - 65*2, 50, 50 );
     plus4.setIdleColor(color(250,250,250));
     plus4.setDoubleSidedText(false);
     plus4.setButtonText("+");
-    plus5 = new Button( 275, screenHeight - borderHeight/2 - 65*1, 50, 50 );
+    plus5 = new MTButton( 275, screenHeight - borderHeight/2 - 65*1, 50, 50 );
     plus5.setIdleColor(color(250,250,250));
     plus5.setDoubleSidedText(false);
     plus5.setButtonText("+");
     
-    round1 = new Button( 375 , screenHeight - borderHeight/2 - 75*3, 50 );
+    round1 = new MTButton( 375 , screenHeight - borderHeight/2 - 75*3, 50 );
     round1.setDoubleSidedText(false);
     round1.setIdleColor(color(0,50,50));
-    round2 = new Button( 375 , screenHeight - borderHeight/2 - 75*2, 50 );
+    round2 = new MTButton( 375 , screenHeight - borderHeight/2 - 75*2, 50 );
     round2.setDoubleSidedText(false);
     round2.setIdleColor(color(0,50,50));
-    round3 = new Button( 375 , screenHeight - borderHeight/2 - 75*1, 50 );
+    round3 = new MTButton( 375 , screenHeight - borderHeight/2 - 75*1, 50 );
     round3.setDoubleSidedText(false);
     round3.setIdleColor(color(0,50,50));
-    round4 = new Button( 375 , screenHeight - borderHeight/2 - 75*0, 50 );
+    round4 = new MTButton( 375 , screenHeight - borderHeight/2 - 75*0, 50 );
     round4.setDoubleSidedText(false);
     round4.setIdleColor(color(0,50,50));
     
-    applyChanges = new Button( 225, screenHeight - borderHeight/2 - 65*0, 200, 50 );
+    applyChanges = new MTButton( 225, screenHeight - borderHeight/2 - 65*0, 200, 50 );
     applyChanges.setIdleColor(color(60,10,10, 1));
     applyChanges.setLitColor(color(255, 0, 0));
     applyChanges.setDoubleSidedText(false);  
