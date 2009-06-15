@@ -55,7 +55,7 @@ void setup( ) {
   demoPlayback = loadStrings("data/tutorial.txt");
   Image.setPApplet( this ); // Image stores a static instance of this PApplet to call Processing methods. This must be set before creating any Image objects.
   
-  game = new Game( );
+  game = new Game( this );
 }
 
 void draw( ) {
@@ -69,7 +69,7 @@ void draw( ) {
   }
   
   if(quit){
-    client.informLauncher();
+    //client.informLauncher();
     exit();
   }
 }// draw

@@ -8,11 +8,11 @@ class MenuState extends GameState
 {
   private Image selectTeam, selectField, aboutBackground;
   private CircularButton zooballLogo, zooballLogo_dragon, zooballLogo_tiger, zooballLogo_start;
-  private Button bottomDragon, bottomTiger, topDragon, topTiger;
-  private Button topAbout, topTutorial, topQuit, topControls;
-  private Button bottomAbout, bottomTutorial, bottomQuit, bottomControls;
-  private Button bottomBack, topBack;
-  private Button easyButton, normalButton, hardButton;
+  private MTButton bottomDragon, bottomTiger, topDragon, topTiger;
+  private MTButton topAbout, topTutorial, topQuit, topControls;
+  private MTButton bottomAbout, bottomTutorial, bottomQuit, bottomControls;
+  private MTButton bottomBack, topBack;
+  private MTButton easyButton, normalButton, hardButton;
   
   boolean topChosen = false;
   boolean bottomChosen = false;
@@ -61,65 +61,65 @@ class MenuState extends GameState
     zooballLogo_start.setPosition( game.getWidth()/2, game.getHeight()/2 );
     zooballLogo_start.setRadius( 393/2 );  
     
-    bottomDragon = new Button( 50 + 469, (int)game.getHeight() - 100, "data/ui/buttons/dragons/disabled.png");
+    bottomDragon = new MTButton( game.parent, 50 + 469, (int)game.getHeight() - 100, "ui/buttons/dragons/disabled.png");
     bottomDragon.setLitImage( loadImage("data/ui/buttons/dragons/enabled.png") );
     bottomDragon.setDelay(1);
-    bottomTiger = new Button( (int)game.getWidth() - 50 - 469, (int)game.getHeight() - 100, "data/ui/buttons/tigers/disabled.png");
+    bottomTiger = new MTButton( (int)game.getWidth() - 50 - 469, (int)game.getHeight() - 100, "data/ui/buttons/tigers/disabled.png");
     bottomTiger.setLitImage( loadImage("data/ui/buttons/tigers/enabled.png") );
     bottomTiger.setDelay(1);
     
-    topDragon = new Button( (int)game.getWidth() - 50 - 469, 100, "data/ui/buttons/dragons/disabled.png");
+    topDragon = new MTButton( (int)game.getWidth() - 50 - 469, 100, "data/ui/buttons/dragons/disabled.png");
     topDragon.setLitImage( loadImage("data/ui/buttons/dragons/enabled.png") );
     topDragon.setRotation( PI );
     topDragon.setDelay(1);
-    topTiger = new Button( 50 + 469, 100, "data/ui/buttons/tigers/disabled.png");
+    topTiger = new MTButton( 50 + 469, 100, "data/ui/buttons/tigers/disabled.png");
     topTiger.setLitImage( loadImage("data/ui/buttons/tigers/enabled.png") );
     topTiger.setRotation( PI );
     topTiger.setDelay(1);
     
-    bottomAbout = new Button( (int)game.getWidth()/2 - 200 , (int)game.getHeight() - 250, "data/ui/buttons/greenGlow/enabled.png");
+    bottomAbout = new MTButton( (int)game.getWidth()/2 - 200 , (int)game.getHeight() - 250, "data/ui/buttons/greenGlow/enabled.png");
     bottomAbout.setButtonText("About");
     bottomAbout.setDoubleSidedText(false);
-    topAbout = new Button( (int)game.getWidth()/2 + 200 , 250, "data/ui/buttons/greenGlow/enabled.png");
+    topAbout = new MTButton( (int)game.getWidth()/2 + 200 , 250, "data/ui/buttons/greenGlow/enabled.png");
     topAbout.setButtonText("About");
     topAbout.setDoubleSidedText(false);
     topAbout.setRotation(PI);
     
-    bottomTutorial = new Button( (int)game.getWidth()/2 + 000, (int)game.getHeight() - 250, "data/ui/buttons/greenGlow/enabled.png");
+    bottomTutorial = new MTButton( (int)game.getWidth()/2 + 000, (int)game.getHeight() - 250, "data/ui/buttons/greenGlow/enabled.png");
     bottomTutorial.setButtonText("Tutorial");
     bottomTutorial.setDoubleSidedText(false);
-    topTutorial = new Button( (int)game.getWidth()/2 - 000, 250, "data/ui/buttons/greenGlow/enabled.png");
+    topTutorial = new MTButton( (int)game.getWidth()/2 - 000, 250, "data/ui/buttons/greenGlow/enabled.png");
     topTutorial.setButtonText("Tutorial");
     topTutorial.setDoubleSidedText(false);
     topTutorial.setRotation(PI);
 
-    bottomQuit = new Button( (int)game.getWidth()/2 + 200, (int)game.getHeight() - 250, "data/ui/buttons/greenGlow/enabled.png");
+    bottomQuit = new MTButton( (int)game.getWidth()/2 + 200, (int)game.getHeight() - 250, "data/ui/buttons/greenGlow/enabled.png");
     bottomQuit.setButtonText("Quit");
     bottomQuit.setDoubleSidedText(false);
-    topQuit = new Button( (int)game.getWidth()/2 - 200, 250, "data/ui/buttons/greenGlow/enabled.png");
+    topQuit = new MTButton( (int)game.getWidth()/2 - 200, 250, "data/ui/buttons/greenGlow/enabled.png");
     topQuit.setButtonText("Quit");
     topQuit.setDoubleSidedText(false);
     topQuit.setRotation(PI);
     
-    bottomBack = new Button( (int)game.getWidth() - 100, (int)game.getHeight() - 70, "data/ui/buttons/greenGlow/enabled.png");
+    bottomBack = new MTButton( (int)game.getWidth() - 100, (int)game.getHeight() - 70, "data/ui/buttons/greenGlow/enabled.png");
     bottomBack.setButtonText("Back");
     bottomBack.setDoubleSidedText(false);
-    topBack = new Button( 100,  70, "data/ui/buttons/greenGlow/enabled.png");
+    topBack = new MTButton( 100,  70, "data/ui/buttons/greenGlow/enabled.png");
     topBack.setButtonText("Back");
     topBack.setDoubleSidedText(false);
     topBack.setRotation(PI);
     
-    bottomControls = new Button( (int)game.getWidth() - 100, (int)game.getHeight() - 70, "data/ui/buttons/greenGlow/enabled.png");
+    bottomControls = new MTButton( (int)game.getWidth() - 100, (int)game.getHeight() - 70, "data/ui/buttons/greenGlow/enabled.png");
     bottomControls.setButtonText("Controls");
     bottomControls.setDoubleSidedText(false);
-    topControls = new Button( 100,  70, "data/ui/buttons/greenGlow/enabled.png");
+    topControls = new MTButton( 100,  70, "data/ui/buttons/greenGlow/enabled.png");
     topControls.setButtonText("Controls");
     topControls.setDoubleSidedText(false);
     topControls.setRotation(PI);
     
-    easyButton = new Button( (int)game.getWidth()/2 - 500, (int)game.getHeight()/2, "data/ui/buttons/easy_field.png");
-    normalButton = new Button( (int)game.getWidth()/2, (int)game.getHeight()/2, "data/ui/buttons/normal_field.png");
-    hardButton = new Button( (int)game.getWidth()/2 + 500, (int)game.getHeight()/2, "data/ui/buttons/hard_field.png");
+    easyButton = new MTButton( (int)game.getWidth()/2 - 500, (int)game.getHeight()/2, "data/ui/buttons/easy_field.png");
+    normalButton = new MTButton( (int)game.getWidth()/2, (int)game.getHeight()/2, "data/ui/buttons/normal_field.png");
+    hardButton = new MTButton( (int)game.getWidth()/2 + 500, (int)game.getHeight()/2, "data/ui/buttons/hard_field.png");
     
     endLoad( );
   }// load
