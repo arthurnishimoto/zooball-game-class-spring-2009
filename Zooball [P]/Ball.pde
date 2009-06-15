@@ -428,6 +428,7 @@ class Ball{
     p.add( n );
     position[current].x = p.x;
     position[current].y = p.y;
+    soundManager.playBounce();
   }
   
   public void clearWallContacts( ) {

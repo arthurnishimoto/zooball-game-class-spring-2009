@@ -125,6 +125,9 @@ class MenuState extends GameState
   }// load
   
   public void enter( ) {
+    demoMode = false;
+    playbackMouse = false;
+    playbackItr = 0;
     timer.setActive( true );
     soundManager.playJungle();
     state = MENU;

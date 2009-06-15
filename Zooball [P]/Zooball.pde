@@ -1,7 +1,12 @@
+import MTButton.*;
+
+import echoClient.*;
+
 import processing.opengl.*;
 import processing.net.*;
 import tacTile.net.*;
 
+EchoClient client = new EchoClient();
 Game game;
 
 Boolean connectToTacTile = true;
@@ -10,12 +15,10 @@ Boolean scaleScreen = true; // All input is off-centered when scaled
 
 Boolean recordingMouse = false;
 Boolean playbackMouse = false;
-Boolean playbackDemo = false;
 String[] mousePlayback;
 String[] demoPlayback;
 String mouseRecorder = "";
 int playbackItr = 0;
-int demoPlaybackItr = 0;
 
 Boolean quit = false;
 
@@ -35,13 +38,10 @@ int msgPort = 7340;
   
 SoundManager soundManager;  
 DebugConsole debugConsole;
-  
+
 void setup( ) {
-  Image.setPApplet( this ); // Image stores a static instance of this PApplet to call Processing methods. This must be set before creating any Image objects.
-  
-  size( screen.width, screen.height, OPENGL ); // OPENGL causes connect failure if placed after TouchAPI CTOR
-  //size( 960, 540, OPENGL );
-  
+  size( screen.width, screen.height, OPENGL );
+
   if( connectToTacTile ){
     //Create connection to Touch Server
     tacTile = new TouchAPI( this, dataPort, msgPort, tacTileMachine);
@@ -51,14 +51,15 @@ void setup( ) {
   }// if-else tacTile
   
   soundManager = new SoundManager(this);
-  debugConsole = new DebugConsole();
+  debugConsole = new DebugConsole(this);
   demoPlayback = loadStrings("data/tutorial.txt");
+  Image.setPApplet( this ); // Image stores a static instance of this PApplet to call Processing methods. This must be set before creating any Image objects.
+  
   game = new Game( );
 }
 
 void draw( ) {
   game.loop( );
-  
   if( recordingMouse ){
     fill(255,0,0);
     ellipse(10,10,10,10);
@@ -67,8 +68,10 @@ void draw( ) {
     ellipse(10,10,10,10);
   }
   
-  if(quit)
+  if(quit){
+    client.informLauncher();
     exit();
+  }
 }// draw
 
 void keyPressed( KeyEvent e ) {
@@ -106,3 +109,4 @@ void keyPressed( KeyEvent e ) {
   }// if game != null
   super.keyPressed( e ); // Pass event up the chain so ESC still works
 }// keyPressed
+

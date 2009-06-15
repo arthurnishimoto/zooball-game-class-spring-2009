@@ -15,13 +15,6 @@ class IntroState extends GameState
   }
   
   public void load( ) {
-    // spin a while to test the loading screen
-    int max = Integer.MAX_VALUE >> 6;
-    Random r = new Random( );
-    
-    for ( int i = 0; i < max; i++ )
-      r.nextDouble( );
-      
     ISE = loadImage( "data/ui/logos/ise1.png" );
         
     endLoad( );
