@@ -64,7 +64,7 @@ abstract class GameState
     else if(mousePressed && usingMouse && recordingMouse)
       mouseRecorder += ( mouseX +" "+ mouseY + " TRUE ");
       
-    if( playbackMouse ){
+    if( playbackMouse && game.getPlayState().timer.isActive() ){
       if( mousePlayback[playbackItr].length() > 0 ){
         //println("xCoord = "+mousePlayback[playbackItr]);
         //println("yCoord = "+mousePlayback[playbackItr+1]);
@@ -90,30 +90,8 @@ abstract class GameState
       }
     }// if playbackMouse
     
-    if( playbackDemo ){
-      if( demoPlayback[demoPlaybackItr].length() > 0 ){
-        float xCoord = Float.valueOf(demoPlayback[demoPlaybackItr].trim()).floatValue();
-        float yCoord = Float.valueOf(demoPlayback[demoPlaybackItr].trim()).floatValue();
-        if( demoPlayback[demoPlaybackItr+2].equals("TRUE") ){
-  	  fill( #FF0000 );
-  	  noStroke();
-  	  ellipse( xCoord, yCoord, 20, 20 );          
-          checkButtonHit(xCoord,yCoord, 1);
-        }else{
-   	  fill( #000000 );
-  	  noStroke();
-  	  ellipse( xCoord, yCoord, 20, 20 );              
-        }
-        demoPlaybackItr += 3;
-      }// if
-      else{
-        playbackDemo = false;
-        demoPlaybackItr = 0;
-      }
-    }// if playbackMouse
-    
     // Process mouse if clicked
-    if(mousePressed && usingMouse && !demoMode ){
+    if(mousePressed && usingMouse){
       float xCoord = mouseX;    
       float yCoord = mouseY;
   		
@@ -131,7 +109,7 @@ abstract class GameState
     }// else if usingMouse
     
     //Process touches off the managedList if there are any touches.
-    if ( ! tacTile.managedListIsEmpty() && !demoMode ){
+    if ( ! tacTile.managedListIsEmpty() ){
       // Grab the managedList
   	touchList = tacTile.getManagedList();
       // Cycle though the touches 
@@ -151,9 +129,12 @@ abstract class GameState
   		noStroke();
   		ellipse( xCoord, yCoord, 20, 20 );
 
-                // ANY CHANGES HERE MUST BE COPIED TO MOUSE IF ABOVE
-                checkButtonHit(xCoord, yCoord, finger);
                 debugConsole.input(xCoord, yCoord, finger);
+                // ANY CHANGES HERE MUST BE COPIED TO MOUSE IF ABOVE
+                if( !demoMode )
+                  checkButtonHit(xCoord, yCoord, finger);
+                else
+                  checkButtonHit_demo(xCoord, yCoord, finger);
   	}// for touchList
     }// if touch
     else if(connectToTacTile){ 
@@ -165,7 +146,10 @@ abstract class GameState
   
   public void checkButtonHit(float x, float y, int finger){
   }// checkButtonHit
-
+  
+  public void checkButtonHit_demo(float x, float y, int finger){ // Only used to allow user touches on pause button during demo
+  }// checkButtonHit
+  
   public void update( ) { timer.update( ); }
   public void draw( ) { }
 }

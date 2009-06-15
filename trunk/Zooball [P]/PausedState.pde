@@ -4,9 +4,11 @@
  * Author:  Andy Bursavich
  * Version: 0.3
  */
+ 
 class PausedState extends GameState
 {
   private CircularButton btnResumeBottom, btnResumeTop, btnQuitBottom, btnQuitTop;
+  private boolean demoPaused = false;
   
   public PausedState( Game game ) {
     super( game );
@@ -41,6 +43,22 @@ class PausedState extends GameState
     drawDebugText( );
   }
   
+  public void enter( ) {
+    timer.setActive( true );
+    if(demoMode)
+      demoPaused = true;
+    demoMode = false;
+  }
+  
+  public void exit( ) {
+    soundManager.pauseSounds();
+    timer.setActive( false );
+    if(demoPaused)
+      demoMode = true;
+    else
+      playbackMouse = false;
+  }// exit
+  
   private void drawBackground( ) {
     boolean debugMode = game.isDebugMode( );
     if ( debugMode ) game.toggleDebugMode( );
@@ -67,9 +85,9 @@ class PausedState extends GameState
   public String toString( ) { return "PausedState"; }
   
   public void checkButtonHit(float x, float y, int finger){
-    if( btnResumeBottom.contains(x,y) || btnResumeTop.contains(x,y) )
+    if( btnResumeBottom.contains(x,y) || btnResumeTop.contains(x,y) ){
       game.setState( game.getPlayState() );
-    else if( btnQuitBottom.contains(x,y) || btnQuitTop.contains(x,y) )
+    }else if( btnQuitBottom.contains(x,y) || btnQuitTop.contains(x,y) )
       game.setState( game.getMenuState() );
   }// checkButtonHit
   

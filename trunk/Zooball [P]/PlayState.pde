@@ -93,6 +93,8 @@
  *              - Foosbar catch/throw and special balls re-implemented. Fixes with resetting physics.
  * 5/5/09       - Version 1.1
  *              - Tutorial fully implemented, ball/bar velocity collision fixes. Stressed tested.
+ * 6/5/09       - Version 1.0.1
+ *              - Implements echoClient to communicate with Processing launcher. Exit button enabled on tutorial.
  *
  * Notes:
  *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?
@@ -118,6 +120,7 @@ Boolean debug2Text = false; // TEMP
 color debugColor = color(255,255,255); // TEMP
 
 boolean demoMode = false;
+boolean playStateActive = false;
 
 // Gameplay Initial Variables
 int nBalls = 1;
@@ -136,7 +139,8 @@ int barWidth = 213;
 
 int FIELD_MODE = 2; // Booster difficulty: 1 = Easy, 2 - Normal (No boosters), 3 - Hard 
 
-double timer_g = 0; // TEMP
+float timer_g = 0; // TEMP
+float demoTimer = 0;
 PFont font;
 
 // Data Structures / Objects
@@ -226,7 +230,7 @@ class PlayState extends GameState
     topQueue = 0;
     bottomQueue = 0;
     lastScored = -1;
-    timer_g = 0;
+    demoTimer = 0;
 
     imgPitch = new Image( "data/objects/stadium/gamefield_grass.gif" );
     imgPitch.setPosition( 0, 0 );
@@ -386,7 +390,8 @@ class PlayState extends GameState
   }// enter()  
 
   public void draw( ) {
-    try{
+    playStateActive = timer.isActive();
+
     frameRate(30); // Framerate must be below 60 to allow bar spin gesture.
 
     if( (ballsInPlay + topQueue + bottomQueue) < nBalls && lastScored == -1 )
@@ -431,7 +436,7 @@ class PlayState extends GameState
     ballLauncher_bottom.process(timer.getSecondsActive()); 
     ballLauncher_top.process(timer.getSecondsActive()); 
 
-    if(demoMode)
+    if(demoMode && timer.isActive())
       demoMode();
 
     if(debugText){
@@ -473,9 +478,6 @@ class PlayState extends GameState
     
     if( timer.isActive() )
       checkWinningConditions();
-    }catch(NullPointerException e){
-      println("Un-oh another null pointer exception");
-    }
   }// draw()
 
   private void drawBackground( ) {
@@ -628,7 +630,6 @@ class PlayState extends GameState
 
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
       game.setState( game.getPausedState() );
-    //if( !demoMode ){
     barManager.barsPressed(x,y);
 
     ballLauncher_top.isHit(x,y);
@@ -638,13 +639,19 @@ class PlayState extends GameState
 
     // Player can touch the ball if get stuck (must be moving very slow or stopped)
     for( int i = 0; i < nBalls; i++ ){
-      if( balls[i] == null )
-        continue;
+      try{
       balls[i].isHit(x,y);
+      }catch(ArrayIndexOutOfBoundsException e){
+        continue;
+      }
     }// for nBalls
-    //}
   }// checkButtonHit
 
+  void checkButtonHit_demo(float x, float y, int finger){
+    if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
+      game.setState( game.getPausedState() );
+  }
+  
   void reloadBall(){
     if( lastScored == 0 ){
       bottomQueue++;
@@ -664,6 +671,7 @@ class PlayState extends GameState
   }// coinToss
 
   public void demoMode(){
+    
     mousePlayback = loadStrings("data/tutorial.txt");
     playbackMouse = true;
     
@@ -692,50 +700,50 @@ class PlayState extends GameState
     tutorialText[7] = "To throw a ball, flick and release in the desired\n     direction. Now go back to the menu and\n     PLAY ZOOBALL!";    
     int delay_8 = 40;
     
-    if( timer_g > 29.8 && timer_g < 30 ){
+    if( demoTimer > 29.8 && demoTimer < 30 ){
       barManager.bars[4].foosPlayers[0].catchBall2(0);
     }    
     
     previousText = tutorialText[0];
-    if( timer_g > delay_0 ){
-      if( timer_g < delay_1 )
+    if( demoTimer > delay_0 ){
+      if( demoTimer < delay_1 )
         fill(50,255,50);
       text( tutorialText[0] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 );
     }
-    if( timer_g > delay_1 ){
-      if( timer_g < delay_2 )
+    if( demoTimer > delay_1 ){
+      if( demoTimer < delay_2 )
         fill(50,255,50);
       text( tutorialText[1] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*1 );
     }
-    if( timer_g > delay_2 ){
-      if( timer_g < delay_3 )
+    if( demoTimer > delay_2 ){
+      if( demoTimer < delay_3 )
         fill(50,255,50);
       text( tutorialText[2] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*3 );
     }
-    if( timer_g > delay_3 ){
-      if( timer_g < delay_4 )
+    if( demoTimer > delay_3 ){
+      if( demoTimer < delay_4 )
         fill(50,255,50);
       text( tutorialText[3] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*5 );
     }
-    if( timer_g > delay_4 ){
-      if( timer_g < delay_5 )
+    if( demoTimer > delay_4 ){
+      if( demoTimer < delay_5 )
         fill(50,255,50);
       text( tutorialText[4] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*7 );
     }
-    if( timer_g > delay_5 ){
-      if( timer_g < delay_6 )
+    if( demoTimer > delay_5 ){
+      if( demoTimer < delay_6 )
         fill(50,255,50);
       text( tutorialText[5] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*9 );
     }
-    if( timer_g > delay_6 ){
-      if( timer_g < delay_7 )
+    if( demoTimer > delay_6 ){
+      if( demoTimer < delay_7 )
         fill(50,255,50);
       text( tutorialText[6] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*11 );
-      if( timer_g < delay_6 + 1 )
+      if( demoTimer < delay_6 + 1 )
         balls[0].launchBall(725, 390, 150, 0);
     }
-    if( timer_g > delay_7 ){
-      if( timer_g < delay_8 )
+    if( demoTimer > delay_7 ){
+      if( demoTimer < delay_8 )
         fill(50,255,50);
       text( tutorialText[7] , game.getWidth()/2 + 320, game.getHeight()/2 + 30 + 24*13 );
     }
@@ -749,50 +757,50 @@ class PlayState extends GameState
     fill(255,255,255);
     noStroke();
     
-    if( timer_g > delay_0 ){
-      if( timer_g < delay_1 )
+    if( demoTimer > delay_0 ){
+      if( demoTimer < delay_1 )
         fill(50,255,50);
       text( tutorialText[0] , 0 + 320, 0 + 30 );
     }
-    if( timer_g > delay_1 ){
-      if( timer_g < delay_2 )
+    if( demoTimer > delay_1 ){
+      if( demoTimer < delay_2 )
         fill(50,255,50);
       text( tutorialText[1] , 0+ 320, 0 + 30 + 24*1 );
     }
-    if( timer_g > delay_2 ){
-      if( timer_g < delay_3 )
+    if( demoTimer > delay_2 ){
+      if( demoTimer < delay_3 )
         fill(50,255,50);
       text( tutorialText[2] , 0 + 320, 0 + 30 + 24*3 );
     }
-    if( timer_g > delay_3 ){
-      if( timer_g < delay_4 )
+    if( demoTimer > delay_3 ){
+      if( demoTimer < delay_4 )
         fill(50,255,50);
       text( tutorialText[3] , 0 + 320, 0 + 30 + 24*5 );
     }
-    if( timer_g > delay_4 ){
-      if( timer_g < delay_5 )
+    if( demoTimer > delay_4 ){
+      if( demoTimer < delay_5 )
         fill(50,255,50);
       text( tutorialText[4] , 0 + 320, 0 + 30 + 24*7 );
     }
-    if( timer_g > delay_5 ){
-      if( timer_g < delay_6 )
+    if( demoTimer > delay_5 ){
+      if( demoTimer < delay_6 )
         fill(50,255,50);
       text( tutorialText[5] , 0 + 320, 0 + 30 + 24*9 );
     }
-    if( timer_g > delay_6 ){
-      if( timer_g < delay_7 )
+    if( demoTimer > delay_6 ){
+      if( demoTimer < delay_7 )
         fill(50,255,50);
       text( tutorialText[6] , 0 + 320, 0 + 30 + 24*11 );
     }
-    if( timer_g > delay_7 ){
-      if( timer_g < delay_8 )
+    if( demoTimer > delay_7 ){
+      if( demoTimer < delay_8 )
         fill(50,255,50);
       text( tutorialText[7] , 0 + 320, 0 + 30 + 24*13 );
     }
 
     popMatrix();    
     
-    if( timer_g > delay_8 ){
+    if( demoTimer > delay_8 ){
       playbackMouse = false;
       demoMode = false;
     }

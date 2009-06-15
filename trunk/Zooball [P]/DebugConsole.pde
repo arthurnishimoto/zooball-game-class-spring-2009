@@ -14,7 +14,7 @@
 Boolean debugConsoleBool = false;
  
 class DebugConsole{
-  Button debugButton;
+  MTButton debugButton;
   
   Button muteButton;
   Button applyChanges;
@@ -33,13 +33,14 @@ class DebugConsole{
   int new_nBalls, newFieldLines;
   float timerIncrementer = 0.015; //Default = 0.048; 0.015 for 60 FPS; 0.030 for 30 FPS
   
-  DebugConsole(){
+  DebugConsole(PApplet p){
     font = loadFont("data/ui/fonts/Arial Bold-14.vlw"); // TEMP
     
     // Button which opens the console
-    debugButton = new Button( 50 , screenHeight - borderHeight/2 - 75*0, 50 );
+    debugButton = new MTButton( p, 50 , screenHeight - borderHeight/2 - 75*0, 50 );
     debugButton.setIdleColor(color(0,10,0));    
-    debugButton.setLitColor(color(0,250,50)); 
+    debugButton.setLitColor(color(0,250,50));
+    debugButton.setDelayedPress(false);
     
     setupPanel();
   }// CTOR
@@ -49,6 +50,8 @@ class DebugConsole{
     if( frameRate > 55 )
       timerIncrementer = 0.015/2;
     else if( frameRate <= 30 )
+      timerIncrementer = 0.015;
+    else
       timerIncrementer = 0.015;
       
     if(debugConsoleBool && game.getPlayState().isLoaded() )
@@ -62,7 +65,10 @@ class DebugConsole{
     debugButton.setLit( debugConsoleBool || debugPanel2 );
           
     textAlign(LEFT); // Default
-    timer_g += timerIncrementer; //Used for debug since console is indepentent of state
+    if(demoMode)
+      if(playStateActive)
+        demoTimer += timerIncrementer; //Used for tutorial timer
+    timer_g += timerIncrementer; //Used for debug since console is independent of state
   }// draw()
   
   public void input(float x, float y, int finger){
