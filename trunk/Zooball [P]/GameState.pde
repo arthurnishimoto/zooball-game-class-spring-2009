@@ -112,6 +112,7 @@ abstract class GameState
     if ( ! tacTile.managedListIsEmpty() ){
       // Grab the managedList
   	touchList = tacTile.getManagedList();
+        sendTouchList(touchList);
       // Cycle though the touches 
   	for ( int index = 0; index < touchList.size(); index ++ ){
   		//Grab a touch
@@ -139,6 +140,7 @@ abstract class GameState
     }// if touch
     else if(connectToTacTile){ 
       checkButtonHit(-100, -100, -1); // Allows for a "touch release" trigger
+      sendTouchList(null);
     }// if tacTileList empty else
     // Events that occur during every loop
 
@@ -146,6 +148,9 @@ abstract class GameState
   
   public void checkButtonHit(float x, float y, int finger){
   }// checkButtonHit
+  
+  public void sendTouchList(ArrayList touchList){
+  }// sendTouchList
   
   public void checkButtonHit_demo(float x, float y, int finger){ // Only used to allow user touches on pause button during demo
   }// checkButtonHit

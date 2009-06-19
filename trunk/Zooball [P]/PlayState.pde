@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 1.1.2
+ * Version: 1.2
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -97,12 +97,15 @@
  *              - Implements echoClient to communicate with Processing launcher. Exit button enabled on tutorial.
  * 6/15/09      - Version 1.1.2
  *              - Button class replaced with MTButton library
+ * 6/19/09      - Version 1.2
+ *              - Foosbar "Spring-mode" fully implemented.
+ *              - Foosbar gesture support: Two touches resets bar to initial position.
+ *              - Successfully testing new features to ensure compatibility.
+ *                  * Tutorial support, Spring-mode catch/throw, issue with spring-mode reset gesture.
  *
  * Notes:
- *      - [TODO] Limit bar spin when two un-parallel fingers in bar touch zone?
- *	- [TODO] Physics engine?
- *      - [TODO] Improve collision detection on goal zones
- *      - [TODO] 1-to-1 control over goalie zone?
+ *      - [TODO] Spring-mode two finger gesture bug.
+ *      - [TODO] Control mode select screen/descriptions
  *      - [NOTE] Two close fingers to move bars works well on TacTile.
  *      - [NOTE] Foosman spin gesture works when FPS is 20-30 (60 too high).
  *      - [NOTE] Turret shoot-on-release works on TacTile only when usingMouse = false.
@@ -570,7 +573,7 @@ class PlayState extends GameState
     rect( borderWidth + goalWidth, borderHeight - 30, game.getWidth( )-(borderWidth + goalWidth)*2, 20 ); // Top border
     fill( topColor );
     noStroke();
-    rect( borderWidth + goalWidth, game.getHeight( )-borderHeight + 10, game.getWidth( )-(borderWidth + goalWidth)*2, 20 ); // Bottom border    
+    rect( borderWidth + goalWidth, game.getHeight( )-borderHeight + 10, game.getWidth( )-(borderWidth + goalWidth)*2, 20 ); // Bottom border
   }// drawBorders()
 
   private void checkWinningConditions(){
@@ -632,8 +635,10 @@ class PlayState extends GameState
 
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
       game.setState( game.getPausedState() );
-    barManager.barsPressed(x,y);
-
+    
+    if(demoMode)
+      barManager.barsPressed(x,y);
+    
     ballLauncher_top.isHit(x,y);
     ballLauncher_top.rotateIsHit(x,y);
     ballLauncher_bottom.isHit(x,y);
@@ -649,6 +654,11 @@ class PlayState extends GameState
     }// for nBalls
   }// checkButtonHit
 
+  void sendTouchList(ArrayList touchList){
+    if( !demoMode )
+      barManager.sendTouchList(touchList);
+  }// sendTouchList
+  
   void checkButtonHit_demo(float x, float y, int finger){
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
       game.setState( game.getPausedState() );
@@ -691,7 +701,7 @@ class PlayState extends GameState
     int delay_2 = 6;
     tutorialText[2] = "You can also rotate the bar by moving left\n     and right";
     int delay_3 = 12;
-    tutorialText[3] = "Each bar will only respond to touches in its own zone.\nPress the blue center of the bar to reset its position.";
+    tutorialText[3] = "Each bar will only respond to touches in its own zone.\nPlace two fingers in a zone to reset the bar rotation.";
     int delay_4 = 20;
     tutorialText[4] = "To launch a ball, press on the ball launcher.\n     It will be green when ready";    
     int delay_5 = 22;

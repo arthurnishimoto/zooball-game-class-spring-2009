@@ -68,6 +68,7 @@ void draw( ) {
     ellipse(10,10,10,10);
   }
   
+  // Probably could override stop() in the future
   if(quit){
     //client.informLauncher();
     exit();
