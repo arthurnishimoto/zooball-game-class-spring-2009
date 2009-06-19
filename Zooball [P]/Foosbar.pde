@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1/Eclipse 3.4.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 0.9
+ * Version: 1.0
  * 
  * Version Notes:
  * 3/1/09    - Initial version
@@ -20,6 +20,8 @@
  * 4/21/09   - Version 0.3 - Revised "Spring-loaded" option for bar rotation. Applies velocity on press release.
  * 4/24/09   - Catch/release ball and associated effects added.
  * 4/29/09   - Version 0.9 - Partial physics integration
+ * 6/15/09   - Version 0.9.1 - Left/right bar zones added. Partial "Spring-mode" re-integration
+ * 6/19/09   - Version 1.0 - Spring-mode fully integrated. Gestures added: Two-touch to reset bar in full rotation mode.
  * ---------------------------------------------
  */
 
@@ -48,7 +50,7 @@ class Foosbar{
   float buttonPos;
   float buttonValue;
   boolean pressed, active, xSwipe, ySwipe, hasBall, atTopEdge, atBottomEdge;
-  boolean centerZonePressed;
+  boolean centerZonePressed, leftZonePressed, rightZonePressed;
   float centerZoneWidth = 50;
   float xMove, yMove;
   float swipeThreshold = 30.0;
@@ -76,9 +78,17 @@ class Foosbar{
   double gameTimer;
   boolean debuffed = false;
   
+  // Spring-Mode
   boolean springEnabled = false;
+  boolean leftZoneHeld = false;
+  boolean rightZoneHeld = false;
+  float releaseVelocity = 30;
+  
   boolean rotationEnabled = true;
 
+  // Internal tracking of how many touches in a touch zone
+  ArrayList touches = new ArrayList();
+  
   boolean hasSpecial = true; // If foosbar has special ability ready
 
   boolean dragons = false;
@@ -300,18 +310,26 @@ class Foosbar{
       sliderMultiplier = orig_sliderMultiplier;
       rotateMultiplier = orig_rotateMultiplier;
     }
-           
-    // Gets xMove directly from finger to also stop spinning
-    if( centerZonePressed && fingerTest.xMove == 0 && !pressed ){ // Resets to neutral position if center zone tapped
-      this.setRotation(0);
-      rotateVelocity = 0;
-      xMove = 0; // Stops spinning on release
-    }
-    
+
     if( hasBall && abs(xMove) > minThrowSpeed )
       for(int i = 0; i < foosPlayers.length; i++)
         foosPlayers[i].releaseBall();
 
+    if(springEnabled){
+      // If released, spin
+      if( touches.size() == 0 && rightZoneHeld ){
+        rightZoneHeld = false;
+        setAngularVelocity(releaseVelocity);
+      }
+      if( touches.size() == 0 && leftZoneHeld ){
+        leftZoneHeld = false;
+        setAngularVelocity(-releaseVelocity);
+      }
+      if( touches.size() == 0 && hasBall )
+        for(int i = 0; i < foosPlayers.length; i++)
+          foosPlayers[i].releaseBall();
+    }
+      
     if( hasBall )
       this.setRotation(0); // Locks bar rotation if hasBall
   }// display
@@ -348,11 +366,21 @@ class Foosbar{
     else
       fill( #AAFFAA, 50);
     noStroke();
-    rect(xPos - barWidth/2, yMinTouchArea, barWidth, yMaxTouchArea);
+    // Left zone (for bottom player) right for top
+    if(leftZonePressed){
+      fill( #00FF00, 100 ); // temp
+      rect(xPos - barWidth/2, yMinTouchArea, barWidth/2 - centerZoneWidth/2, yMaxTouchArea);
+    }
+    
+    // Right zone (for bottom player) left for top
+    if(rightZonePressed){
+      fill( #0000FF, 100 ); // temp
+      rect(xPos + centerZoneWidth/2, yMinTouchArea, barWidth/2 - centerZoneWidth/2, yMaxTouchArea);
+    }
     
     // Center Zone Bar
     if(centerZonePressed)
-      fill( #00FFFF, 50);
+      fill( #00FFFF, 100);
     else
       fill( #00AAAA, 50);
     rect(xPos - centerZoneWidth/2, yMinTouchArea, centerZoneWidth, yMaxTouchArea);
@@ -435,6 +463,7 @@ class Foosbar{
     
     fill(debugColor);
     textFont(font,12);
+    
     if( debuffTimer - gameTimer > 0)
       text("Debuff Time Remaining "+(debuffTimer - gameTimer), xPos, yPos+barHeight/2-16*10);
     text("Bar Rotation: "+barRotation, xPos, yPos+barHeight/2-16*9);
@@ -442,6 +471,7 @@ class Foosbar{
     text("Active: "+pressed, xPos, yPos+barHeight/2-16*7);
     text("Y Position: "+position[current].y, xPos, yPos+barHeight/2-16*6);
     text("Movement: "+xMove+" , "+yMove, xPos, yPos+barHeight/2-16*5);
+    text("Touches in zone: "+touches.size(), xPos, yPos+barHeight/2-16*11);
     if( barRotation > foosPlayers[0].minStopAngle && barRotation < foosPlayers[0].maxStopAngle )
       text(" CATCHING ", xPos, yPos+barHeight/2-16*4);
     else if( barRotation < 375-foosPlayers[0].minStopAngle && barRotation > 375-foosPlayers[0].maxStopAngle )
@@ -778,6 +808,10 @@ class Foosbar{
             if( ball.getSpeed() > 1 )
               foosPlayers[i].catchBall( ball );          
           
+          if( springEnabled && rightZonePressed )
+            if( ball.getSpeed() > 1 )
+              foosPlayers[i].catchBall2( ball.getID() );  
+              
           foosPlayers[i].specialCollision( ball );
           
           if( ball.getSpeed() > 0 )
@@ -875,6 +909,18 @@ class Foosbar{
     position[current].y = y;
   }
   public Vector2D getVelocity( ) { return velocity[current]; }
+  
+  public void setAngularVelocity( double angular ){
+    if( angular > maxAngularVelocity )
+      angular = maxAngularVelocity;
+    else if( angular < -maxAngularVelocity )
+      angular = -maxAngularVelocity;
+      
+    int previous = current^1;
+    velocity[previous].x = angular;
+    velocity[current].x = angular;  
+  }
+  
   public void setVelocity( double angular, double linear ) {
     if( angular > maxAngularVelocity )
       angular = maxAngularVelocity;
@@ -910,7 +956,24 @@ class Foosbar{
     double yPos = position[current].y;
     int sensitivityAdjust = 20; // Adjusts touch drags to a 1-to-1 control
 
+    // Left zone (for bottom player) right for top
+    if( xCoord > xPos - barWidth/2 && xCoord < xPos - centerZoneWidth/2 && yCoord > yMinTouchArea && yCoord < yMinTouchArea+yMaxTouchArea){
+      leftZonePressed = true;
+    }else
+      leftZonePressed = false;
     
+    if( xCoord > xPos - centerZoneWidth/2 && xCoord < xPos + centerZoneWidth/2 && yCoord > yMinTouchArea && yCoord < yMinTouchArea+yMaxTouchArea){
+      centerZonePressed = true;
+    }else
+      centerZonePressed = false;
+      
+    // Right Zone
+    if( xCoord > xPos + centerZoneWidth/2 && xCoord < xPos + barWidth/2 && yCoord > yMinTouchArea && yCoord < yMinTouchArea+yMaxTouchArea){
+      rightZonePressed = true;
+    }else
+      rightZonePressed = false;
+    
+    // Entire Zone
     if( xCoord > xPos - barWidth/2 && xCoord < xPos + barWidth/2 && yCoord > yMinTouchArea && yCoord < yMinTouchArea+yMaxTouchArea){
       fingerTest.xMove = xCoord-fingerTest.xPos;
       fingerTest.yMove = yCoord-fingerTest.yPos;
@@ -933,17 +996,28 @@ class Foosbar{
         return false;
       }
       
+      // Set rotational behaviour of bar based on control mode
       if( springEnabled ){
-
-        return true;
+        if( rightZonePressed ){
+          this.setRotation(-44.7);
+          rotateVelocity = 0;
+          rightZoneHeld = true;
+        }
+        else if( leftZonePressed ){
+          this.setRotation(44.7);
+          rotateVelocity = 0;
+          leftZoneHeld = true;
+        }
       }// if spring enabled
-    
-      if( rotationEnabled )
+      else if( rotationEnabled ){
         rotateVelocity = -(xMove) * rotateMultiplier;
-      else{
+      }// else if rotation enabled
+      else{ // Fixed bar mode
         this.setRotation(0);
         rotateVelocity = 0;
       }
+      
+      // Set sliding velocity of bar
       this.setVelocity( rotateVelocity , yMove * sensitivityAdjust * sliderMultiplier );
 
       pressed = true;
@@ -952,6 +1026,60 @@ class Foosbar{
     pressed = false;
     return false;
   }// isHit
+  
+  ArrayList touchListIDs = new ArrayList();
+  
+  // Essentionally a copy of isHit but can calculate multiple touches accuratly
+  boolean checkForTouches(ArrayList touchList){
+    if( touchList == null ){
+      touches.clear();
+      return false;
+    }
+    //println("Foosbar::checkForTouches() called");
+    if(!active)
+      return false;
+    touchListIDs.clear();
+    double xPos = position[current].x;
+    double yPos = position[current].y;
+    int sensitivityAdjust = 20; // Adjusts touch drags to a 1-to-1 control
+
+    for ( int index = 0; index < touchList.size(); index ++ ){
+      //Grab a touch
+      Touches curTouch = (Touches) touchList.get(index);
+      
+      //Grab data
+      float xCoord = curTouch.getXPos() * width;    
+      float yCoord = height - curTouch.getYPos() * height;
+    
+      //Get finger ID
+      int finger = curTouch.getFinger();
+      
+      touchListIDs.add((float)finger);
+      // Touches in whole touch zone      
+      if( xCoord > xPos - barWidth/2 && xCoord < xPos + barWidth/2 && yCoord > yMinTouchArea && yCoord < yMinTouchArea+yMaxTouchArea){
+        if( !(touches.contains((float)finger)) ){
+          touches.add((float)finger);
+        }
+                  
+      }// if touch on object
+      //println( touchListIDs );
+      for( int i = 0; i < touches.size(); i++ ){
+        if( !touchListIDs.contains( touches.get(i) ) )
+          touches.remove(i);
+      }
+      
+      // Reset bar on two or more touches
+      if( touches.size() >= 2 ){
+        this.setRotation(0);
+        rotateVelocity = 0;
+        xMove = 0; // Stops spinning on release      
+      }else{
+        isHit(xCoord,yCoord);
+      }
+    }// for touchList
+    pressed = false;
+    return false;
+  }// checkForTouches
   
   /**
    * Checks if ball is inside Foosbar touch zone.
