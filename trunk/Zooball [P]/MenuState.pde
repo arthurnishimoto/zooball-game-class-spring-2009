@@ -6,13 +6,15 @@
  */
 class MenuState extends GameState
 {
-  private Image selectTeam, selectField, aboutBackground;
+  private Image selectTeam, selectField, aboutBackground, controlsBackground;
   private CircularButton zooballLogo, zooballLogo_dragon, zooballLogo_tiger, zooballLogo_start;
   private MTButton bottomDragon, bottomTiger, topDragon, topTiger;
   private MTButton topAbout, topTutorial, topQuit, topControls;
   private MTButton bottomAbout, bottomTutorial, bottomQuit, bottomControls;
   private MTButton bottomBack, topBack;
   private MTButton easyButton, normalButton, hardButton;
+  
+  private FoosbarManager FM;
   
   boolean topChosen = false;
   boolean bottomChosen = false;
@@ -25,6 +27,7 @@ class MenuState extends GameState
   final private static int MENU = 1;
   final private static int FIELD_SELECT = 2;
   final private static int ABOUT = 3;
+  final private static int CONTROLS = 4;
   
   int state = MENU;
   double menuTransitionDelay;
@@ -34,16 +37,17 @@ class MenuState extends GameState
   }// CTOR
   
   public void load( ) {
-    // spin a while to test the loading screen
-    int max = Integer.MAX_VALUE >> 6;
-    Random r = new Random( );
+    screenDimensions[0] = (int)game.getWidth( );
+    screenDimensions[1] = (int)game.getHeight( );
+    screenDimensions[2] = borderWidth;
+    screenDimensions[3] = borderHeight;
     
-    for ( int i = 0; i < max; i++ )
-      r.nextDouble( );   
+    FM = new FoosbarManager( 5, barWidth, screenDimensions, balls, red_foosmanImages, yellow_foosmanImages);
 
     selectTeam = new Image("data/ui/text/selectTeam.png");
     selectField = new Image("data/ui/text/selectPlayMode.png");
     aboutBackground = new Image("data/ui/logos/about2.png");
+    controlsBackground = new Image("data/ui/logos/controls.png");
     
     zooballLogo = new CircularButton("data/ui/logos/zooball.png");
     zooballLogo.setPosition( game.getWidth()/2, game.getHeight()/2 );
@@ -108,15 +112,15 @@ class MenuState extends GameState
     topBack.setButtonText("Back");
     topBack.setDoubleSidedText(false);
     topBack.setRotation(PI);
-    /*
-    bottomControls = new MTButton( (int)game.getWidth() - 100, (int)game.getHeight() - 70, "data/ui/buttons/greenGlow/enabled.png");
+    
+    bottomControls = new MTButton( game.parent, (int)game.getWidth() - 100, (int)game.getHeight() - 70, loadImage("data/ui/buttons/greenGlow/enabled.png"));
     bottomControls.setButtonText("Controls");
     bottomControls.setDoubleSidedText(false);
-    topControls = new MTButton( 100,  70, "data/ui/buttons/greenGlow/enabled.png");
+    topControls = new MTButton( game.parent, 100,  70, loadImage("data/ui/buttons/greenGlow/enabled.png"));
     topControls.setButtonText("Controls");
     topControls.setDoubleSidedText(false);
     topControls.setRotation(PI);
-    */
+    
     easyButton = new MTButton( game.parent, (int)game.getWidth()/2 - 500, (int)game.getHeight()/2,  loadImage("data/ui/buttons/easy_field.png") );
     normalButton = new MTButton( game.parent, (int)game.getWidth()/2, (int)game.getHeight()/2,  loadImage("data/ui/buttons/normal_field.png") );
     hardButton = new MTButton( game.parent, (int)game.getWidth()/2 + 500, (int)game.getHeight()/2,  loadImage("data/ui/buttons/hard_field.png") );
@@ -151,6 +155,9 @@ class MenuState extends GameState
       case(ABOUT):
         drawAbout();
         break;
+      case(CONTROLS):
+        drawControls();
+        break;
       default:
         println("Warning: Unknown sub-state "+state+"called in MenuState.");
         break;
@@ -181,15 +188,26 @@ class MenuState extends GameState
     topBack.process(font, timer.getSecondsActive());
   }// drawAboutButtons
   
+  private void drawControls(){
+    
+    bottomBack.process(font, timer.getSecondsActive());
+    topBack.process(font, timer.getSecondsActive());
+    FM.displayZones();    
+    FM.display();
+    controlsBackground.draw();
+  }// drawAboutButtons
+  
   private void drawMenuButtons(){
     selectTeam.draw();
     bottomAbout.process(font, timer.getSecondsActive());
     bottomTutorial.process(font, timer.getSecondsActive());
     bottomQuit.process(font, timer.getSecondsActive());
+    //bottomControls.process(font, timer.getSecondsActive());
     
     topAbout.process(font, timer.getSecondsActive());
     topTutorial.process(font, timer.getSecondsActive());
     topQuit.process(font, timer.getSecondsActive());
+    //topControls.process(font, timer.getSecondsActive());
     
     bottomTiger.process(font, timer.getSecondsActive());
     bottomTiger.setLit( (bottomChosen && bottomTigerTeam) );
@@ -234,7 +252,8 @@ class MenuState extends GameState
     switch(state){
       case(MENU):
         if( zooballLogo.contains(x,y) && playEnabled ){
-          state = FIELD_SELECT;
+          FM = new FoosbarManager( 5, barWidth, screenDimensions, balls, red_foosmanImages, yellow_foosmanImages);
+          state = CONTROLS;
           menuTransitionDelay = timer.getSecondsActive() + 2;
           //game.reloadState( game.getPlayState() );
           //game.setState( game.getPlayState() );
@@ -298,6 +317,11 @@ class MenuState extends GameState
           game.reloadState( game.getPlayState() );
           game.setState( game.getPlayState() );
         }
+        break;
+      case(CONTROLS):
+        if( topBack.isHit(x,y) || bottomBack.isHit(x,y) )
+          state = MENU;
+
         break;
     }// switch
   }// checkButtonHit
