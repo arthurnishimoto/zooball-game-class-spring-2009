@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 1.2
+ * Version: 1.1.2
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -97,15 +97,10 @@
  *              - Implements echoClient to communicate with Processing launcher. Exit button enabled on tutorial.
  * 6/15/09      - Version 1.1.2
  *              - Button class replaced with MTButton library
- * 6/19/09      - Version 1.2
- *              - Foosbar "Spring-mode" fully implemented.
- *              - Foosbar gesture support: Two touches resets bar to initial position.
- *              - Successfully testing new features to ensure compatibility.
- *                  * Tutorial support, Spring-mode catch/throw, issue with spring-mode reset gesture.
- *
+ * 7/6/09       - Started control screen. echoClient now triggers on esc key. 
  * Notes:
- *      - [TODO] Spring-mode two finger gesture bug.
- *      - [TODO] Control mode select screen/descriptions
+ *      - [TODO] Improve collision detection on goal zones
+ *      - [TODO] 1-to-1 control over goalie zone?
  *      - [NOTE] Two close fingers to move bars works well on TacTile.
  *      - [NOTE] Foosman spin gesture works when FPS is 20-30 (60 too high).
  *      - [NOTE] Turret shoot-on-release works on TacTile only when usingMouse = false.
@@ -636,7 +631,7 @@ class PlayState extends GameState
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
       game.setState( game.getPausedState() );
     
-    if(demoMode)
+    //if(demoMode)
       barManager.barsPressed(x,y);
     
     ballLauncher_top.isHit(x,y);

@@ -97,6 +97,28 @@ class FoosbarManager{
         bars[4].setupBars(screenDim, balls);
         bars[5].setupBars(screenDim, balls);
         break;
+      }else if( nBars == 4 ){
+        if ( redTeamTop ){
+          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 2, team1, 0, team1_Images);
+          bars[1] = new Foosbar( (1+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team2, 1, team2_Images);
+          bars[2] = new Foosbar( (2+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team1, 0, team1_Images);
+          bars[3] = new Foosbar( (3+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 2, team2, 1, team2_Images);
+          bars[0].setupBars(screenDim, balls);
+          bars[1].setupBars(screenDim, balls);
+          bars[2].setupBars(screenDim, balls);
+          bars[3].setupBars(screenDim, balls);
+          break;
+        }else{
+          bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 2, team2, 0, team2_Images);
+          bars[1] = new Foosbar( (1+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team1, 1, team1_Images);
+          bars[2] = new Foosbar( (2+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 3, team2, 0, team2_Images);
+          bars[3] = new Foosbar( (3+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 2, team1, 1, team1_Images);
+          bars[0].setupBars(screenDim, balls);
+          bars[1].setupBars(screenDim, balls);
+          bars[2].setupBars(screenDim, balls);
+          bars[3].setupBars(screenDim, balls);
+          break;
+        }
       }else if( nBars == 2 ){
         if ( redTeamTop ){
           bars[0] = new Foosbar( (0+1)*(screenWidth)/fieldLines , screenHeight/2, barWidth, screenHeight, 1, team1, 0, team1_Images);
@@ -167,6 +189,13 @@ class FoosbarManager{
       bars[x].step( dt );
     }// for nBars
   }// step
+  
+  
+  void display(){
+    for( int x = 0 ; x < nBars ; x++ ){
+      bars[x].display();
+    }// for
+  }// display
   
   // Displays team zone areas
   void displayZones(){

@@ -70,12 +70,16 @@ void draw( ) {
   
   // Probably could override stop() in the future
   if(quit){
-    //client.informLauncher();
+    client.informLauncher();
     exit();
   }
 }// draw
 
 void keyPressed( KeyEvent e ) {
+  if(key==27){
+    client.informLauncher(); // Sends message if esc key pressed
+  }
+  
   if ( game != null ) {
     if ( e.getKeyChar( ) == 'q'){
       if(debugConsoleBool)
