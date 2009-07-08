@@ -150,7 +150,7 @@ class FoosbarManager{
   }// CTOR
   
   // Process manager tasks based on current state
-  void process(Ball[] balls, double timer_g, PlayState parent){
+  void process(Ball[] balls, double timer_g, GameState parent){
     if( state == ACTIVE ){
       for( int x = 0 ; x < nBars ; x++ ){
         bars[x].display();
@@ -238,6 +238,7 @@ class FoosbarManager{
      for( int i = 0 ; i < nBars ; i++ )
        bars[i].checkForTouches(touchList);
   }// sendTouchList
+  
   void setSpringEnabled(boolean enable){
     for( int x = 0 ; x < nBars ; x++ )
       bars[x].setSpringEnabled(enable);
@@ -247,6 +248,30 @@ class FoosbarManager{
     for( int x = 0 ; x < nBars ; x++ )
       bars[x].setRotationEnabled(enable);
   }// setRotationEnabled
+  
+  void setTopSpringEnabled(boolean enable){
+    for( int x = 0 ; x < nBars ; x++ )
+      if( bars[x].zoneFlag == 0 )
+        bars[x].setSpringEnabled(enable);
+  }// setSpringEnabled
+  
+  void setTopRotationEnabled(boolean enable){
+    for( int x = 0 ; x < nBars ; x++ )
+      if( bars[x].zoneFlag == 0 )
+        bars[x].setRotationEnabled(enable);
+  }// setRotationEnabled  
+
+  void setBottomSpringEnabled(boolean enable){
+    for( int x = 0 ; x < nBars ; x++ )
+      if( bars[x].zoneFlag == 1 )
+        bars[x].setSpringEnabled(enable);
+  }// setSpringEnabled
+  
+  void setBottomRotationEnabled(boolean enable){
+    for( int x = 0 ; x < nBars ; x++ )
+      if( bars[x].zoneFlag == 1 )
+        bars[x].setRotationEnabled(enable);
+  }// setRotationEnabled  
   
   void setBarWidth(float newWidth){
     for( int x = 0 ; x < nBars ; x++ )

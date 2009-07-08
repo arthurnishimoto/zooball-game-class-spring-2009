@@ -97,7 +97,9 @@
  *              - Implements echoClient to communicate with Processing launcher. Exit button enabled on tutorial.
  * 6/15/09      - Version 1.1.2
  *              - Button class replaced with MTButton library
- * 7/6/09       - Started control screen. echoClient now triggers on esc key. 
+ * 7/6/09       - Started control screen. echoClient now triggers on esc key.
+ * 7/7/09       - Version 1.1.9
+ *              - Control select screen fully integrated. Fix for ball out of bounds. - Needs tacTile testing before moving to v1.2
  * Notes:
  *      - [TODO] Improve collision detection on goal zones
  *      - [TODO] 1-to-1 control over goalie zone?
@@ -121,6 +123,9 @@ color debugColor = color(255,255,255); // TEMP
 
 boolean demoMode = false;
 boolean playStateActive = false;
+
+boolean springMode = false;
+boolean rotateMode = true;
 
 // Gameplay Initial Variables
 int nBalls = 1;
@@ -280,7 +285,17 @@ class PlayState extends GameState
       yellow_foosmanImages[i] = loadImage(filepath + filename + i + extention);      
 
     barManager = new FoosbarManager( fieldLines, barWidth, screenDimensions, balls, red_foosmanImages, yellow_foosmanImages);
-
+    if(springMode){
+      barManager.setSpringEnabled(true);
+      barManager.setRotationEnabled(false);
+    }else if(rotateMode){
+      barManager.setSpringEnabled(false);
+      barManager.setRotationEnabled(true);
+    }else{
+      barManager.setSpringEnabled(false);
+      barManager.setRotationEnabled(false);
+    }
+    
     // Sets team colors
     if( !redTeamTop ){
       topColor = color(255,0,0);
