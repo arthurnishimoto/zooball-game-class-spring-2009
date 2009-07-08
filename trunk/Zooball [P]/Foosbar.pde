@@ -359,24 +359,27 @@ class Foosbar{
     noStroke();
     
     // Zone Bar
-    if(pressed)
-      fill( #00FF00, 50);
+    //if(pressed)
+    //  fill( #00FF00, 50);
     //else if(hasBall)
     //  fill( #FF0000, 50);
-    else
-      fill( #AAFFAA, 50);
+    //else
+      //fill( #AAFFAA, 50);
     noStroke();
+    
     // Left zone (for bottom player) right for top
     if(leftZonePressed){
       fill( #00FF00, 100 ); // temp
-      rect(xPos - barWidth/2, yMinTouchArea, barWidth/2 - centerZoneWidth/2, yMaxTouchArea);
-    }
+    }else
+      fill( #AAFFAA, 50);
+    rect(xPos - barWidth/2, yMinTouchArea, barWidth/2 - centerZoneWidth/2, yMaxTouchArea);
     
     // Right zone (for bottom player) left for top
     if(rightZonePressed){
-      fill( #0000FF, 100 ); // temp
-      rect(xPos + centerZoneWidth/2, yMinTouchArea, barWidth/2 - centerZoneWidth/2, yMaxTouchArea);
-    }
+      fill( #00FF00, 100 ); // temp
+    }else
+      fill( #AAFFAA, 50);
+    rect(xPos + centerZoneWidth/2, yMinTouchArea, barWidth/2 - centerZoneWidth/2, yMaxTouchArea);
     
     // Center Zone Bar
     if(centerZonePressed)

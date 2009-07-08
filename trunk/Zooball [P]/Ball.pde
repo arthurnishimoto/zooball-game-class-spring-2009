@@ -212,7 +212,7 @@ class Ball{
       noStroke();
       ellipse(xPos, yPos, diameter + 10, diameter + 10);
     }
-      
+    
   }// display
   
   /**
@@ -490,7 +490,7 @@ class Ball{
       // rotation = revolutions * 2*pi = (distance / (2*pi * r)) * 2*pi = distance / r
       rotation[next] = normalizeRotation( rotation[current] + v4.magnitude( ) / radius );
     }
-    
+    ballOutOfBounds();
     current = next;
   }
   // TODO: Use position to check for booster? Probably not worth it...
@@ -580,6 +580,14 @@ class Ball{
 
     this.setVelocity(xVel, yVel);
   }// move
+
+  boolean ballOutOfBounds(){
+    if( this.position[current].x < 0 || this.position[current].x > width || this.position[current].y < 0 || this.position[current].y > height ){
+      this.setPosition( width/2, height/2 );
+      return true;
+    }
+    return false;
+  }
 
   /**
    * Checks if ball is in active state.

@@ -7,12 +7,16 @@
 class MenuState extends GameState
 {
   private Image selectTeam, selectField, aboutBackground, controlsBackground;
+  private PImage dragonEnabled, dragonDisabled, tigerEnabled, tigerDisabled, greenGlowDisabled, greenGlowEnabled;
   private CircularButton zooballLogo, zooballLogo_dragon, zooballLogo_tiger, zooballLogo_start;
   private MTButton bottomDragon, bottomTiger, topDragon, topTiger;
   private MTButton topAbout, topTutorial, topQuit, topControls;
   private MTButton bottomAbout, bottomTutorial, bottomQuit, bottomControls;
   private MTButton bottomBack, topBack;
   private MTButton easyButton, normalButton, hardButton;
+  
+  private MTButton topFixedButton, topSpringButton, topRotateButton;
+  private MTButton bottomFixedButton, bottomSpringButton, bottomRotateButton;
   
   private FoosbarManager FM;
   
@@ -23,6 +27,13 @@ class MenuState extends GameState
   boolean topTigerTeam = false;
   boolean bottomTigerTeam = false;
   boolean playEnabled = false;
+  
+  boolean top_fixed_controls = false;
+  boolean top_spring_controls = false;
+  boolean top_rotate_controls = false;
+  boolean bottom_fixed_controls = false;
+  boolean bottom_spring_controls = false;
+  boolean bottom_rotate_controls = false;
   
   final private static int MENU = 1;
   final private static int FIELD_SELECT = 2;
@@ -36,7 +47,25 @@ class MenuState extends GameState
     super( game );
   }// CTOR
   
+  private float SCREEN_LEFT=0, SCREEN_RIGHT=1920, SCREEN_TOP=0, SCREEN_BOTTOM=1080,
+    FIELD_LEFT=SCREEN_LEFT+100, FIELD_RIGHT=SCREEN_RIGHT-100, FIELD_TOP=SCREEN_TOP+100, FIELD_BOTTOM=SCREEN_BOTTOM-100;
+  private Line[] horzWalls;
+  private long lastUpdate = 0; // physics time in microseconds
+    
   public void load( ) {
+    lastUpdate = 0;
+    horzWalls = new Line[6];
+    // top and bottom of field
+    horzWalls[0] = new Line( FIELD_LEFT, FIELD_TOP, FIELD_RIGHT, FIELD_TOP );
+    horzWalls[1] = new Line( FIELD_LEFT, FIELD_BOTTOM, FIELD_RIGHT, FIELD_BOTTOM );
+    
+    dragonEnabled = loadImage("data/ui/buttons/dragons/enabled.png");
+    dragonDisabled = loadImage("data/ui/buttons/dragons/disabled.png");
+    tigerEnabled = loadImage("data/ui/buttons/tigers/enabled.png");
+    tigerDisabled = loadImage("data/ui/buttons/tigers/disabled.png");
+    greenGlowDisabled = loadImage("data/ui/buttons/greenGlow/disabled.png");
+    greenGlowEnabled = loadImage("data/ui/buttons/greenGlow/enabled.png");
+    
     screenDimensions[0] = (int)game.getWidth( );
     screenDimensions[1] = (int)game.getHeight( );
     screenDimensions[2] = borderWidth;
@@ -65,58 +94,58 @@ class MenuState extends GameState
     zooballLogo_start.setPosition( game.getWidth()/2, game.getHeight()/2 );
     zooballLogo_start.setRadius( 393/2 );  
     
-    bottomDragon = new MTButton( game.parent, 50 + 469, (int)game.getHeight() - 100, loadImage("data/ui/buttons/dragons/disabled.png") );
-    bottomDragon.setLitImage( loadImage("data/ui/buttons/dragons/enabled.png") );
+    bottomDragon = new MTButton( game.parent, 50 + 469, (int)game.getHeight() - 100, dragonDisabled );
+    bottomDragon.setLitImage( dragonEnabled );
     bottomDragon.setDelay(1);
-    bottomTiger = new MTButton( game.parent, (int)game.getWidth() - 50 - 469, (int)game.getHeight() - 100, loadImage("data/ui/buttons/tigers/disabled.png") );
-    bottomTiger.setLitImage( loadImage("data/ui/buttons/tigers/enabled.png") );
+    bottomTiger = new MTButton( game.parent, (int)game.getWidth() - 50 - 469, (int)game.getHeight() - 100, tigerDisabled );
+    bottomTiger.setLitImage( tigerEnabled );
     bottomTiger.setDelay(1);
     
-    topDragon = new MTButton( game.parent, (int)game.getWidth() - 50 - 469, 100,  loadImage("data/ui/buttons/dragons/disabled.png") );
-    topDragon.setLitImage( loadImage("data/ui/buttons/dragons/enabled.png") );
+    topDragon = new MTButton( game.parent, (int)game.getWidth() - 50 - 469, 100,  dragonDisabled );
+    topDragon.setLitImage( dragonEnabled );
     topDragon.setRotation( PI );
     topDragon.setDelay(1);
-    topTiger = new MTButton( game.parent, 50 + 469, 100,  loadImage("data/ui/buttons/tigers/disabled.png") );
-    topTiger.setLitImage( loadImage("data/ui/buttons/tigers/enabled.png") );
+    topTiger = new MTButton( game.parent, 50 + 469, 100,  tigerDisabled );
+    topTiger.setLitImage( tigerEnabled );
     topTiger.setRotation( PI );
     topTiger.setDelay(1);
     
-    bottomAbout = new MTButton( game.parent, (int)game.getWidth()/2 - 200 , (int)game.getHeight() - 250,  loadImage("data/ui/buttons/greenGlow/enabled.png") );
+    bottomAbout = new MTButton( game.parent, (int)game.getWidth()/2 - 200 , (int)game.getHeight() - 250,  greenGlowEnabled );
     bottomAbout.setButtonText("About");
     bottomAbout.setDoubleSidedText(false);
-    topAbout = new MTButton( game.parent, (int)game.getWidth()/2 + 200 , 250,  loadImage("data/ui/buttons/greenGlow/enabled.png") );
+    topAbout = new MTButton( game.parent, (int)game.getWidth()/2 + 200 , 250,  greenGlowEnabled );
     topAbout.setButtonText("About");
     topAbout.setDoubleSidedText(false);
     topAbout.setRotation(PI);
     
-    bottomTutorial = new MTButton( game.parent, (int)game.getWidth()/2 + 000, (int)game.getHeight() - 250,  loadImage("data/ui/buttons/greenGlow/enabled.png") );
+    bottomTutorial = new MTButton( game.parent, (int)game.getWidth()/2 + 000, (int)game.getHeight() - 250,  greenGlowEnabled );
     bottomTutorial.setButtonText("Tutorial");
     bottomTutorial.setDoubleSidedText(false);
-    topTutorial = new MTButton( game.parent, (int)game.getWidth()/2 - 000, 250,  loadImage("data/ui/buttons/greenGlow/enabled.png") );
+    topTutorial = new MTButton( game.parent, (int)game.getWidth()/2 - 000, 250,  greenGlowEnabled );
     topTutorial.setButtonText("Tutorial");
     topTutorial.setDoubleSidedText(false);
     topTutorial.setRotation(PI);
 
-    bottomQuit = new MTButton( game.parent, (int)game.getWidth()/2 + 200, (int)game.getHeight() - 250,  loadImage("data/ui/buttons/greenGlow/enabled.png") );
+    bottomQuit = new MTButton( game.parent, (int)game.getWidth()/2 + 200, (int)game.getHeight() - 250,  greenGlowEnabled );
     bottomQuit.setButtonText("Quit");
     bottomQuit.setDoubleSidedText(false);
-    topQuit = new MTButton( game.parent, (int)game.getWidth()/2 - 200, 250,  loadImage("data/ui/buttons/greenGlow/enabled.png") );
+    topQuit = new MTButton( game.parent, (int)game.getWidth()/2 - 200, 250,  greenGlowEnabled );
     topQuit.setButtonText("Quit");
     topQuit.setDoubleSidedText(false);
     topQuit.setRotation(PI);
     
-    bottomBack = new MTButton( game.parent, (int)game.getWidth() - 100, (int)game.getHeight() - 70,  loadImage("data/ui/buttons/greenGlow/enabled.png") );
+    bottomBack = new MTButton( game.parent, (int)game.getWidth() - 100, (int)game.getHeight() - 70,  greenGlowEnabled );
     bottomBack.setButtonText("Back");
     bottomBack.setDoubleSidedText(false);
-    topBack = new MTButton( game.parent, 100,  70,  loadImage("data/ui/buttons/greenGlow/enabled.png") );
+    topBack = new MTButton( game.parent, 100,  70,  greenGlowEnabled );
     topBack.setButtonText("Back");
     topBack.setDoubleSidedText(false);
     topBack.setRotation(PI);
     
-    bottomControls = new MTButton( game.parent, (int)game.getWidth() - 100, (int)game.getHeight() - 70, loadImage("data/ui/buttons/greenGlow/enabled.png"));
+    bottomControls = new MTButton( game.parent, (int)game.getWidth() - 100, (int)game.getHeight() - 70, greenGlowEnabled );
     bottomControls.setButtonText("Controls");
     bottomControls.setDoubleSidedText(false);
-    topControls = new MTButton( game.parent, 100,  70, loadImage("data/ui/buttons/greenGlow/enabled.png"));
+    topControls = new MTButton( game.parent, 100,  70, greenGlowEnabled );
     topControls.setButtonText("Controls");
     topControls.setDoubleSidedText(false);
     topControls.setRotation(PI);
@@ -125,6 +154,38 @@ class MenuState extends GameState
     normalButton = new MTButton( game.parent, (int)game.getWidth()/2, (int)game.getHeight()/2,  loadImage("data/ui/buttons/normal_field.png") );
     hardButton = new MTButton( game.parent, (int)game.getWidth()/2 + 500, (int)game.getHeight()/2,  loadImage("data/ui/buttons/hard_field.png") );
     
+    bottomFixedButton = new MTButton( game.parent, (int)game.getWidth()/2 - 200 , (int)game.getHeight() - 150,  greenGlowDisabled );
+    bottomFixedButton.setLitImage( greenGlowEnabled );
+    bottomFixedButton.setButtonText("Fixed");
+    bottomFixedButton.setDoubleSidedText(false);
+    
+    bottomSpringButton = new MTButton( game.parent, (int)game.getWidth()/2 - 000 , (int)game.getHeight() - 150,  greenGlowDisabled );
+    bottomSpringButton.setLitImage( greenGlowEnabled );
+    bottomSpringButton.setButtonText("Spring");
+    bottomSpringButton.setDoubleSidedText(false);
+    
+    bottomRotateButton = new MTButton( game.parent, (int)game.getWidth()/2 + 200 , (int)game.getHeight() - 150,  greenGlowDisabled );
+    bottomRotateButton.setLitImage( greenGlowEnabled );
+    bottomRotateButton.setButtonText("Full Rotate");
+    bottomRotateButton.setDoubleSidedText(false);
+    
+    topFixedButton = new MTButton( game.parent, (int)game.getWidth()/2 + 200 , 150,  greenGlowDisabled );
+    topFixedButton.setLitImage( greenGlowEnabled );
+    topFixedButton.setButtonText("Fixed");
+    topFixedButton.setDoubleSidedText(false);
+    topFixedButton.setRotation(PI);
+    
+    topSpringButton = new MTButton( game.parent, (int)game.getWidth()/2 - 000 , 150,  greenGlowDisabled );
+    topSpringButton.setLitImage( greenGlowEnabled );
+    topSpringButton.setButtonText("Spring");
+    topSpringButton.setDoubleSidedText(false);
+    topSpringButton.setRotation(PI);
+    
+    topRotateButton = new MTButton( game.parent, (int)game.getWidth()/2 - 200 , 150,  greenGlowDisabled );
+    topRotateButton.setLitImage( greenGlowEnabled );
+    topRotateButton.setButtonText("Full Rotate");
+    topRotateButton.setDoubleSidedText(false);
+    topRotateButton.setRotation(PI);
     endLoad( );
   }// load
   
@@ -138,9 +199,22 @@ class MenuState extends GameState
   }// enter
   
   public void update( ) {
-    super.update( );
-    //if ( timer.getSecondsActive( ) > 5.0 )
-    //  game.setState( game.getPlayState( ) );
+    super.update( ); // update PlayState timer
+    long time = timer.getMicrosecondsActive( ); // get current game time
+    // step until physics time is caught with up or past current game time
+    while ( lastUpdate < time ) {
+      // The chosen step size means that the physics is updated 200 times/second,
+      // or about 3.333 times/frame when running at 60 frames/second. This size can
+      // be lowered to prevent tunneling (objects passing through each other, before
+      // collision can be detected) or raised if performance is an issue (but it isn't).
+      //step( 0.005 ); // step physics objects forward by 0.005 seconds and handle collisions
+      if(state == CONTROLS){
+        FM.step( 0.005 );
+        FM.collide( horzWalls );
+      }
+      lastUpdate += 5000; // update physics time by the equivalent 5000 microseconds
+    }
+
   }// update
   
   public void draw( ) {
@@ -189,11 +263,30 @@ class MenuState extends GameState
   }// drawAboutButtons
   
   private void drawControls(){
+    bottomFixedButton.setLit(bottom_fixed_controls);
+    bottomSpringButton.setLit(bottom_spring_controls);
+    bottomRotateButton.setLit(bottom_rotate_controls);
     
+    topFixedButton.setLit(top_fixed_controls);
+    topSpringButton.setLit(top_spring_controls);
+    topRotateButton.setLit(top_rotate_controls);
+    
+    zooballLogo.draw();
     bottomBack.process(font, timer.getSecondsActive());
     topBack.process(font, timer.getSecondsActive());
+
+    FM.process(null, timer.getSecondsActive(), this);
     FM.displayZones();    
     FM.display();
+    
+    bottomFixedButton.process(font, timer.getSecondsActive());
+    bottomSpringButton.process(font, timer.getSecondsActive());
+    bottomRotateButton.process(font, timer.getSecondsActive());
+    
+    topFixedButton.process(font, timer.getSecondsActive());
+    topSpringButton.process(font, timer.getSecondsActive());
+    topRotateButton.process(font, timer.getSecondsActive());
+    
     controlsBackground.draw();
   }// drawAboutButtons
   
@@ -321,7 +414,78 @@ class MenuState extends GameState
       case(CONTROLS):
         if( topBack.isHit(x,y) || bottomBack.isHit(x,y) )
           state = MENU;
-
+          
+        if( bottomFixedButton.isHit(x,y) ){
+          bottom_fixed_controls = true;
+          bottom_spring_controls = false;
+          bottom_rotate_controls = false;
+          FM.setBottomSpringEnabled(false);
+          FM.setBottomRotationEnabled(false);
+        }
+        if( bottomSpringButton.isHit(x,y) ){
+          bottom_fixed_controls = false;
+          bottom_spring_controls = true;
+          bottom_rotate_controls = false;
+          FM.setBottomRotationEnabled(false);
+          FM.setBottomSpringEnabled(true);
+        }
+        if( bottomRotateButton.isHit(x,y) ){
+          bottom_fixed_controls = false;
+          bottom_spring_controls = false;
+          bottom_rotate_controls = true;
+          FM.setBottomSpringEnabled(false);
+          FM.setBottomRotationEnabled(true);
+        }
+        
+        if( topFixedButton.isHit(x,y) ){
+          top_fixed_controls = true;
+          top_spring_controls = false;
+          top_rotate_controls = false;
+          FM.setTopSpringEnabled(false);
+          FM.setTopRotationEnabled(false);
+        }
+        if( topSpringButton.isHit(x,y) ){
+          top_fixed_controls = false;
+          top_spring_controls = true;
+          top_rotate_controls = false;
+          FM.setTopRotationEnabled(false);
+          FM.setTopSpringEnabled(true);
+        }
+        if( topRotateButton.isHit(x,y) ){
+          top_fixed_controls = false;
+          top_spring_controls = false;
+          top_rotate_controls = true;
+          FM.setTopSpringEnabled(false);
+          FM.setTopRotationEnabled(true);
+        }
+        
+        if( top_fixed_controls && bottom_fixed_controls ){
+          zooballLogo_start.draw();
+          if( zooballLogo_start.contains(x,y) )
+            state = FIELD_SELECT;
+          menuTransitionDelay = timer.getSecondsActive() + 2;
+          springMode = false;
+          rotateMode = false;
+        }else if( top_spring_controls && bottom_spring_controls ){
+          zooballLogo_start.draw();
+          if( zooballLogo_start.contains(x,y) )
+            state = FIELD_SELECT;
+          menuTransitionDelay = timer.getSecondsActive() + 2;
+          springMode = true;
+          rotateMode = false;
+        }else if( top_rotate_controls && bottom_rotate_controls ){
+          zooballLogo_start.draw();
+          if( zooballLogo_start.contains(x,y) )
+            state = FIELD_SELECT;
+          menuTransitionDelay = timer.getSecondsActive() + 2;
+          springMode = false;
+          rotateMode = true;
+        }
+        
+        if(connectToTacTile)
+          FM.sendTouchList(tacTile.getManagedList());
+        else
+          FM.barsPressed(x,y);
         break;
     }// switch
   }// checkButtonHit

@@ -9,7 +9,7 @@ import tacTile.net.*;
 EchoClient client = new EchoClient();
 Game game;
 
-Boolean connectToTacTile = true;
+Boolean connectToTacTile = false;
 Boolean usingMouse = true;
 Boolean scaleScreen = true; // All input is off-centered when scaled
 
