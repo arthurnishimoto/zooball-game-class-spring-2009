@@ -196,6 +196,7 @@ class MenuState extends GameState
     timer.setActive( true );
     soundManager.playJungle();
     state = MENU;
+    //state = CONTROLS;
   }// enter
   
   public void update( ) {
@@ -276,7 +277,8 @@ class MenuState extends GameState
     topBack.process(font, timer.getSecondsActive());
 
     FM.process(null, timer.getSecondsActive(), this);
-    FM.displayZones();    
+    FM.displayZones();
+    //FM.displayDebug(color(0,0,0), font);
     FM.display();
     
     bottomFixedButton.process(font, timer.getSecondsActive());
@@ -287,8 +289,54 @@ class MenuState extends GameState
     topSpringButton.process(font, timer.getSecondsActive());
     topRotateButton.process(font, timer.getSecondsActive());
     
+    pushMatrix();
+    translate( game.getWidth()/2, game.getHeight()/2 );
+    
+    drawControlTextBox( 1 );
+    
+    rotate(PI);
+    
+    drawControlTextBox( 0 );
+    
+    popMatrix();
     controlsBackground.draw();
   }// drawAboutButtons
+  
+  private void drawControlTextBox(int pos){
+    fill(0,0,0, 150);
+    rect( 0-820, 250, 500, 200 );
+    
+    textFont(font,18);
+    //fill(255,255,255);
+    fill(50,255,50);
+    noStroke();
+    
+    if( pos == 1 ){
+      if( bottom_fixed_controls )
+        text( "Fixed Control Mode: \nSlide the foosbar up and down. No rotation control." , 0 - 800, 250 + 30 );
+      else if( bottom_spring_controls )
+        text( "Spring Control Mode: \nTouch left/right touch zone to spring back.\nRelease to rotate forward." , 0 - 800, 250 + 30 );
+      else if( bottom_rotate_controls )
+        text( "Rotate Control Mode: \nTouch left/right to rotate foosbar.\nCatch balls by holding back slightly. (See tutorial)" , 0 - 800, 250 + 30 );
+      else
+        text( "Select a control mode." , 0 - 800, 250 + 30 );
+        
+      text( "Try out the control mode by pressing on the touch\nbox on you side of the table." , 0 - 800, 250 + 160 ); 
+    }else if( pos == 0 ){
+      if( top_fixed_controls )
+        text( "Fixed Control Mode: \nSlide the foosbar up and down. No rotation control." , 0 - 800, 250 + 30 );
+      else if( top_spring_controls )
+        text( "Spring Control Mode: \nTouch left/right touch zone to spring back.\nRelease to rotate forward.\nCatch balls by holding back." , 0 - 800, 250 + 30 );
+      else if( top_rotate_controls )
+        text( "Rotate Control Mode: \nTouch left/right to rotate foosbar.\nCatch balls by holding back slightly. (See tutorial)" , 0 - 800, 250 + 30 );
+      else
+        text( "Select a control mode." , 0 - 800, 250 + 30 );
+        
+      text( "Try out the control mode by pressing on the touch\nbox on you side of the table." , 0 - 800, 250 + 160 ); 
+    }// if-else
+    
+
+  }// drawControlTextBoxes
   
   private void drawMenuButtons(){
     selectTeam.draw();
@@ -391,7 +439,7 @@ class MenuState extends GameState
         break;
       case(FIELD_SELECT):
         if( topBack.isHit(x,y) || bottomBack.isHit(x,y) )
-          state = MENU;
+          state = CONTROLS;
         if( easyButton.isHit(x,y) && menuTransitionDelay < timer.getSecondsActive() ){
           FIELD_MODE = 1;
           demoMode = false;
@@ -414,27 +462,44 @@ class MenuState extends GameState
       case(CONTROLS):
         if( topBack.isHit(x,y) || bottomBack.isHit(x,y) )
           state = MENU;
-          
+        
+        if( bottom_fixed_controls ){
+          FM.setBottomSpringEnabled(false);
+          FM.setBottomRotationEnabled(false);
+        }else if( bottom_spring_controls){
+          FM.setBottomSpringEnabled(true);
+          FM.setBottomRotationEnabled(false);         
+        }else if( bottom_rotate_controls){
+          FM.setBottomSpringEnabled(false);
+          FM.setBottomRotationEnabled(true);
+        }
+        
+        if( top_fixed_controls ){
+          FM.setTopSpringEnabled(false);
+          FM.setTopRotationEnabled(false);
+        }else if( top_spring_controls){
+          FM.setTopSpringEnabled(true);
+          FM.setTopRotationEnabled(false);         
+        }else if( top_rotate_controls){
+          FM.setTopSpringEnabled(false);
+          FM.setTopRotationEnabled(true);
+        }
+        
         if( bottomFixedButton.isHit(x,y) ){
           bottom_fixed_controls = true;
           bottom_spring_controls = false;
           bottom_rotate_controls = false;
-          FM.setBottomSpringEnabled(false);
-          FM.setBottomRotationEnabled(false);
+
         }
         if( bottomSpringButton.isHit(x,y) ){
           bottom_fixed_controls = false;
           bottom_spring_controls = true;
           bottom_rotate_controls = false;
-          FM.setBottomRotationEnabled(false);
-          FM.setBottomSpringEnabled(true);
         }
         if( bottomRotateButton.isHit(x,y) ){
           bottom_fixed_controls = false;
           bottom_spring_controls = false;
           bottom_rotate_controls = true;
-          FM.setBottomSpringEnabled(false);
-          FM.setBottomRotationEnabled(true);
         }
         
         if( topFixedButton.isHit(x,y) ){
@@ -461,31 +526,35 @@ class MenuState extends GameState
         
         if( top_fixed_controls && bottom_fixed_controls ){
           zooballLogo_start.draw();
-          if( zooballLogo_start.contains(x,y) )
+          if( zooballLogo_start.contains(x,y)  && menuTransitionDelay < timer.getSecondsActive() ){
+            menuTransitionDelay = timer.getSecondsActive() + 2;
             state = FIELD_SELECT;
-          menuTransitionDelay = timer.getSecondsActive() + 2;
+          }
           springMode = false;
           rotateMode = false;
         }else if( top_spring_controls && bottom_spring_controls ){
           zooballLogo_start.draw();
-          if( zooballLogo_start.contains(x,y) )
+          if( zooballLogo_start.contains(x,y)  && menuTransitionDelay < timer.getSecondsActive() ){
             state = FIELD_SELECT;
-          menuTransitionDelay = timer.getSecondsActive() + 2;
+            menuTransitionDelay = timer.getSecondsActive() + 2;
+          }
           springMode = true;
           rotateMode = false;
         }else if( top_rotate_controls && bottom_rotate_controls ){
           zooballLogo_start.draw();
-          if( zooballLogo_start.contains(x,y) )
+          if( zooballLogo_start.contains(x,y)  && menuTransitionDelay < timer.getSecondsActive() ){
             state = FIELD_SELECT;
-          menuTransitionDelay = timer.getSecondsActive() + 2;
+            menuTransitionDelay = timer.getSecondsActive() + 2;
+          }
           springMode = false;
           rotateMode = true;
         }
         
         if(connectToTacTile)
-          FM.sendTouchList(tacTile.getManagedList());
-        else
-          FM.barsPressed(x,y);
+          FM.sendTouchList(tacTile.getManagedList(), tacTile.managedListIsEmpty() );
+        
+        FM.barsPressed(-100,-100);
+        FM.sendTouchList(null, true);
         break;
     }// switch
   }// checkButtonHit
