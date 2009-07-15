@@ -260,14 +260,18 @@ class Foosbar{
       else
         tigers = true;
       yMinTouchArea = borderHeight;
+      try{
       yMaxTouchArea = game.getHeight()/2 - borderHeight;
+      }catch(Exception e){}
     }else if(zoneFlag == 1){
       if( !redTeamTop )
         dragons = true;
       else
         tigers = true;
+      try{
       yMinTouchArea = game.getHeight()/2;
       yMaxTouchArea = game.getHeight()/2 - borderHeight;
+      }catch(Exception e){}
     }else{
       yMinTouchArea = 0;
       yMaxTouchArea = game.getHeight();      
@@ -1033,11 +1037,12 @@ class Foosbar{
   ArrayList touchListIDs = new ArrayList();
   
   // Essentionally a copy of isHit but can calculate multiple touches accuratly
-  boolean checkForTouches(ArrayList touchList){
+  boolean checkForTouches(ArrayList touchList, boolean isManagedListEmpty){
     if( touchList == null ){
       touches.clear();
       return false;
-    }
+    }else if( isManagedListEmpty && touchList.size() > 0 ) // Prevents last active touch from becoming active for a second
+                    touchList.clear();
     //println("Foosbar::checkForTouches() called");
     if(!active)
       return false;

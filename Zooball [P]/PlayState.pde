@@ -7,7 +7,7 @@
  * Class: CS 426 Spring 2009
  * System: Processing 1.0.1, Windows XP SP2/Windows Vista
  * Author: Arthur Nishimoto - Infinite State Entertainment
- * Version: 1.1.2
+ * Version: 1.2
  *
  * Version Notes:
  * 3/1/09	- Initial version 0.1
@@ -646,7 +646,7 @@ class PlayState extends GameState
     if( btnPauseBottom.contains(x,y) || btnPauseTop.contains(x,y) )
       game.setState( game.getPausedState() );
     
-    //if(demoMode)
+    if(demoMode)
       barManager.barsPressed(x,y);
     
     ballLauncher_top.isHit(x,y);
@@ -666,7 +666,7 @@ class PlayState extends GameState
 
   void sendTouchList(ArrayList touchList){
     if( !demoMode )
-      barManager.sendTouchList(touchList);
+      barManager.sendTouchList(touchList, tacTile.managedListIsEmpty() );
   }// sendTouchList
   
   void checkButtonHit_demo(float x, float y, int finger){

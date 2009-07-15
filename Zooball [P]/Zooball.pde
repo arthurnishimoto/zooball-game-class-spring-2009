@@ -9,7 +9,7 @@ import tacTile.net.*;
 EchoClient client = new EchoClient();
 Game game;
 
-Boolean connectToTacTile = false;
+Boolean connectToTacTile = true;
 Boolean usingMouse = true;
 Boolean scaleScreen = true; // All input is off-centered when scaled
 
@@ -68,18 +68,20 @@ void draw( ) {
     ellipse(10,10,10,10);
   }
   
-  // Probably could override stop() in the future
   if(quit){
     client.informLauncher();
     exit();
   }
 }// draw
 
-void keyPressed( KeyEvent e ) {
-  if(key==27){
+void keyPressed(){
+if(key==27){
     client.informLauncher(); // Sends message if esc key pressed
   }
-  
+}
+
+void keyPressed( KeyEvent e ) {
+    
   if ( game != null ) {
     if ( e.getKeyChar( ) == 'q'){
       if(debugConsoleBool)

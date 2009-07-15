@@ -234,9 +234,9 @@ class FoosbarManager{
         bars[i].isHit(x,y);
   }// barsPressed
   
-  void sendTouchList(ArrayList touchList){
+  void sendTouchList(ArrayList touchList, boolean isEmpty){
      for( int i = 0 ; i < nBars ; i++ )
-       bars[i].checkForTouches(touchList);
+       bars[i].checkForTouches(touchList, isEmpty);
   }// sendTouchList
   
   void setSpringEnabled(boolean enable){

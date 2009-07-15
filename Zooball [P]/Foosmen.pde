@@ -130,7 +130,9 @@ class Foosmen{
     else{
       for( int i = 0;  i < 360; i += rotateInc ){
         if( barRotation >= i - rotateInc && barRotation < i + rotateInc ){
+           try{
           image(parent.foosmenImages[i], 0, 0);
+           }catch(Exception e){}
           break;
         }
       }// for
