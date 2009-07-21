@@ -17,6 +17,7 @@ class PlayState extends GameState
   private Booster[] boosters;
   private Line[] horzWalls, vertWalls, goalWalls;
   private FoosBar[] bars;
+  //private Image imgChalk;
 
   public PlayState( Game game, TouchAPI tacTile ) {
     super( game, tacTile );
@@ -159,6 +160,9 @@ class PlayState extends GameState
     boosters[9] = new BoosterCorner( FIELD_LEFT, FIELD_BOTTOM, 90, -250, new Vector2D( 80, -80 ) );
     boosters[10] = new BoosterCorner( FIELD_RIGHT, FIELD_TOP, -90, 250, new Vector2D( -80, 80 ) );
     boosters[11] = new BoosterCorner( FIELD_RIGHT, FIELD_BOTTOM, -90, -250, new Vector2D( -80, -80 ) );
+    //imgChalk = new Image( "objects/stadium/chalk.gif" );
+    //imgChalk.setPosition( FIELD_LEFT, FIELD_TOP );
+    //imgChalk.setSize( FIELD_RIGHT-FIELD_LEFT, FIELD_BOTTOM-FIELD_TOP );
     endLoad( );
   }
 
@@ -259,6 +263,7 @@ class PlayState extends GameState
   }
   
   private void drawChalk( ) {
+    //imgChalk.draw( );
     float px = 5;
     fill( 255 );
     // outline

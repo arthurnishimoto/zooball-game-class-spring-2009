@@ -47,7 +47,7 @@ class Game
   }
   
   private void calculateScreenTransformation( ) {
-    if ( width / height >= DEFAULT_WIDTH / DEFAULT_HEIGHT ) {
+    if ( width / (double)height >= DEFAULT_WIDTH / DEFAULT_HEIGHT ) {
       screenScale = height / DEFAULT_HEIGHT;
       screenOffsetX = (width - DEFAULT_WIDTH * screenScale) * 0.5;
       screenOffsetY = 0;
@@ -61,13 +61,27 @@ class Game
   
   public void loop( ) {
     state.update( );
+    state.input( );
     // Translate and Scale
     pushMatrix( );
     translate( screenOffsetX, screenOffsetY );
     scale( screenScale );
     state.draw( );
-    state.input( );
     popMatrix( );
+    drawBars( );
+  }
+  
+  private void drawBars( ) {
+    if ( screenOffsetX > 0 ) {
+      fill( 50, 50, 50 );
+      rect( 0, 0, screenOffsetX, height );
+      rect( width - screenOffsetX, 0, screenOffsetX, height );
+    }
+    else if ( screenOffsetY > 0 ) {
+      fill( 50, 50, 50 );
+      rect( 0, 0, width, screenOffsetY );
+      rect( 0, height - screenOffsetY, width, screenOffsetY );
+    }
   }
   
   public void drawDebugText( String string ) {
