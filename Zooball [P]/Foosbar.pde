@@ -69,6 +69,7 @@ class Foosbar{
   float rotateVelocity;
   float maxRotateVelocity = 10;
   float barFriction = 0.15;
+  boolean isCatching;
   
   // On Fire Debuff
   float orig_sliderMultiplier = sliderMultiplier;
@@ -482,7 +483,7 @@ class Foosbar{
     if( barRotation > foosPlayers[0].minStopAngle && barRotation < foosPlayers[0].maxStopAngle )
       text(" CATCHING ", xPos, yPos+barHeight/2-16*4);
     else if( barRotation < 375-foosPlayers[0].minStopAngle && barRotation > 375-foosPlayers[0].maxStopAngle )
-      text(" CATCHING ", xPos, yPos+barHeight/2-16*4);
+      text(" BLOCKING ", xPos, yPos+barHeight/2-16*4);
     text("Players: "+nPlayers, xPos, yPos+barHeight/2-16*3);
     if(atTopEdge)
       text("atTopEdge", xPos, yPos+barHeight/2-16*2);
@@ -811,13 +812,13 @@ class Foosbar{
           if( barRotation > foosPlayers[0].minStopAngle && barRotation < foosPlayers[0].maxStopAngle )
             if( ball.getSpeed() > 1 )
               foosPlayers[i].catchBall( ball );
-          if( barRotation < 375-foosPlayers[0].minStopAngle && barRotation > 375-foosPlayers[0].maxStopAngle )
-            if( ball.getSpeed() > 1 )
-              foosPlayers[i].catchBall( ball );          
+          //if( barRotation < 375-foosPlayers[0].minStopAngle && barRotation > 375-foosPlayers[0].maxStopAngle )
+          //  if( ball.getSpeed() > 1 )
+          //    foosPlayers[i].catchBall( ball );          
           
-          if( springEnabled && rightZonePressed )
-            if( ball.getSpeed() > 1 )
-              foosPlayers[i].catchBall2( ball.getID() );  
+          //if( springEnabled && rightZonePressed && zoneFlag == 1)
+          //  if( ball.getSpeed() > 1 )
+          //    foosPlayers[i].catchBall2( ball.getID() );  
               
           foosPlayers[i].specialCollision( ball );
           
