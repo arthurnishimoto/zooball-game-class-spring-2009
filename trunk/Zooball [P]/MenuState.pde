@@ -272,7 +272,17 @@ class MenuState extends GameState
     topSpringButton.setLit(top_spring_controls);
     topRotateButton.setLit(top_rotate_controls);
     
-    zooballLogo.draw();
+    
+    if( top_fixed_controls && bottom_fixed_controls ){
+      zooballLogo_start.draw();
+    }else if( top_spring_controls && bottom_spring_controls ){
+      zooballLogo_start.draw();
+    }else if( top_rotate_controls && bottom_rotate_controls ){
+      zooballLogo_start.draw();
+    }else{
+      zooballLogo.draw();
+    }
+    
     bottomBack.process(font, timer.getSecondsActive());
     topBack.process(font, timer.getSecondsActive());
 
@@ -381,6 +391,7 @@ class MenuState extends GameState
       zooballLogo.draw();
       playEnabled = false;
     }
+    
   }// drawButtons
   
   private void drawDebugText( ) {
@@ -525,7 +536,6 @@ class MenuState extends GameState
         }
         
         if( top_fixed_controls && bottom_fixed_controls ){
-          zooballLogo_start.draw();
           if( zooballLogo_start.contains(x,y)  && menuTransitionDelay < timer.getSecondsActive() ){
             menuTransitionDelay = timer.getSecondsActive() + 2;
             state = FIELD_SELECT;
@@ -533,7 +543,6 @@ class MenuState extends GameState
           springMode = false;
           rotateMode = false;
         }else if( top_spring_controls && bottom_spring_controls ){
-          zooballLogo_start.draw();
           if( zooballLogo_start.contains(x,y)  && menuTransitionDelay < timer.getSecondsActive() ){
             state = FIELD_SELECT;
             menuTransitionDelay = timer.getSecondsActive() + 2;
@@ -541,7 +550,6 @@ class MenuState extends GameState
           springMode = true;
           rotateMode = false;
         }else if( top_rotate_controls && bottom_rotate_controls ){
-          zooballLogo_start.draw();
           if( zooballLogo_start.contains(x,y)  && menuTransitionDelay < timer.getSecondsActive() ){
             state = FIELD_SELECT;
             menuTransitionDelay = timer.getSecondsActive() + 2;
@@ -550,11 +558,25 @@ class MenuState extends GameState
           rotateMode = true;
         }
         
-        if(connectToTacTile)
-          FM.sendTouchList(tacTile.getManagedList(), tacTile.managedListIsEmpty() );
+        ArrayList touchList = tacTile.getManagedList();
+        if( mousePressed ){
+          float xCoordm = mouseX/screenScale;
+          float yCoordm = mouseY/screenScale;
+          xCoordm = xCoordm/width;
+          yCoordm = (height - yCoordm)/height;
+
+          // Adds  a "mouse touch" to the touchList
+          touchList.add( new Touches( 0, 0, xCoordm, yCoordm, 1.0 ) );
         
-        FM.barsPressed(-100,-100);
-        FM.sendTouchList(null, true);
+        } else {
+          FM.barsPressed(-100,-100);
+          FM.sendTouchList(null, true);
+        }
+        
+        if(connectToTacTile)
+          FM.sendTouchList( touchList, false );
+        
+        
         break;
     }// switch
   }// checkButtonHit

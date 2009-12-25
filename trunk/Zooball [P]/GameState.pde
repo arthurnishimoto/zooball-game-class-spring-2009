@@ -50,8 +50,8 @@ abstract class GameState
     
     // Displays mouse position
     if(usingMouse){
-      float xCoord = mouseX;    
-      float yCoord = mouseY;
+      float xCoord = mouseX/screenScale;    
+      float yCoord = mouseY/screenScale;
   		
       //Draw mouse
       fill( #000000 );
@@ -92,8 +92,8 @@ abstract class GameState
     
     // Process mouse if clicked
     if(mousePressed && usingMouse){
-      float xCoord = mouseX;    
-      float yCoord = mouseY;
+      float xCoord = mouseX/screenScale;
+      float yCoord = mouseY/screenScale;
   		
       //Draw mouse
       fill( #FF0000 );
@@ -109,9 +109,21 @@ abstract class GameState
     }// else if usingMouse
     
     //Process touches off the managedList if there are any touches.
-    if ( ! tacTile.managedListIsEmpty() ){
+    if ( true ){
       // Grab the managedList
   	touchList = tacTile.getManagedList();
+  
+        if( mousePressed ){
+          float xCoordm = mouseX/screenScale;
+          float yCoordm = mouseY/screenScale;
+          xCoordm = xCoordm/width;
+          yCoordm = (height - yCoordm)/height;
+
+          // Adds  a "mouse touch" to the touchList
+          touchList.add( new Touches( 0, 0, xCoordm, yCoordm, 1.0 ) );
+        
+        }
+  
         sendTouchList(touchList);
       // Cycle though the touches 
   	for ( int index = 0; index < touchList.size(); index ++ ){
@@ -138,10 +150,7 @@ abstract class GameState
                   checkButtonHit_demo(xCoord, yCoord, finger);
   	}// for touchList
     }// if touch
-    else if(connectToTacTile){ 
-      checkButtonHit(-100, -100, -1); // Allows for a "touch release" trigger
-      sendTouchList(null);
-    }// if tacTileList empty else
+
     // Events that occur during every loop
 
   }// input()

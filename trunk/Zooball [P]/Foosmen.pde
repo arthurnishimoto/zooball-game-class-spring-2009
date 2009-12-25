@@ -360,7 +360,7 @@ class Foosmen{
   
   void catchBall(Ball ball){
     specialCollision(ball);
-    if( parent.debuffed || !parent.pressed )
+    if( parent.debuffed || parent.touches.size() == 0 )
       return;
       
     if( parent.barRotation > minStopAngle && parent.barRotation < maxStopAngle ){
