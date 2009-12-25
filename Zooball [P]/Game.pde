@@ -4,6 +4,8 @@
  * Author:  Andy Bursavich
  * Version: 0.4
  */
+
+float screenScale;
 class Game
 {
   private GameState state;
@@ -21,7 +23,7 @@ class Game
   private boolean strokeMode = false;
   private final static float DEFAULT_WIDTH = 1920;
   private final static float DEFAULT_HEIGHT = 1080;
-  private float screenScale;
+
   private float screenOffsetX;
   private float screenOffsetY;
   protected PApplet parent;

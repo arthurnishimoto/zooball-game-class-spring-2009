@@ -100,6 +100,10 @@
  * 7/6/09       - Started control screen. echoClient now triggers on esc key.
  * 7/7/09       - Version 1.1.9
  *              - Control select screen fully integrated. Fix for ball out of bounds. - Needs tacTile testing before moving to v1.2
+ * 9/30/09      - Version 1.2.1
+ *              - Fixed bug where balls were not correcty being caught under full rotation mode.
+ * 12/15/09     - Version 1.3
+ *              - Minor bug fixes, mouse 'touch' less off-centered, config file added for TouchAPI portability.
  * Notes:
  *      - [TODO] Improve collision detection on goal zones
  *      - [TODO] 1-to-1 control over goalie zone?
@@ -630,13 +634,13 @@ class PlayState extends GameState
     // Keyboard input
     if(keyPressed && usingMouse){
       if( key == 'j' || key == 'J' )
-        balls[0].launchBall(mouseX, mouseY, -150, 0);
+        balls[0].launchBall(x, y, -150, 0);
       else if( key == 'l' || key == 'L' )
-        balls[0].launchBall(mouseX, mouseY, 150, 0);
+        balls[0].launchBall(x, y, 150, 0);
       else if( key == 'i' || key == 'I' )
-        balls[0].launchBall(mouseX, mouseY, 0, -150);
+        balls[0].launchBall(x, y, 0, -150);
       else if( key == 'k' || key == 'K' )
-        balls[0].launchBall(mouseX, mouseY, 0, 150);
+        balls[0].launchBall(x, y, 0, 150);
       else if( key == 'u' || key == 'U' )
         balls[0].setFireball();
       else if( key == 'o' || key == 'O' )
@@ -666,7 +670,7 @@ class PlayState extends GameState
 
   void sendTouchList(ArrayList touchList){
     if( !demoMode )
-      barManager.sendTouchList(touchList, tacTile.managedListIsEmpty() );
+      barManager.sendTouchList(touchList, false );
   }// sendTouchList
   
   void checkButtonHit_demo(float x, float y, int finger){
