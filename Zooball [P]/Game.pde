@@ -6,6 +6,9 @@
  */
 
 float screenScale;
+float screenOffsetX;
+float screenOffsetY;
+
 class Game
 {
   private GameState state;
@@ -24,8 +27,6 @@ class Game
   private final static float DEFAULT_WIDTH = 1920;
   private final static float DEFAULT_HEIGHT = 1080;
 
-  private float screenOffsetX;
-  private float screenOffsetY;
   protected PApplet parent;
   
   public Game( PApplet p ) {

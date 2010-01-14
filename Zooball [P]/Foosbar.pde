@@ -1041,6 +1041,7 @@ class Foosbar{
   boolean checkForTouches(ArrayList touchList, boolean isManagedListEmpty){
     if( touchList == null ){
       touches.clear();
+      pressed = false;
       return false;
     }else if( isManagedListEmpty && touchList.size() > 0 ) // Prevents last active touch from becoming active for a second
                     touchList.clear();

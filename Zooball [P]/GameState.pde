@@ -47,12 +47,12 @@ abstract class GameState
   }// exit
   
   public void input( ) {
-    
+  
     // Displays mouse position
     if(usingMouse){
-      float xCoord = mouseX/screenScale;    
-      float yCoord = mouseY/screenScale;
-  		
+      float xCoord = (mouseX + screenOffsetX) / screenScale;
+      float yCoord = (mouseY - screenOffsetY) / screenScale;
+  		println( screenScale + " " + screenOffsetX + " " + screenOffsetY );
       //Draw mouse
       fill( #000000 );
       noStroke();
@@ -92,8 +92,8 @@ abstract class GameState
     
     // Process mouse if clicked
     if(mousePressed && usingMouse){
-      float xCoord = mouseX/screenScale;
-      float yCoord = mouseY/screenScale;
+      float xCoord = (mouseX + screenOffsetX) / screenScale;
+      float yCoord = (mouseY - screenOffsetY) / screenScale;
   		
       //Draw mouse
       fill( #FF0000 );
@@ -114,8 +114,8 @@ abstract class GameState
   	touchList = tacTile.getManagedList();
   
         if( mousePressed ){
-          float xCoordm = mouseX/screenScale;
-          float yCoordm = mouseY/screenScale;
+          float xCoordm = (mouseX + screenOffsetX) / screenScale;
+          float yCoordm = (mouseY - screenOffsetY) / screenScale;
           xCoordm = xCoordm/width;
           yCoordm = (height - yCoordm)/height;
 
