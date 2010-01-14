@@ -560,8 +560,8 @@ class MenuState extends GameState
         
         ArrayList touchList = tacTile.getManagedList();
         if( mousePressed ){
-          float xCoordm = mouseX/screenScale;
-          float yCoordm = mouseY/screenScale;
+          float xCoordm = (mouseX + screenOffsetX) / screenScale;
+          float yCoordm = (mouseY - screenOffsetY) / screenScale;
           xCoordm = xCoordm/width;
           yCoordm = (height - yCoordm)/height;
 
