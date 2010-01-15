@@ -52,7 +52,7 @@ abstract class GameState
     if(usingMouse){
       float xCoord = (mouseX + screenOffsetX) / screenScale;
       float yCoord = (mouseY - screenOffsetY) / screenScale;
-  		println( screenScale + " " + screenOffsetX + " " + screenOffsetY );
+
       //Draw mouse
       fill( #000000 );
       noStroke();
@@ -110,6 +110,8 @@ abstract class GameState
     
     //Process touches off the managedList if there are any touches.
     if ( true ){
+      
+       
       // Grab the managedList
   	touchList = tacTile.getManagedList();
   
@@ -123,7 +125,9 @@ abstract class GameState
           touchList.add( new Touches( 0, 0, xCoordm, yCoordm, 1.0 ) );
         
         }
-  
+        if( tacTile.managedListIsEmpty() )
+         touchList.add( new Touches( 0, 0, -100, -100, 1.0 ) );
+         
         sendTouchList(touchList);
       // Cycle though the touches 
   	for ( int index = 0; index < touchList.size(); index ++ ){
